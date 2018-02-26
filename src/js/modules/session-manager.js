@@ -141,9 +141,9 @@ var SessionManager = {
             });
     },
 
-    optimize: function() {
+    optimize: function(progressCb) {
         var _this = this;
-        return Optimizer(this.session).then(function(session) {
+        return Optimizer(this.session, progressCb).then(function(session) {
             _this.session = session;
         });
     },

@@ -1,4 +1,5 @@
 var storage = require("./storage");
+var Promise = require('bluebird');
 var sessionRepo = storage.instance("sessions");
 var ImageCompressor = require("image-compressor.js");
 
@@ -7,9 +8,14 @@ ImageCompressor = new ImageCompressor();
 // Files having greater size than this value (in bytes) will be optimized
 var FILESIZE_TRESHOLD = 300000
 
-function Optimizer(session) {
+function Optimizer(session, onProgressCb) {
     var id = session._id;
     var attachments = session._attachments;
+
+    var progress = {
+        total: 0,
+        done: 0
+    }
 
     function needsOptimization(attachment) {
         if (attachment.content_type.indexOf('image/') === -1) {
@@ -35,25 +41,40 @@ function Optimizer(session) {
               convertSize: 999999999 // prevent converting to JPG
             });
         }).then(function(result) {
-            session._attachments[name] = {
-                'content_type': file.type,
-                'data': result
+            session._attachments[name] = Object.assign(file, {
+                data: result
+            })
+            if (onProgressCb) {
+                progress.done = progress.done + 1;
+                onProgressCb(progress);
             }
         });
     }
 
     this.process = function() {
-        var promises = [];
+        
+        var optimizableAttachments = [];
+        
         for (var name in attachments) {
             if (needsOptimization(attachments[name])) {
-                promises.push(optimize(name, attachments[name]));
+                optimizableAttachments.push({
+                    name: name,
+                    attachment: attachments[name]
+                })
             }
         }
-        if ( ! promises.length) {
+        
+        if ( ! optimizableAttachments.length) {
             return Promise.resolve(session);
         }
-        return Promise.all(promises).then(function() {
-            if ( ! session.hasOwnProperty('browser_mode')) {
+        
+        // Set the total number of tasks to execute
+        progress.total = optimizableAttachments.length;
+
+        return Promise.reduce(optimizableAttachments, function (_, item) {
+            return optimize(item.name, item.attachment)
+        }).then(function() {
+            if ( ! session.hasOwnProperty("browser_mode")) {
                 return sessionRepo.update(session);
             }
             return session;
@@ -61,7 +82,7 @@ function Optimizer(session) {
     }
 }
 
-module.exports = function(session) {
-    var optimizer = new Optimizer(session)
+module.exports = function(session, onProgressCb) {
+    var optimizer = new Optimizer(session, onProgressCb)
     return optimizer.process()
 }

@@ -202,27 +202,35 @@ var Survey = {
 
     submit: function() {
         var _this = this;
-        // First, save all fields
+
         return this.validate()
             .then(function() {
+                _this.toggleAutosave(false);                
                 submitProgress.show('Saving your session...');
                 return _this.saveSession();
-            }).then(function() {
+            })
+            .then(function() {
                 submitProgress.show("Optimizing attachments...");
-                return SessionManager.optimize();
+                return SessionManager.optimize(function(progress) {
+                    submitProgress.show("Optimizing attachments " + progress.done + '/' + progress.total);
+                });
             })
             .then(function() {
                 submitProgress.show("Finalizing your submission...");
-                _this.toggleAutosave(false);
                 _this.stopLeaveCheck();
                 return SessionManager.end();
             })
             .catch(function(error) {
-                submitProgress.hide();
                 if (error.message == 'redirected!') {
                     throw error;
                 }
                 console.error(error);
+                
+                setTimeout(() => {
+                    submitProgress.hide();
+                    _this.toggleAutosave(true);
+                }, 250)
+                
                 throw new Error(i18n._("survey.errors"));
             });
     },
