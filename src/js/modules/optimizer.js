@@ -20,16 +20,23 @@ function Optimizer(session) {
         return true;
     }
 
-    function optimize(file, properties) {
-        return sessionRepo.getAttachment(id, file).then(function (blob) {
+    function getFileBlob(name, file) {
+        if (session.hasOwnProperty('browser_mode')) {
+            return Promise.resolve(file.data)
+        }
+        return sessionRepo.getAttachment(id, name);
+    }
+
+    function optimize(name, file) {
+        return getFileBlob(name, file).then(function (blob) {
             return ImageCompressor.compress(blob, {
               maxWidth: 600,
               quality: 0.7,
               convertSize: 999999999 // prevent converting to JPG
             });
         }).then(function(result) {
-            session._attachments[file] = {
-                'content_type': properties.type,
+            session._attachments[name] = {
+                'content_type': file.type,
                 'data': result
             }
         });
@@ -46,7 +53,10 @@ function Optimizer(session) {
             return Promise.resolve(session);
         }
         return Promise.all(promises).then(function() {
-            return sessionRepo.update(session);
+            if ( ! session.hasOwnProperty('browser_mode')) {
+                return sessionRepo.update(session);
+            }
+            return session;
         });
     }
 }
