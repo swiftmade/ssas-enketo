@@ -75,7 +75,7 @@ var Survey = {
             i18n.set(queryParams.get('lang'));
         }
         var lang = i18n.get();
-        this.form.langs.setAll(lang == 'en' ? 'default' : lang);
+        this.form.langs.setAll(lang);
     },
 
     initializeForm: function(modelStr, instanceStr, submitted) {
