@@ -184,7 +184,7 @@ var Survey = {
         
         this.validating = disableSubmitButton()
             .then(function() {
-                _this.form.validate();
+                return _this.form.validate();
             })
             .then(function(valid) {
                 _this.validating = null;
