@@ -28,7 +28,7 @@ function Optimizer(session, onProgressCb) {
 
     function getFileBlob(name, file) {
         if (session.hasOwnProperty('browser_mode')) {
-            return Promise.resolve(file.data)
+            return Promise.resolve(file);
         }
         return sessionRepo.getAttachment(id, name);
     }
@@ -37,13 +37,14 @@ function Optimizer(session, onProgressCb) {
         return getFileBlob(name, file).then(function (blob) {
             return ImageCompressor.compress(blob, {
               maxWidth: 600,
-              quality: 0.7,
+              quality: 0.6,
               convertSize: 999999999 // prevent converting to JPG
             });
         }).then(function(result) {
-            session._attachments[name] = Object.assign(file, {
+            session._attachments[name] = {
+                content_type: file.content_type,
                 data: result
-            })
+            }
             if (onProgressCb) {
                 progress.done = progress.done + 1;
                 onProgressCb(progress);
@@ -73,7 +74,7 @@ function Optimizer(session, onProgressCb) {
 
         return Promise.reduce(optimizableAttachments, function (_, item) {
             return optimize(item.name, item.attachment)
-        }).then(function() {
+        }, null).then(function() {
             if ( ! session.hasOwnProperty("browser_mode")) {
                 return sessionRepo.update(session);
             }
