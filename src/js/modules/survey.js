@@ -15,6 +15,7 @@ var Survey = {
     formId: null,
     autoSave: null,
     saving: null,
+    validating: null,
 
     initializeSurvey: function() {
         var that = this;
@@ -160,28 +161,43 @@ var Survey = {
     },
 
     validate: function() {
+        // Return the active validation promise
+        // If a check is already going on
+        if (this.validating) {
+            return this.validating;
+        }
         // You can add ?no_validation=1 to the url to disable validation for that session
         if (searchParams.has('no_validation')) {
             return Promise.resolve(true);
         }
 
+        var previousContent = $(".submit-form").html();
+
         function disableSubmitButton() {
-            var previousContent = $('.submit-form').html();
             $('.submit-form').attr('disabled', 'disabled').html('Validating...');
             return new Promise(function(resolve) {
                 setTimeout(resolve);
             });
         }
 
-        var that = this;
-        return disableSubmitButton().then(function() {
-            that.form.validate();
-        }).then(function(valid) {
-            $('.submit-form').html(previousContent).removeAttr('disabled');
-            if ( ! valid) {
-                throw new Error("Validation failed");
-            }
-        });
+        var _this = this;
+        
+        this.validating = disableSubmitButton()
+            .then(function() {
+                _this.form.validate();
+            })
+            .then(function(valid) {
+                _this.validating = null;
+                $('.submit-form').html(previousContent).removeAttr('disabled');
+                return valid;
+            })
+            .then(function(valid) {
+                if (!valid) {
+                    throw new Error("Validation failed");
+                }
+            });
+
+        return this.validating
     },
 
     submit: function() {
