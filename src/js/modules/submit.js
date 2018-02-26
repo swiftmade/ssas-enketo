@@ -4,7 +4,6 @@ var Promise = require('bluebird');
 var storage = require('./storage');
 var Queue = require('bluebird-queue');
 var sessionRepo = storage.instance('sessions');
-var searchParams = require("./utils/search-params");
 var fileManager = require('enketo-core/src/js/file-manager');
 
 var utils = {
@@ -88,8 +87,9 @@ var utils = {
 	},
 
 	request: function(form, headers, progressCb) {
+		var _this = this;
 		return new Promise(function(resolve, reject) {
-			$.ajax(searchParams.get('submission_url'), {
+			$.ajax(_this.openrosaUrl, {
 				'type': 'POST',
 				'data': form,
 				cache: false,
@@ -119,10 +119,16 @@ var utils = {
 				reject(error);
 			});
 		});
+	},
+
+	setOpenrosaServer: function(url) {
+		this.openrosaUrl = url;
 	}
 };
 
-module.exports = function(packet, progressCb) {
+module.exports = function(to, packet, progressCb) {
+	// Set the server url
+	utils.setOpenrosaServer(to);
 	// TODO: Learn the maximum upload size first.
 	return utils.upload(packet, progressCb);
 };

@@ -1,6 +1,6 @@
 var $ = require('jquery');
 var Promise = require('bluebird');
-var searchParams = require('./utils/search-params');
+var queryParams = require('./utils/query-params');
 
 module.exports = function() {
     var session = {
@@ -12,11 +12,11 @@ module.exports = function() {
         'deprecated_id': null
     };
     return new Promise(function(resolve) {
-        if (!searchParams.has('submissionUrl')) {
+        if ( ! queryParams.has('edit')) {
             resolve(session);
             return;
         }
-        $.getJSON(searchParams.get('submissionUrl'))
+        $.getJSON(queryParams.getPath('edit'))
             .done(function(data) {
                 session.submitted = true;
                 session.xml = data.instance;
@@ -25,7 +25,7 @@ module.exports = function() {
                 resolve(session);
             })
             .fail(function() {
-                throw new Error("Could not load document");
+                throw new Error("Could not load the document");
             });
     });
 };

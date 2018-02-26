@@ -7,6 +7,7 @@ var app = angular.module('app', []);
 var submit = require('./modules/submit');
 var storage = require('./modules/storage');
 var sessionRepo = storage.instance('sessions');
+var queryParams = require('./modules/utils/query-params');
 
 app.filter('fileSize', function() {
     return function(bytes) {
@@ -52,7 +53,7 @@ app.service('UploadManager', function() {
 
             var next = queue.shift();
 
-            submit(next.packet, next.progress)
+            submit(queryParams.getPath('server'), next.packet, next.progress)
                 .then(function() {
                     next.done(true);
                     active--;

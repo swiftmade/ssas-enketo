@@ -93459,7 +93459,6 @@ var Promise = require('bluebird');
 var storage = require('./storage');
 var Queue = require('bluebird-queue');
 var sessionRepo = storage.instance('sessions');
-var searchParams = require("./utils/search-params");
 var fileManager = require('enketo-core/src/js/file-manager');
 
 var utils = {
@@ -93543,8 +93542,9 @@ var utils = {
 	},
 
 	request: function(form, headers, progressCb) {
+		var _this = this;
 		return new Promise(function(resolve, reject) {
-			$.ajax(searchParams.get('submission_url'), {
+			$.ajax(_this.openrosaUrl, {
 				'type': 'POST',
 				'data': form,
 				cache: false,
@@ -93574,19 +93574,33 @@ var utils = {
 				reject(error);
 			});
 		});
+	},
+
+	setOpenrosaServer: function(url) {
+		this.openrosaUrl = url;
 	}
 };
 
-module.exports = function(packet, progressCb) {
+module.exports = function(to, packet, progressCb) {
+	// Set the server url
+	utils.setOpenrosaServer(to);
 	// TODO: Learn the maximum upload size first.
 	return utils.upload(packet, progressCb);
 };
 
-},{"./storage":32,"./utils/search-params":34,"bluebird":6,"bluebird-queue":4,"enketo-core/src/js/file-manager":9,"jquery":14,"lodash":16}],34:[function(require,module,exports){
+},{"./storage":32,"bluebird":6,"bluebird-queue":4,"enketo-core/src/js/file-manager":9,"jquery":14,"lodash":16}],34:[function(require,module,exports){
 var UrlSearchParams = require('url-search-params');
-var searchParams = new UrlSearchParams(window.location.search);
+var queryParams = new UrlSearchParams(window.location.search);
 
-module.exports = searchParams;
+queryParams.getPath = function(key) {
+    var path = '';
+    if (queryParams.has('base')) {
+        path = queryParams.get('base') + '/';
+    }
+    return path + queryParams.get(key);
+}
+
+module.exports = queryParams;
 },{"url-search-params":25}],35:[function(require,module,exports){
 var $ = require('jquery');
 var _ = require('lodash');
@@ -93597,6 +93611,7 @@ var app = angular.module('app', []);
 var submit = require('./modules/submit');
 var storage = require('./modules/storage');
 var sessionRepo = storage.instance('sessions');
+var queryParams = require('./modules/utils/query-params');
 
 app.filter('fileSize', function() {
     return function(bytes) {
@@ -93642,7 +93657,7 @@ app.service('UploadManager', function() {
 
             var next = queue.shift();
 
-            submit(next.packet, next.progress)
+            submit(queryParams.getPath('server'), next.packet, next.progress)
                 .then(function() {
                     next.done(true);
                     active--;
@@ -93722,4 +93737,4 @@ app.controller('SubmissionsCtrl', ['$scope', 'UploadManager', function($scope, $
     };
 }]);
 
-},{"./modules/storage":32,"./modules/submit":33,"angular":2,"jquery":14,"lodash":16,"moment":17,"toastr":24}]},{},[35]);
+},{"./modules/storage":32,"./modules/submit":33,"./modules/utils/query-params":34,"angular":2,"jquery":14,"lodash":16,"moment":17,"toastr":24}]},{},[35]);

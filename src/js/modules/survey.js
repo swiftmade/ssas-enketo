@@ -1,7 +1,7 @@
 var toastr = require('toastr');
 var Promise = require('bluebird');
 var Form = require('enketo-core/src/js/Form');
-var searchParams = require('./utils/search-params');
+var queryParams = require('./utils/query-params');
 var appendRecordFiles = require("./record-files");
 var submitProgress = require('./submit-progress');
 //
@@ -63,7 +63,7 @@ var Survey = {
 
     loadSurvey: function() {
         return new Promise(function(resolve, reject) {
-            $.getJSON(searchParams.get('json'), function(survey) {
+            $.getJSON(queryParams.getPath('json'), function(survey) {
                 survey.form = survey.form.replace(/jr:\/\/images\/https:\/\/www.dropbox.com\/s\/.*?\//g, "assets/");
                 resolve(survey);
             });
@@ -71,8 +71,8 @@ var Survey = {
     },
 
     localizeForm: function() {
-        if(searchParams.has('lang')) {
-            i18n.set(searchParams.get('lang'));
+        if(queryParams.has('lang')) {
+            i18n.set(queryParams.get('lang'));
         }
         var lang = i18n.get();
         this.form.langs.setAll(lang == 'en' ? 'default' : lang);
@@ -166,8 +166,8 @@ var Survey = {
         if (this.validating) {
             return this.validating;
         }
-        // You can add ?no_validation=1 to the url to disable validation for that session
-        if (searchParams.has('no_validation')) {
+        // You can add ?novalidate=1 to the url to disable validation for that session
+        if (queryParams.has('novalidate')) {
             return Promise.resolve(true);
         }
 

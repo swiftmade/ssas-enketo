@@ -7,7 +7,7 @@ var storage = require('./storage');
 var Optimizer = require("./optimizer");
 var sessionRepo = storage.instance('sessions');
 var BrowserSession = require('./browser-session');
-var searchParams = require('./utils/search-params');
+var queryParams = require('./utils/query-params');
 
 var SessionManager = {
     //
@@ -19,7 +19,7 @@ var SessionManager = {
     activateBrowserMode: function() {
         var that = this;
         this.browserMode = true;
-        this.returnUrl = searchParams.get('returnUrl');
+        this.returnUrl = queryParams.getPath('return');
 
         $('.save-progress').remove();
 
@@ -32,8 +32,7 @@ var SessionManager = {
     start: function() {
         var that = this;
 
-        var browserMode = searchParams.get('mode');
-        if (browserMode === 'edit' || browserMode === 'create') {
+        if (queryParams.has('online')) {
             return this.activateBrowserMode();
         }
 
@@ -154,7 +153,7 @@ var SessionManager = {
         this.session.last_update = Date.now();
         if (this.browserMode) {
             // Immediately submit and return
-            return submit(this.session).then(function() {
+            return submit(queryParams.getPath('online'), this.session).then(function() {
                 window.location = this.returnUrl;
                 throw new Error("redirected!");
             }.bind(this));
