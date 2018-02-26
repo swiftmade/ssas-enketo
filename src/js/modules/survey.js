@@ -160,8 +160,11 @@ var Survey = {
     },
 
     validate: function() {
-        // DEBUG MODE?
-        // return Promise.resolve(true);
+        // You can add ?no_validation=1 to the url to disable validation for that session
+        if (searchParams.has('no_validation')) {
+            return Promise.resolve(true);
+        }
+
         function disableSubmitButton() {
             var previousContent = $('.submit-form').html();
             $('.submit-form').attr('disabled', 'disabled').html('Validating...');
