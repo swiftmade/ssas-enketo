@@ -3,11 +3,10 @@ var _ = require('lodash');
 var submit = require('./submit');
 var vue = require('./app-vue');
 var Promise = require('bluebird');
-var storage = require('./storage');
 var Optimizer = require("./optimizer");
-var sessionRepo = storage.instance('sessions');
 var BrowserSession = require('./browser-session');
 var queryParams = require('./utils/query-params');
+var sessionRepo = require("./repositories/sessions-repository");
 
 var SessionManager = {
     //

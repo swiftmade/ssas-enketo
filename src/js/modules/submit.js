@@ -1,10 +1,9 @@
 var $ = require('jquery');
 var _ = require('lodash');
 var Promise = require('bluebird');
-var storage = require('./storage');
 var Queue = require('bluebird-queue');
-var sessionRepo = storage.instance('sessions');
 var fileManager = require('enketo-core/src/js/file-manager');
+var sessionRepo = require("./repositories/sessions-repository");
 
 var utils = {
 	form: function(packet) {

@@ -5,9 +5,8 @@ var toastr = require('toastr');
 var angular = require('angular');
 var app = angular.module('app', []);
 var submit = require('./modules/submit');
-var storage = require('./modules/storage');
-var sessionRepo = storage.instance('sessions');
 var queryParams = require('./modules/utils/query-params');
+var sessionRepo = require("./modules/repositories/sessions-repository");
 
 app.filter('fileSize', function() {
     return function(bytes) {

@@ -93419,7 +93419,7 @@ function Storage(dbName) {
             return driver.get(result.id);
         });
     };
-    
+
     this.update = function(doc) {
         return driver.put(doc).then(function(result) {
             return driver.get(result.id);
@@ -93453,13 +93453,24 @@ module.exports = {
 };
 
 },{"lodash":16,"pouchdb":19}],33:[function(require,module,exports){
+var repository = require('./repository');
+var queryParams = require('../utils/query-params');
+
+var dbName = 'sessions';
+
+if (queryParams.has('db')) {
+    dbName = queryParams.get('db');
+}
+
+module.exports = repository.instance(dbName);
+
+},{"../utils/query-params":35,"./repository":32}],34:[function(require,module,exports){
 var $ = require('jquery');
 var _ = require('lodash');
 var Promise = require('bluebird');
-var storage = require('./storage');
 var Queue = require('bluebird-queue');
-var sessionRepo = storage.instance('sessions');
 var fileManager = require('enketo-core/src/js/file-manager');
+var sessionRepo = require("./repositories/sessions-repository");
 
 var utils = {
 	form: function(packet) {
@@ -93588,7 +93599,7 @@ module.exports = function(to, packet, progressCb) {
 	return utils.upload(packet, progressCb);
 };
 
-},{"./storage":32,"bluebird":6,"bluebird-queue":4,"enketo-core/src/js/file-manager":9,"jquery":14,"lodash":16}],34:[function(require,module,exports){
+},{"./repositories/sessions-repository":33,"bluebird":6,"bluebird-queue":4,"enketo-core/src/js/file-manager":9,"jquery":14,"lodash":16}],35:[function(require,module,exports){
 var UrlSearchParams = require('url-search-params');
 var queryParams = new UrlSearchParams(window.location.search);
 
@@ -93601,7 +93612,7 @@ queryParams.getPath = function(key) {
 }
 
 module.exports = queryParams;
-},{"url-search-params":25}],35:[function(require,module,exports){
+},{"url-search-params":25}],36:[function(require,module,exports){
 var $ = require('jquery');
 var _ = require('lodash');
 var moment = require('moment');
@@ -93609,9 +93620,8 @@ var toastr = require('toastr');
 var angular = require('angular');
 var app = angular.module('app', []);
 var submit = require('./modules/submit');
-var storage = require('./modules/storage');
-var sessionRepo = storage.instance('sessions');
 var queryParams = require('./modules/utils/query-params');
+var sessionRepo = require("./modules/repositories/sessions-repository");
 
 app.filter('fileSize', function() {
     return function(bytes) {
@@ -93737,4 +93747,4 @@ app.controller('SubmissionsCtrl', ['$scope', 'UploadManager', function($scope, $
     };
 }]);
 
-},{"./modules/storage":32,"./modules/submit":33,"./modules/utils/query-params":34,"angular":2,"jquery":14,"lodash":16,"moment":17,"toastr":24}]},{},[35]);
+},{"./modules/repositories/sessions-repository":33,"./modules/submit":34,"./modules/utils/query-params":35,"angular":2,"jquery":14,"lodash":16,"moment":17,"toastr":24}]},{},[36]);

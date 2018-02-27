@@ -32,6 +32,7 @@ This is where the survey is displayed. It will start with a loading screen until
 | return     | No       | Upon submission, this url will be loaded. Only available in "online" mode.                              |
 | base       | No       | This will be prepended to all of the parameters taking paths (json, online, edit and return).           |
 | novalidate | No       | When this parameter is found, validation will be turned off for that session.                           |	
+| db         | No       | Sets the name of the database used to store sessions. Defaults to "sessions" when not set.              |	
 
 
 #### 2) submissions.html
@@ -43,3 +44,4 @@ This page will display all the submissions stored offline and let the user uploa
 | lang       | Yes      | Determines UI and Survey language. Pass in "en" if not sure.                                            |
 | server       | Yes      | The path for the OpenRosa server's submission endpoint |
 | base       | No       | This will be prepended to all of the parameters taking paths (server).           |
+| db         | No       | Sets the name of the database used to store sessions. Defaults to "sessions" when not set.              |

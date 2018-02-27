@@ -1,7 +1,6 @@
-var storage = require("./storage");
 var Promise = require('bluebird');
-var sessionRepo = storage.instance("sessions");
 var ImageCompressor = require("image-compressor.js");
+var sessionRepo = require("./repositories/sessions-repository");
 
 ImageCompressor = new ImageCompressor();
 
