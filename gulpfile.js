@@ -1,6 +1,5 @@
 var gulp = require('gulp');
 var sass = require('gulp-sass');
-var watch = require('gulp-watch');
 var notify = require('gulp-notify');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
@@ -50,14 +49,18 @@ gulp.task('sass', function() {
         .pipe(gulp.dest(Paths.dist.css));
 });
 
+gulp.task('style', gulp.series(
+    'vendor-fixes',
+    'enketo-sass',
+    'sass',
+));
+
 gulp.task('fonts', function() {
     return gulp.src([
         Paths.node_modules + '/font-awesome/fonts/fontawesome-webfont.*'
     ])
     .pipe(gulp.dest(Paths.dist.fonts));
 });
-
-gulp.task('style', ['vendor-fixes', 'enketo-sass', 'sass']);
 
 gulp.task('browserify-app', function() {
     //
@@ -67,8 +70,7 @@ gulp.task('browserify-app', function() {
             console.error(err);
         })
         .pipe(source('enketo-bundle.js'))
-        .pipe(gulp.dest(Paths.dist.js))
-        .pipe(notify("Browserified!"));
+        .pipe(gulp.dest(Paths.dist.js));
 });
 
 gulp.task('browserify-submissions', function() {
@@ -87,31 +89,38 @@ gulp.task('browserify-localization', function() {
 })
 
 gulp.task('uglify', function() {
-    return gulp.src(Paths.dist.js + '**/*.js')
-        .pipe(uglify().on('error', function(e) {
-            console.log(e);
+    return gulp
+      .src([
+        Paths.dist.js + "enketo-bundle.js",
+        Paths.dist.js + "i18n-bundle.js",
+        Paths.dist.js + 'submissions-bundle.js',
+      ])
+      .pipe(uglify().on("error", function(e) {
+          console.log(e);
         }))
-        .pipe(rename({ suffix: '.min' }))
-        .pipe(gulp.dest(Paths.dist.js));
+      .pipe(rename({ suffix: ".min" }))
+      .pipe(gulp.dest(Paths.dist.js));
 });
 
 gulp.task('watch', function() {
-
-    watch(Paths.src.sass + '**/*.scss', function() {
-        gulp.start('style');
-    });
-
-    watch(Paths.src.js + '**/*.js' , function() {
-        gulp.start('compile');
-    });
+    gulp.watch(Paths.src.js + '**/*.js', gulp.parallel('compile'));
+    gulp.watch(Paths.src.sass + '**/*.scss', gulp.parallel('style'));
 });
 
-gulp.task('compile', [
-    'browserify-localization',
-    'browserify-app',
-    'browserify-submissions'
-]);
+gulp.task('compile', gulp.series(
+    gulp.parallel([
+        'browserify-localization',
+        'browserify-app',
+        'browserify-submissions',
+    ]),
+    // Minify the js files...
+    'uglify',
+));
 
-gulp.task('dev', ['style', 'compile', 'watch']);
-gulp.task('build', ['style', 'compile', 'uglify', 'fonts']);
-gulp.task('default', ['build']);
+gulp.task('build', gulp.parallel(
+    'style',
+    'compile',
+    'fonts',
+));
+
+gulp.task('default', gulp.series('build'));
