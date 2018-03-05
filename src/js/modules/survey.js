@@ -39,11 +39,11 @@ var Survey = {
                     //
                     $header.show();
                     
-                    setTimeout(() => {
+                    setTimeout(function() {
                         $("#loading-block").remove();
                         $(window).scrollTop(0);
                         resolve();
-                    })
+                    });
                 });
             });
         });
@@ -226,7 +226,7 @@ var Survey = {
                 }
                 console.error(error);
                 
-                setTimeout(() => {
+                setTimeout(function() {
                     submitProgress.hide();
                     _this.toggleAutosave(true);
                 }, 250)

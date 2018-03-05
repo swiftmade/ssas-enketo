@@ -96,11 +96,11 @@ gulp.task('uglify', function() {
 });
 
 gulp.task('watch', function() {
-    
+
     watch(Paths.src.sass + '**/*.scss', function() {
         gulp.start('style');
     });
-    
+
     watch(Paths.src.js + '**/*.js' , function() {
         gulp.start('compile');
     });

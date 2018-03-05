@@ -56,7 +56,7 @@ module.exports = function(form) {
     $scope.jump = function(page) {
       $scope.accordion.collapseAll();
       form.pages.flipToPageContaining(page.el);
-      setTimeout(() => {
+      setTimeout(function() {
         $("#jump-to-block").overlay("hide");
       });
     };
