@@ -1,7 +1,8 @@
 var Vue = require('vue');
 
 Vue.filter('timeAgo', function (value) {
-    return 'TODO: Fix'
+    var date = new Date(value);
+    return date.toLocaleString();
 });
 
 function fireSessionEvent(name, payload) {

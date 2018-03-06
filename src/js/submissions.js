@@ -17,7 +17,8 @@ app.filter('fileSize', function() {
 
 app.filter('date', function() {
     return function(date) {
-        return 'TODO: Fix';
+        var date = new Date(value);
+        return date.toLocaleString();
     };
 });
 
