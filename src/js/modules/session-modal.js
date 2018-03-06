@@ -1,8 +1,7 @@
 var Vue = require('vue');
-var moment = require('moment');
 
 Vue.filter('timeAgo', function (value) {
-    return moment(value).fromNow();
+    return 'TODO: Fix'
 });
 
 function fireSessionEvent(name, payload) {

@@ -1,5 +1,5 @@
 var $ = require('jquery');
-var Promise = require('bluebird');
+var Promise = require('lie');
 var queryParams = require('./utils/query-params');
 
 module.exports = function() {

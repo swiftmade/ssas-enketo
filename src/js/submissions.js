@@ -1,6 +1,4 @@
 var $ = require('jquery');
-var _ = require('lodash');
-var moment = require('moment');
 var toastr = require('toastr');
 var angular = require('angular');
 var app = angular.module('app', []);
@@ -19,7 +17,7 @@ app.filter('fileSize', function() {
 
 app.filter('date', function() {
     return function(date) {
-        return moment(date).format("DD/MM/YYYY hh:mm");
+        return 'TODO: Fix';
     };
 });
 
@@ -79,19 +77,21 @@ app.service('UploadManager', function() {
 app.controller('SubmissionsCtrl', ['$scope', 'UploadManager', function($scope, $upload) {
 
     sessionRepo.all().then(function(sessions) {
-        var packets = _.filter(sessions, function(session) {
-            return !session.draft && !session.submitted;
-        });
+        $scope.packets = sessions
+            .filter(function (session) {
+                return !session.draft && !session.submitted;
+            })
+            .map(function(packet) {
+                packet.size = Object.values(packet._attachments)
+                    .map(function(attachment) {
+                        return attachment.length;
+                    })
+                    .reduce(function(total, attachment) {
+                        return total + attachment.length;
+                    }, 0);
+                return packet;
+            });
 
-        packets = _.map(packets, function(packet) {
-            packet.size = _.sum(_.map(packet._attachments, function(attachment) {
-                return attachment.length;
-            }));
-
-            return packet;
-        });
-
-        $scope.packets = packets;
         $scope.$apply();
     });
 

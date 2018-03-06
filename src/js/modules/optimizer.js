@@ -1,4 +1,5 @@
-var Promise = require('bluebird');
+var Promise = require('lie');
+var TaskQueue = require('./utils/task-queue');
 var ImageCompressor = require("image-compressor.js");
 var sessionRepo = require("./repositories/sessions-repository");
 
@@ -10,11 +11,6 @@ var FILESIZE_TRESHOLD = 300000
 function Optimizer(session, onProgressCb) {
     var id = session._id;
     var attachments = session._attachments;
-
-    var progress = {
-        total: 0,
-        done: 0
-    }
 
     function needsOptimization(attachment) {
         if (attachment.content_type.indexOf('image/') === -1) {
@@ -43,37 +39,32 @@ function Optimizer(session, onProgressCb) {
             session._attachments[name] = {
                 content_type: file.content_type,
                 data: result
-            }
-            if (onProgressCb) {
-                progress.done = progress.done + 1;
-                onProgressCb(progress);
-            }
+            };
         });
     }
 
     this.process = function() {
-        
-        var optimizableAttachments = [];
+        // Create a new task queue to optimize photos sequentially
+        var queue = new TaskQueue();
+        // Register progress callback
+        if (onProgressCb) {
+            queue.onProgress(onProgressCb);
+        }
         
         for (var name in attachments) {
             if (needsOptimization(attachments[name])) {
-                optimizableAttachments.push({
-                    name: name,
-                    attachment: attachments[name]
-                })
+                queue.add(function() {
+                    return optimize(name, attachments[name]);
+                });
             }
         }
-        
-        if ( ! optimizableAttachments.length) {
+
+        // If the queue is empty, no work is to be done.
+        if (queue.isEmpty()) {
             return Promise.resolve(session);
         }
-        
-        // Set the total number of tasks to execute
-        progress.total = optimizableAttachments.length;
 
-        return Promise.reduce(optimizableAttachments, function (_, item) {
-            return optimize(item.name, item.attachment)
-        }, null).then(function() {
+        return queue.run(function() {
             if ( ! session.hasOwnProperty("browser_mode")) {
                 return sessionRepo.update(session);
             }

@@ -2,7 +2,6 @@ var $ = require("jquery");
 var angular = require("angular");
 var vAccordion = require("v-accordion");
 var app = angular.module("app", ["vAccordion"]);
-var _ = require("lodash");
 
 module.exports = function(form) {
   app.controller("jumpCtrl", function($scope) {
@@ -24,12 +23,11 @@ module.exports = function(form) {
         }
 
         var firstSpace = label.indexOf(" ");
-        var notations = _.filter(
-          label.substr(0, firstSpace).split("."),
-          function(not) {
-            return not != "";
-          }
-        );
+        var notations = label.substr(0, firstSpace)
+          .split(".")
+          .filter(function(str) {
+            return str != '';
+          });
 
         rawPages.push({
           el: page.children().first(),
@@ -39,7 +37,7 @@ module.exports = function(form) {
       });
     });
 
-    _.each(rawPages, function(page) {
+    rawPages.forEach(function(page) {
       _.set($scope.pages, page.notations.join(".items."), page);
       if (page.notations.length > 1) {
         // lose something in the beginning

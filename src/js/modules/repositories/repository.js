@@ -1,5 +1,4 @@
 var PouchDB = require('pouchdb');
-var _ = require('lodash');
 
 window.PouchDB = PouchDB;
 
@@ -25,7 +24,7 @@ function Storage(dbName) {
         return driver
             .allDocs({ include_docs: true })
             .then(function(result) {
-                return _.map(result.rows, function(row) {
+                return result.rows.map(function(row) {
                     return row.doc;
                 });
             });

@@ -1,8 +1,7 @@
 var $ = require('jquery');
-var _ = require('lodash');
 var submit = require('./submit');
 var vue = require('./app-vue');
-var Promise = require('bluebird');
+var Promise = require('lie');
 var Optimizer = require("./optimizer");
 var BrowserSession = require('./browser-session');
 var queryParams = require('./utils/query-params');
@@ -88,7 +87,7 @@ var SessionManager = {
     loadSessions: function() {
         return sessionRepo.all().then(function(sessions) {
             // Only display draft sessions
-            sessions = _.filter(sessions, function(session) {
+            sessions = sessions.filter(function(session) {
                 return session.draft;
             });
 
@@ -101,7 +100,7 @@ var SessionManager = {
         var _this = this;
         var attachments = {};
 
-        _.each(files, function(file) {
+        files.forEach(function(file) {
             /**
              * If the file value is a string
              * Then this is just a file name and should be marked as a stub

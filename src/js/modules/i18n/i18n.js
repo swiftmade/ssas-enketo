@@ -1,6 +1,6 @@
 var en = require('./en');
 var lo = require('./lo');
-var _ = require('lodash');
+var _ = require('../utils/helpers');
 
 var Cookies = {
 	set: function(key, value) {
@@ -45,9 +45,9 @@ i18n._ = function(key, bindings) {
 
 	var t = _.get(this.translations, key, _.get(fallback, key, ""));
 
-	_.each(bindings, function(binding, key) {
-		t = t.replace(new RegExp(":" + key, 'g'), binding);
-	});
+	for (var key in bindings) {
+		t = t.replace(new RegExp(":" + key, "g"), bindings[key]);
+	}
 
 	return t;
 };

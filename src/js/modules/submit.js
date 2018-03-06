@@ -1,7 +1,6 @@
 var $ = require('jquery');
-var _ = require('lodash');
-var Promise = require('bluebird');
-var Queue = require('bluebird-queue');
+var Promise = require('lie');
+var TaskQueue = require('./utils/task-queue');
 var fileManager = require('enketo-core/src/js/file-manager');
 var sessionRepo = require("./repositories/sessions-repository");
 
@@ -25,34 +24,36 @@ var utils = {
 		var chunks = [
 			[]
 		];
-
+		
 		var index = 0;
 		var size = 0;
 		// TODO: learn this from the server
 		var maxSize = 50 * 1024 * 1024;
 
-		_.each(files, function(file, name) {
+		for (var name in files) {
+			var file = files[name];
 			if (size >= maxSize) {
 				size = 0;
 				index++;
 				chunks[index] = [];
 			}
 			chunks[index].push(name);
-			size += file.length;
-		});
-
+			size += file.length;			
+		}
+		
 		return chunks;
 	},
 
 	loadChunk: function(packet, chunk, form) {
+
 		if(packet.hasOwnProperty('browser_mode')) {
-			_.each(chunk, function(file) {
+			chunk.forEach(function(file) {
 				form.append(file, packet._attachments[file].data, file);
 			});
 			return Promise.resolve(true);
 		}
 
-		return Promise.all(_.map(chunk, function(file) {
+		return Promise.all(chunk.map(function(file) {
 			return sessionRepo.getAttachment(packet._id, file).then(function(blob) {
 				form.append(file, blob, file);
 			});
@@ -65,24 +66,19 @@ var utils = {
 		var chunks = this.chunks(packet._attachments);
 		var headers = _this.headers(packet);
 
-		var uploadQueue = new Queue({
-			concurrency: 1
-		});
+		var uploadQueue = new TaskQueue();
 
-		var uploadRequests = _.map(chunks, function(chunk) {
-			return function() {
+		chunks.forEach(function(chunk) {
+			var factory = function() {
 				var form = _this.form(packet);
 				return _this.loadChunk(packet, chunk, form).then(function() {
 					return _this.request(form, headers, progressCb);
 				});
 			};
+			uploadQueue.add(factory);
 		});
 
-		_.each(uploadRequests, function(request) {
-			uploadQueue.add(request);
-		});
-
-		return uploadQueue.start();
+		return uploadQueue.run();
 	},
 
 	request: function(form, headers, progressCb) {
