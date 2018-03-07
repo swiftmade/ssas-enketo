@@ -64,7 +64,7 @@ function Optimizer(session, onProgressCb) {
             return Promise.resolve(session);
         }
 
-        return queue.run(function() {
+        return queue.run().then(function() {
             if ( ! session.hasOwnProperty("browser_mode")) {
                 return sessionRepo.update(session);
             }

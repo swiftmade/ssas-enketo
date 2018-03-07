@@ -36,7 +36,7 @@
         <tr ng-repeat="packet in packets | orderBy:'-date'">
             <td>{{ packet.name }}</td>
             <td>{{ packet.size | fileSize }}</td>
-            <td>{{ packet.date | date }}</td>
+            <td>{{ packet.last_update | date }}</td>
             <td>
                 <progress value="packet.progress" ng-if="packet.uploading"></progress>
                 <button class="btn btn-primary" ng-show="!packet.uploading && !packet.uploaded"

@@ -58966,7 +58966,7 @@ app.filter('fileSize', function() {
 });
 
 app.filter('date', function() {
-    return function(date) {
+    return function(value) {
         var date = new Date(value);
         return date.toLocaleString();
     };
@@ -58987,60 +58987,20 @@ app.directive('progress', function() {
     }
 });
 
-app.service('UploadManager', function() {
-    var parallel = 4; // parallel uploads
-    var active = 0;
-    var queue = [];
-
-    var manager = {
-        run: function() {
-            if (active == parallel || !queue.length) {
-                return;
-            }
-            active++;
-
-            var next = queue.shift();
-
-            submit(queryParams.getPath('server'), next.packet, next.progress)
-                .then(function() {
-                    next.done(true);
-                    active--;
-                    manager.run();
-                }).catch(function(err) {
-                    next.done(false);
-                    toastr.error(i18n._("submissions.error", { packet: next.packet.name }));
-                });
-        },
-        queue: function(process) {
-            if (process.packet.uploading || process.packet.uploaded) {
-                return;
-            }
-
-            process.packet.uploading = true;
-            queue.push(process);
-            manager.run();
-        }
-    };
-
-    return manager;
-});
-
-app.controller('SubmissionsCtrl', ['$scope', 'UploadManager', function($scope, $upload) {
+app.controller('SubmissionsCtrl', ['$scope', '$timeout', function($scope, $timeout) {
 
     sessionRepo.all().then(function(sessions) {
         $scope.packets = sessions
             .filter(function (session) {
                 return !session.draft && !session.submitted;
             })
-            .map(function(packet) {
-                packet.size = Object.values(packet._attachments)
-                    .map(function(attachment) {
-                        return attachment.length;
-                    })
+            .map(function(session) {
+                var xmlSize = session.xml.length * 2;
+                session.size = Object.values(session._attachments)
                     .reduce(function(total, attachment) {
                         return total + attachment.length;
-                    }, 0);
-                return packet;
+                    }, xmlSize);
+                return session;
             });
 
         $scope.$apply();
@@ -59053,33 +59013,56 @@ app.controller('SubmissionsCtrl', ['$scope', 'UploadManager', function($scope, $
     };
 
     $scope.remove = function(packet) {
-        var index = $scope.packets.indexOf(packet);
-        $scope.packets.splice(index);
+        $timeout(function() {
+            var index = $scope.packets.indexOf(packet);
+            if (index >= 0) {
+                $scope.packets.splice(index, 1);
+            }
+        });
     };
 
     $scope.upload = function(packet) {
-        $upload.queue({
-            packet: packet,
-            progress: function(p) {
-                packet.progress = p * 100;
-                $scope.$apply();
-            },
-            done: function(result) {
-                packet.uploading = false;
-                packet.uploaded = result;
-                $scope.$apply();
-                if(!result) {
-                    return;
-                }
-                sessionRepo.get(packet._id).then(function(session) {
+        
+        $timeout(function() {
+            if (packet.uploading) {
+                return; // Already uploading.. Don't do anything
+            }
+
+            packet.uploading = true;
+            packet.progress = 0;
+
+            var onUploadProgress = function(progress) {
+                $timeout(function() {
+                    console.log(packet.name + ': ' + progress);
+                    packet.progress = progress * 100;
+                });
+            };
+
+            submit(queryParams.getPath("server"), packet, onUploadProgress)
+                .then(function(result) {
+                    return sessionRepo.get(packet._id);
+                })
+                .then(function(session) {
                     session.submitted = true;
                     return sessionRepo.update(session);
-                }).then(function() {
-                    toastr.success(i18n._("submissions.success", { packet: packet.name }));
+                })
+                .then(function() {
+                    console.log(packet.name + ": finished");
+                    toastr.success(i18n._("submissions.success", {
+                        packet: packet.name
+                    }));
                     $scope.remove(packet);
+                })
+                .catch(function(err) {
+                    packet.uploading = false;
+                    packet.uploaded = false;
+                    $scope.$apply();
+                    toastr.error(i18n._("submissions.error", {
+                        packet: next.packet.name
+                    }));
                 });
-            }
         });
+    
     };
 }]);
 
