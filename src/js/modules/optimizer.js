@@ -23,7 +23,7 @@ function Optimizer(session, onProgressCb) {
 
     function getFileBlob(name, file) {
         if (session.hasOwnProperty('browser_mode')) {
-            return Promise.resolve(file);
+            return Promise.resolve(file.data);
         }
         return sessionRepo.getAttachment(id, name);
     }

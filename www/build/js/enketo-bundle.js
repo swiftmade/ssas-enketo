@@ -105980,7 +105980,7 @@ function Optimizer(session, onProgressCb) {
 
     function getFileBlob(name, file) {
         if (session.hasOwnProperty('browser_mode')) {
-            return Promise.resolve(file);
+            return Promise.resolve(file.data);
         }
         return sessionRepo.getAttachment(id, name);
     }
@@ -106044,16 +106044,25 @@ module.exports = function(session, onProgressCb) {
 
 var fileManager = require("enketo-core/src/js/file-manager");
 var sessionRepo = require("../repositories/sessions-repository");
+var queryParams = require("../utils/query-params");
 
-fileManager.setSessionId = function(id) {
-    this.sessionId = id;
+fileManager.setSession = function(session) {
+    console.log(session);
+    this.session = session;
 };
 
 var originalGetFileUrl = fileManager.getFileUrl;
 
 fileManager.getFileUrl = function (subject) {
     if (subject && typeof subject === 'string') {
-        return sessionRepo.getAttachment(this.sessionId, subject).then(function(attachment) {
+        // In browser mode, load the attachments directly from the server
+        if (this.session.browser_mode) {
+            return Promise.resolve(
+                queryParams.getUrl("submissions/" + this.session.instance_id + "/photo/" + subject)
+            )
+        }
+        // When running against PouchDB load it from there
+        return sessionRepo.getAttachment(this.session._id, subject).then(function(attachment) {
             return URL.createObjectURL(attachment);
         });
     }
@@ -106061,7 +106070,7 @@ fileManager.getFileUrl = function (subject) {
 }
 
 module.exports = fileManager;
-},{"../repositories/sessions-repository":100,"enketo-core/src/js/file-manager":17}],98:[function(require,module,exports){
+},{"../repositories/sessions-repository":100,"../utils/query-params":109,"enketo-core/src/js/file-manager":17}],98:[function(require,module,exports){
 var fileManager = require('./patches/file-manager');
 
 module.exports = function(record) {
@@ -106610,7 +106619,7 @@ var Survey = {
           that.initializeForm(modelStr, session.xml, session.submitted);
           that.formId = $("form").attr("id");
           // This is needed to restore attachments from PouchDB
-          fileManager.setSessionId(session._id);
+          fileManager.setSession(session);
 
           JumpTo(that.form);
           that.modifyUI();
@@ -106934,6 +106943,14 @@ queryParams.getPath = function(key) {
         path = queryParams.get('base') + '/';
     }
     return path + queryParams.get(key);
+}
+
+queryParams.getUrl = function(uri) {
+    var url = '';
+    if (queryParams.has('base')) {
+        url = queryParams.get('base') + '/';
+    }
+    return url + uri;
 }
 
 module.exports = queryParams;

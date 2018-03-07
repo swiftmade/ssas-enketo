@@ -58671,16 +58671,25 @@ exports.parse = function (str) {
 
 var fileManager = require("enketo-core/src/js/file-manager");
 var sessionRepo = require("../repositories/sessions-repository");
+var queryParams = require("../utils/query-params");
 
-fileManager.setSessionId = function(id) {
-    this.sessionId = id;
+fileManager.setSession = function(session) {
+    console.log(session);
+    this.session = session;
 };
 
 var originalGetFileUrl = fileManager.getFileUrl;
 
 fileManager.getFileUrl = function (subject) {
     if (subject && typeof subject === 'string') {
-        return sessionRepo.getAttachment(this.sessionId, subject).then(function(attachment) {
+        // In browser mode, load the attachments directly from the server
+        if (this.session.browser_mode) {
+            return Promise.resolve(
+                queryParams.getUrl("submissions/" + this.session.instance_id + "/photo/" + subject)
+            )
+        }
+        // When running against PouchDB load it from there
+        return sessionRepo.getAttachment(this.session._id, subject).then(function(attachment) {
             return URL.createObjectURL(attachment);
         });
     }
@@ -58688,7 +58697,7 @@ fileManager.getFileUrl = function (subject) {
 }
 
 module.exports = fileManager;
-},{"../repositories/sessions-repository":29,"enketo-core/src/js/file-manager":5}],28:[function(require,module,exports){
+},{"../repositories/sessions-repository":29,"../utils/query-params":31,"enketo-core/src/js/file-manager":5}],28:[function(require,module,exports){
 var PouchDB = require('pouchdb');
 
 window.PouchDB = PouchDB;
@@ -58912,6 +58921,14 @@ queryParams.getPath = function(key) {
         path = queryParams.get('base') + '/';
     }
     return path + queryParams.get(key);
+}
+
+queryParams.getUrl = function(uri) {
+    var url = '';
+    if (queryParams.has('base')) {
+        url = queryParams.get('base') + '/';
+    }
+    return url + uri;
 }
 
 module.exports = queryParams;

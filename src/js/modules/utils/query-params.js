@@ -9,4 +9,12 @@ queryParams.getPath = function(key) {
     return path + queryParams.get(key);
 }
 
+queryParams.getUrl = function(uri) {
+    var url = '';
+    if (queryParams.has('base')) {
+        url = queryParams.get('base') + '/';
+    }
+    return url + uri;
+}
+
 module.exports = queryParams;

@@ -31,7 +31,7 @@ var Survey = {
           that.initializeForm(modelStr, session.xml, session.submitted);
           that.formId = $("form").attr("id");
           // This is needed to restore attachments from PouchDB
-          fileManager.setSessionId(session._id);
+          fileManager.setSession(session);
 
           JumpTo(that.form);
           that.modifyUI();
