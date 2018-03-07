@@ -107,19 +107,15 @@ gulp.task('watch', function() {
     gulp.watch(Paths.src.sass + '**/*.scss', gulp.parallel('style'));
 });
 
-gulp.task('compile', gulp.series(
-    gulp.parallel([
-        'browserify-localization',
-        'browserify-app',
-        'browserify-submissions',
-    ]),
-    // Minify the js files...
-    'uglify',
+gulp.task('compile', gulp.parallel(
+    'browserify-localization',
+    'browserify-app',
+    'browserify-submissions',
 ));
 
 gulp.task('build', gulp.parallel(
     'style',
-    'compile',
+    gulp.series('compile', 'uglify'),
     'fonts',
 ));
 

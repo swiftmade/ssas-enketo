@@ -2,6 +2,7 @@ var $ = require("jquery");
 var angular = require("angular");
 var vAccordion = require("v-accordion");
 var app = angular.module("app", ["vAccordion"]);
+var _ = require('./utils/helpers');
 
 module.exports = function(form) {
   app.controller("jumpCtrl", function($scope) {

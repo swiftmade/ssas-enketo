@@ -58680,9 +58680,7 @@ var originalGetFileUrl = fileManager.getFileUrl;
 
 fileManager.getFileUrl = function (subject) {
     if (subject && typeof subject === 'string') {
-        console.log([this.sessionId, subject]);
         return sessionRepo.getAttachment(this.sessionId, subject).then(function(attachment) {
-            console.log(attachment);
             return URL.createObjectURL(attachment);
         });
     }
