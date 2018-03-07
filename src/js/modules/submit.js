@@ -1,7 +1,7 @@
 var $ = require('jquery');
 var Promise = require('lie');
 var TaskQueue = require('./utils/task-queue');
-var fileManager = require('enketo-core/src/js/file-manager');
+var fileManager = require('./patches/file-manager');
 var sessionRepo = require("./repositories/sessions-repository");
 
 var utils = {

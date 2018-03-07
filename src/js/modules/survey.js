@@ -4,6 +4,7 @@ var Form = require("enketo-core/src/js/Form");
 var queryParams = require("./utils/query-params");
 var appendRecordFiles = require("./record-files");
 var submitProgress = require("./submit-progress");
+var fileManager = require("./patches/file-manager");
 //
 var JumpTo = require("./jump-to");
 var SessionManager = require("./session-manager");
@@ -29,6 +30,9 @@ var Survey = {
         SessionManager.start().then(function(session) {
           that.initializeForm(modelStr, session.xml, session.submitted);
           that.formId = $("form").attr("id");
+          // This is needed to restore attachments from PouchDB
+          fileManager.setSessionId(session._id);
+
           JumpTo(that.form);
           that.modifyUI();
           that.subscribeProgress();

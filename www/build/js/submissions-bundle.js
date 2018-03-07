@@ -58662,6 +58662,35 @@ exports.parse = function (str) {
 };
 
 },{}],27:[function(require,module,exports){
+/**
+ * This patches the file-manager module from enketo-core
+ * The aim of this patch is to be able to retrieve attachments stored inside PouchDB
+ * The actual source for this module can be found here:
+ * https://github.com/enketo/enketo-core/blob/master/src/js/file-manager.js
+ */
+
+var fileManager = require("enketo-core/src/js/file-manager");
+var sessionRepo = require("../repositories/sessions-repository");
+
+fileManager.setSessionId = function(id) {
+    this.sessionId = id;
+};
+
+var originalGetFileUrl = fileManager.getFileUrl;
+
+fileManager.getFileUrl = function (subject) {
+    if (subject && typeof subject === 'string') {
+        console.log([this.sessionId, subject]);
+        return sessionRepo.getAttachment(this.sessionId, subject).then(function(attachment) {
+            console.log(attachment);
+            return URL.createObjectURL(attachment);
+        });
+    }
+    return originalGetFileUrl(subject);
+}
+
+module.exports = fileManager;
+},{"../repositories/sessions-repository":29,"enketo-core/src/js/file-manager":5}],28:[function(require,module,exports){
 var PouchDB = require('pouchdb');
 
 window.PouchDB = PouchDB;
@@ -58732,7 +58761,7 @@ module.exports = {
     }
 };
 
-},{"pouchdb":13}],28:[function(require,module,exports){
+},{"pouchdb":13}],29:[function(require,module,exports){
 var repository = require('./repository');
 var queryParams = require('../utils/query-params');
 
@@ -58744,11 +58773,11 @@ if (queryParams.has('db')) {
 
 module.exports = repository.instance(dbName);
 
-},{"../utils/query-params":30,"./repository":27}],29:[function(require,module,exports){
+},{"../utils/query-params":31,"./repository":28}],30:[function(require,module,exports){
 var $ = require('jquery');
 var Promise = require('lie');
 var TaskQueue = require('./utils/task-queue');
-var fileManager = require('enketo-core/src/js/file-manager');
+var fileManager = require('./patches/file-manager');
 var sessionRepo = require("./repositories/sessions-repository");
 
 var utils = {
@@ -58875,7 +58904,7 @@ module.exports = function(to, packet, progressCb) {
 	return utils.upload(packet, progressCb);
 };
 
-},{"./repositories/sessions-repository":28,"./utils/task-queue":31,"enketo-core/src/js/file-manager":5,"jquery":10,"lie":11}],30:[function(require,module,exports){
+},{"./patches/file-manager":27,"./repositories/sessions-repository":29,"./utils/task-queue":32,"jquery":10,"lie":11}],31:[function(require,module,exports){
 var UrlSearchParams = require('url-search-params');
 var queryParams = new UrlSearchParams(window.location.search);
 
@@ -58888,7 +58917,7 @@ queryParams.getPath = function(key) {
 }
 
 module.exports = queryParams;
-},{"url-search-params":20}],31:[function(require,module,exports){
+},{"url-search-params":20}],32:[function(require,module,exports){
 var Promise = require("lie");
 
 function TaskQueue() {
@@ -58947,7 +58976,7 @@ function TaskQueue() {
 }
 
 module.exports = TaskQueue;
-},{"lie":11}],32:[function(require,module,exports){
+},{"lie":11}],33:[function(require,module,exports){
 var $ = require('jquery');
 var toastr = require('toastr');
 var angular = require('angular');
@@ -59033,7 +59062,6 @@ app.controller('SubmissionsCtrl', ['$scope', '$timeout', function($scope, $timeo
 
             var onUploadProgress = function(progress) {
                 $timeout(function() {
-                    console.log(packet.name + ': ' + progress);
                     packet.progress = progress * 100;
                 });
             };
@@ -59047,7 +59075,6 @@ app.controller('SubmissionsCtrl', ['$scope', '$timeout', function($scope, $timeo
                     return sessionRepo.update(session);
                 })
                 .then(function() {
-                    console.log(packet.name + ": finished");
                     toastr.success(i18n._("submissions.success", {
                         packet: packet.name
                     }));
@@ -59066,4 +59093,4 @@ app.controller('SubmissionsCtrl', ['$scope', '$timeout', function($scope, $timeo
     };
 }]);
 
-},{"./modules/repositories/sessions-repository":28,"./modules/submit":29,"./modules/utils/query-params":30,"angular":2,"jquery":10,"toastr":19}]},{},[32]);
+},{"./modules/repositories/sessions-repository":29,"./modules/submit":30,"./modules/utils/query-params":31,"angular":2,"jquery":10,"toastr":19}]},{},[33]);

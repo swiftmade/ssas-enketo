@@ -104833,7 +104833,7 @@ $(document).ready(function() {
     });
 });
 
-},{"./modules/app-vue":92,"./modules/support":103,"./modules/survey":104,"./modules/utils/overlay":105,"jquery":68,"toastr":80,"vue":89}],92:[function(require,module,exports){
+},{"./modules/app-vue":92,"./modules/support":104,"./modules/survey":105,"./modules/utils/overlay":106,"jquery":68,"toastr":80,"vue":89}],92:[function(require,module,exports){
 var Vue = require('vue');
 var vueModal = require('./session-modal');
 
@@ -104846,7 +104846,7 @@ var vue = new Vue({
 });
 
 module.exports = vue;
-},{"./session-modal":100,"vue":89}],93:[function(require,module,exports){
+},{"./session-modal":101,"vue":89}],93:[function(require,module,exports){
 var $ = require('jquery');
 var Promise = require('lie');
 var queryParams = require('./utils/query-params');
@@ -104879,7 +104879,7 @@ module.exports = function() {
     });
 };
 
-},{"./utils/query-params":106,"jquery":68,"lie":70}],94:[function(require,module,exports){
+},{"./utils/query-params":107,"jquery":68,"lie":70}],94:[function(require,module,exports){
 var $ = require("jquery");
 var angular = require("angular");
 var vAccordion = require("v-accordion");
@@ -105039,8 +105039,37 @@ module.exports = function(session, onProgressCb) {
     var optimizer = new Optimizer(session, onProgressCb)
     return optimizer.process()
 }
-},{"./repositories/sessions-repository":98,"./utils/task-queue":107,"image-compressor.js":64,"lie":70}],96:[function(require,module,exports){
-var fileManager = require('enketo-core/src/js/file-manager');
+},{"./repositories/sessions-repository":99,"./utils/task-queue":108,"image-compressor.js":64,"lie":70}],96:[function(require,module,exports){
+/**
+ * This patches the file-manager module from enketo-core
+ * The aim of this patch is to be able to retrieve attachments stored inside PouchDB
+ * The actual source for this module can be found here:
+ * https://github.com/enketo/enketo-core/blob/master/src/js/file-manager.js
+ */
+
+var fileManager = require("enketo-core/src/js/file-manager");
+var sessionRepo = require("../repositories/sessions-repository");
+
+fileManager.setSessionId = function(id) {
+    this.sessionId = id;
+};
+
+var originalGetFileUrl = fileManager.getFileUrl;
+
+fileManager.getFileUrl = function (subject) {
+    if (subject && typeof subject === 'string') {
+        console.log([this.sessionId, subject]);
+        return sessionRepo.getAttachment(this.sessionId, subject).then(function(attachment) {
+            console.log(attachment);
+            return URL.createObjectURL(attachment);
+        });
+    }
+    return originalGetFileUrl(subject);
+}
+
+module.exports = fileManager;
+},{"../repositories/sessions-repository":99,"enketo-core/src/js/file-manager":17}],97:[function(require,module,exports){
+var fileManager = require('./patches/file-manager');
 
 module.exports = function(record) {
 
@@ -105059,7 +105088,7 @@ module.exports = function(record) {
     record.files = files
     return Promise.resolve(record)
 }
-},{"enketo-core/src/js/file-manager":17}],97:[function(require,module,exports){
+},{"./patches/file-manager":96}],98:[function(require,module,exports){
 var PouchDB = require('pouchdb');
 
 window.PouchDB = PouchDB;
@@ -105130,7 +105159,7 @@ module.exports = {
     }
 };
 
-},{"pouchdb":73}],98:[function(require,module,exports){
+},{"pouchdb":73}],99:[function(require,module,exports){
 var repository = require('./repository');
 var queryParams = require('../utils/query-params');
 
@@ -105142,7 +105171,7 @@ if (queryParams.has('db')) {
 
 module.exports = repository.instance(dbName);
 
-},{"../utils/query-params":106,"./repository":97}],99:[function(require,module,exports){
+},{"../utils/query-params":107,"./repository":98}],100:[function(require,module,exports){
 var $ = require('jquery');
 var submit = require('./submit');
 var vue = require('./app-vue');
@@ -105307,7 +105336,7 @@ var SessionManager = {
 
 module.exports = SessionManager;
 
-},{"./app-vue":92,"./browser-session":93,"./optimizer":95,"./repositories/sessions-repository":98,"./submit":102,"./utils/query-params":106,"jquery":68,"lie":70}],100:[function(require,module,exports){
+},{"./app-vue":92,"./browser-session":93,"./optimizer":95,"./repositories/sessions-repository":99,"./submit":103,"./utils/query-params":107,"jquery":68,"lie":70}],101:[function(require,module,exports){
 var Vue = require('vue');
 
 Vue.filter('timeAgo', function (value) {
@@ -105378,7 +105407,7 @@ module.exports = Vue.component('modal', {
         }
     }
 });
-},{"vue":89}],101:[function(require,module,exports){
+},{"vue":89}],102:[function(require,module,exports){
 module.exports = {
     show: function(msg) {
         $("#submit-progress-text").text(msg);
@@ -105388,11 +105417,11 @@ module.exports = {
         $('#submit-progress').overlay('hide');
     }
 }
-},{}],102:[function(require,module,exports){
+},{}],103:[function(require,module,exports){
 var $ = require('jquery');
 var Promise = require('lie');
 var TaskQueue = require('./utils/task-queue');
-var fileManager = require('enketo-core/src/js/file-manager');
+var fileManager = require('./patches/file-manager');
 var sessionRepo = require("./repositories/sessions-repository");
 
 var utils = {
@@ -105519,7 +105548,7 @@ module.exports = function(to, packet, progressCb) {
 	return utils.upload(packet, progressCb);
 };
 
-},{"./repositories/sessions-repository":98,"./utils/task-queue":107,"enketo-core/src/js/file-manager":17,"jquery":68,"lie":70}],103:[function(require,module,exports){
+},{"./patches/file-manager":96,"./repositories/sessions-repository":99,"./utils/task-queue":108,"jquery":68,"lie":70}],104:[function(require,module,exports){
 if ( typeof exports === 'object' && typeof exports.nodeName !== 'string' && typeof define !== 'function' ) {
     var define = function( factory ) {
         factory( require, exports, module );
@@ -105554,13 +105583,14 @@ define( function( require, exports, module ) {
     module.exports = features;
 } );
 
-},{}],104:[function(require,module,exports){
+},{}],105:[function(require,module,exports){
 var toastr = require("toastr");
 var Promise = require("lie");
 var Form = require("enketo-core/src/js/Form");
 var queryParams = require("./utils/query-params");
 var appendRecordFiles = require("./record-files");
 var submitProgress = require("./submit-progress");
+var fileManager = require("./patches/file-manager");
 //
 var JumpTo = require("./jump-to");
 var SessionManager = require("./session-manager");
@@ -105586,6 +105616,9 @@ var Survey = {
         SessionManager.start().then(function(session) {
           that.initializeForm(modelStr, session.xml, session.submitted);
           that.formId = $("form").attr("id");
+          // This is needed to restore attachments from PouchDB
+          fileManager.setSessionId(session._id);
+
           JumpTo(that.form);
           that.modifyUI();
           that.subscribeProgress();
@@ -105844,7 +105877,7 @@ var Survey = {
 
 module.exports = Survey;
 
-},{"./jump-to":94,"./record-files":96,"./session-manager":99,"./submit-progress":101,"./utils/query-params":106,"enketo-core/src/js/Form":9,"lie":70,"toastr":80}],105:[function(require,module,exports){
+},{"./jump-to":94,"./patches/file-manager":96,"./record-files":97,"./session-manager":100,"./submit-progress":102,"./utils/query-params":107,"enketo-core/src/js/Form":9,"lie":70,"toastr":80}],106:[function(require,module,exports){
 module.exports = (function() {
     
     var $body = $('body');
@@ -105879,7 +105912,7 @@ module.exports = (function() {
 })()
 
 
-},{}],106:[function(require,module,exports){
+},{}],107:[function(require,module,exports){
 var UrlSearchParams = require('url-search-params');
 var queryParams = new UrlSearchParams(window.location.search);
 
@@ -105892,7 +105925,7 @@ queryParams.getPath = function(key) {
 }
 
 module.exports = queryParams;
-},{"url-search-params":81}],107:[function(require,module,exports){
+},{"url-search-params":81}],108:[function(require,module,exports){
 var Promise = require("lie");
 
 function TaskQueue() {

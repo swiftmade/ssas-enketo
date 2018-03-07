@@ -1,4 +1,4 @@
-var fileManager = require('enketo-core/src/js/file-manager');
+var fileManager = require('./patches/file-manager');
 
 module.exports = function(record) {
 
