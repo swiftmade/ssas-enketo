@@ -7,6 +7,7 @@ var flatten = require('gulp-flatten');
 var replace = require('gulp-replace');
 var browserify = require('browserify');
 var uglifyCss = require("gulp-uglifycss");
+var cachebust = require("gulp-cache-bust");
 var source = require('vinyl-source-stream');
 
 var Paths = {
@@ -18,6 +19,7 @@ var Paths = {
         js: './www/build/js/',
         css: './www/build/css/',
         fonts: './www/build/fonts/',
+        html: './www/',
     },
     vendor: {
         enketo: 'node_modules/enketo-core/src/',
@@ -88,20 +90,6 @@ gulp.task('browserify-localization', function() {
         .pipe(gulp.dest(Paths.dist.js));
 })
 
-gulp.task('uglify', function() {
-    return gulp
-      .src([
-        Paths.dist.js + "enketo-bundle.js",
-        Paths.dist.js + "i18n-bundle.js",
-        Paths.dist.js + 'submissions-bundle.js',
-      ])
-      .pipe(uglify().on("error", function(e) {
-          console.log(e);
-        }))
-      .pipe(rename({ suffix: ".min" }))
-      .pipe(gulp.dest(Paths.dist.js));
-});
-
 gulp.task('watch', function() {
     gulp.watch(Paths.src.js + '**/*.js', gulp.parallel('compile'));
     gulp.watch(Paths.src.sass + '**/*.scss', gulp.parallel('style'));
@@ -113,9 +101,31 @@ gulp.task('compile', gulp.parallel(
     'browserify-submissions',
 ));
 
+gulp.task("uglify", function() {
+  return gulp
+    .src([
+      Paths.dist.js + "enketo-bundle.js",
+      Paths.dist.js + "i18n-bundle.js",
+      Paths.dist.js + "submissions-bundle.js"
+    ])
+    .pipe(
+      uglify().on("error", function(e) {
+        console.log(e);
+      })
+    )
+    .pipe(rename({ suffix: ".min" }))
+    .pipe(gulp.dest(Paths.dist.js));
+});
+
+gulp.task('bust', function() {
+    return gulp.src(Paths.dist.html + '*.html')
+        .pipe(cachebust({type: 'timestamp'}))
+        .pipe(gulp.dest(Paths.dist.html));
+});
+
 gulp.task('build', gulp.parallel(
     'style',
-    gulp.series('compile', 'uglify'),
+    gulp.series('compile', 'uglify', 'bust'),
     'fonts',
 ));
 
