@@ -105881,7 +105881,7 @@ var app = angular.module("app", ["vAccordion"]);
 var _ = require('./utils/helpers');
 
 module.exports = function(form) {
-  app.controller("jumpCtrl", function($scope) {
+  app.controller("jumpCtrl", ['$scope', function($scope) {
     var rawPages = [];
     $scope.pages = {};
     $scope.search = {
@@ -105940,7 +105940,7 @@ module.exports = function(form) {
       $scope.accordion.collapseAll();
       $("#jump-to-block").overlay("hide");
     });
-  });
+  }]);
 
   $("#jump-to-block")
     .attr("ng-app", "app")
