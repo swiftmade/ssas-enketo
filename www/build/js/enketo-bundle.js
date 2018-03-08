@@ -106007,14 +106007,17 @@ function Optimizer(session, onProgressCb) {
         if (onProgressCb) {
             queue.onProgress(onProgressCb);
         }
-        
-        for (var name in attachments) {
-            if (needsOptimization(attachments[name])) {
+
+        Object.keys(attachments).forEach(function(key) {
+            var fileName = key;
+            var file = attachments[key];
+
+            if (needsOptimization(file)) {
                 queue.add(function() {
-                    return optimize(name, attachments[name]);
+                    return optimize(fileName, file);
                 });
             }
-        }
+        });
 
         // If the queue is empty, no work is to be done.
         if (queue.isEmpty()) {
@@ -106022,7 +106025,7 @@ function Optimizer(session, onProgressCb) {
         }
 
         return queue.run().then(function() {
-            if ( ! session.hasOwnProperty("browser_mode")) {
+            if ( ! session.browser_mode) {
                 return sessionRepo.update(session);
             }
             return session;
@@ -106046,25 +106049,39 @@ var fileManager = require("enketo-core/src/js/file-manager");
 var sessionRepo = require("../repositories/sessions-repository");
 var queryParams = require("../utils/query-params");
 
+// Preserve the original getFileUrl method
+var originalGetFileUrl = fileManager.getFileUrl;
+
 fileManager.setSession = function(session) {
-    console.log(session);
     this.session = session;
 };
 
-var originalGetFileUrl = fileManager.getFileUrl;
+fileManager.getFileUrlFromDatabase = function(subject) {
+    return sessionRepo
+        .getAttachment(this.session._id, subject)
+        .then(function(attachment) {
+            return URL.createObjectURL(attachment);
+        });
+};
+
+fileManager.getFileUrlOnServer = function(subject) {
+    return Promise.resolve(
+        queryParams.getUrl(
+            "submissions/"
+            + this.session.instance_id
+            + "/photo/" + subject
+        )
+    );
+};
 
 fileManager.getFileUrl = function (subject) {
     if (subject && typeof subject === 'string') {
-        // In browser mode, load the attachments directly from the server
         if (this.session.browser_mode) {
-            return Promise.resolve(
-                queryParams.getUrl("submissions/" + this.session.instance_id + "/photo/" + subject)
-            )
+            // In browser mode, load the attachments directly from the server
+            return this.getFileUrlOnServer(subject);
         }
         // When running against PouchDB load it from there
-        return sessionRepo.getAttachment(this.session._id, subject).then(function(attachment) {
-            return URL.createObjectURL(attachment);
-        });
+        return this.getFileUrlFromDatabase(subject);
     }
     return originalGetFileUrl(subject);
 }
@@ -107003,10 +107020,9 @@ function TaskQueue() {
         return tasks.reduce ( function(previous, taskFactory) {
             return previous
                 .then(function() {
-                    return taskFactory();
-                })
-                .then(function() {
-                    taskIsDone();
+                    return taskFactory().then(function() {
+                        taskIsDone();
+                    });
                 });
         }, Promise.resolve());
     };

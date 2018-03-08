@@ -46,10 +46,9 @@ function TaskQueue() {
         return tasks.reduce ( function(previous, taskFactory) {
             return previous
                 .then(function() {
-                    return taskFactory();
-                })
-                .then(function() {
-                    taskIsDone();
+                    return taskFactory().then(function() {
+                        taskIsDone();
+                    });
                 });
         }, Promise.resolve());
     };

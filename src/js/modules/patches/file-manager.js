@@ -9,25 +9,39 @@ var fileManager = require("enketo-core/src/js/file-manager");
 var sessionRepo = require("../repositories/sessions-repository");
 var queryParams = require("../utils/query-params");
 
+// Preserve the original getFileUrl method
+var originalGetFileUrl = fileManager.getFileUrl;
+
 fileManager.setSession = function(session) {
-    console.log(session);
     this.session = session;
 };
 
-var originalGetFileUrl = fileManager.getFileUrl;
+fileManager.getFileUrlFromDatabase = function(subject) {
+    return sessionRepo
+        .getAttachment(this.session._id, subject)
+        .then(function(attachment) {
+            return URL.createObjectURL(attachment);
+        });
+};
+
+fileManager.getFileUrlOnServer = function(subject) {
+    return Promise.resolve(
+        queryParams.getUrl(
+            "submissions/"
+            + this.session.instance_id
+            + "/photo/" + subject
+        )
+    );
+};
 
 fileManager.getFileUrl = function (subject) {
     if (subject && typeof subject === 'string') {
-        // In browser mode, load the attachments directly from the server
         if (this.session.browser_mode) {
-            return Promise.resolve(
-                queryParams.getUrl("submissions/" + this.session.instance_id + "/photo/" + subject)
-            )
+            // In browser mode, load the attachments directly from the server
+            return this.getFileUrlOnServer(subject);
         }
         // When running against PouchDB load it from there
-        return sessionRepo.getAttachment(this.session._id, subject).then(function(attachment) {
-            return URL.createObjectURL(attachment);
-        });
+        return this.getFileUrlFromDatabase(subject);
     }
     return originalGetFileUrl(subject);
 }

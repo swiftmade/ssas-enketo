@@ -50,14 +50,17 @@ function Optimizer(session, onProgressCb) {
         if (onProgressCb) {
             queue.onProgress(onProgressCb);
         }
-        
-        for (var name in attachments) {
-            if (needsOptimization(attachments[name])) {
+
+        Object.keys(attachments).forEach(function(key) {
+            var fileName = key;
+            var file = attachments[key];
+
+            if (needsOptimization(file)) {
                 queue.add(function() {
-                    return optimize(name, attachments[name]);
+                    return optimize(fileName, file);
                 });
             }
-        }
+        });
 
         // If the queue is empty, no work is to be done.
         if (queue.isEmpty()) {
@@ -65,7 +68,7 @@ function Optimizer(session, onProgressCb) {
         }
 
         return queue.run().then(function() {
-            if ( ! session.hasOwnProperty("browser_mode")) {
+            if ( ! session.browser_mode) {
                 return sessionRepo.update(session);
             }
             return session;
