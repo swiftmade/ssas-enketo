@@ -58711,7 +58711,7 @@ fileManager.getFileUrl = function (subject) {
 }
 
 module.exports = fileManager;
-},{"../repositories/sessions-repository":29,"../utils/query-params":31,"enketo-core/src/js/file-manager":5}],28:[function(require,module,exports){
+},{"../repositories/sessions-repository":29,"../utils/query-params":33,"enketo-core/src/js/file-manager":5}],28:[function(require,module,exports){
 var PouchDB = require('pouchdb');
 
 window.PouchDB = PouchDB;
@@ -58794,7 +58794,7 @@ if (queryParams.has('db')) {
 
 module.exports = repository.instance(dbName);
 
-},{"../utils/query-params":31,"./repository":28}],30:[function(require,module,exports){
+},{"../utils/query-params":33,"./repository":28}],30:[function(require,module,exports){
 var $ = require('jquery');
 var Promise = require('lie');
 var TaskQueue = require('./utils/task-queue');
@@ -58925,7 +58925,64 @@ module.exports = function(to, packet, progressCb) {
 	return utils.upload(packet, progressCb);
 };
 
-},{"./patches/file-manager":27,"./repositories/sessions-repository":29,"./utils/task-queue":32,"jquery":10,"lie":11}],31:[function(require,module,exports){
+},{"./patches/file-manager":27,"./repositories/sessions-repository":29,"./utils/task-queue":34,"jquery":10,"lie":11}],31:[function(require,module,exports){
+var toastr = require("toastr");
+var cookies = require('./cookies');
+var queryParams = require('./query-params');
+
+function detectToken() {
+    if (cookies('enketo_token')) {
+        return cookies('enketo_token');
+    } else if (queryParams.has('token')) {
+        return queryParams.get('token');
+    }
+    return null;
+}
+
+function handleAuthenticationRequiredErrors() {
+    $( document ).ajaxError(function(event, xhr) {
+        if (xhr.status === 401) {
+            toastr.error('This survey is not accessible to guest users. Please login before continuning.', 'Authentication Needed', {
+                timeOut: 0,
+                extendedTimeOut: 0,
+                tapToDismiss: false
+            });
+        }
+    });
+}
+
+module.exports = (function() {
+    var token;
+    /**
+     * If token is found, set it in the request header
+     */
+    if (token = detectToken()) {
+        $.ajaxSetup({
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('Authorization', 'Bearer ' + token)
+            }
+        })
+    }
+    // Also, handle 401 responses and display user the right message
+    handleAuthenticationRequiredErrors();
+})()
+},{"./cookies":32,"./query-params":33,"toastr":19}],32:[function(require,module,exports){
+module.exports = function (cname) {
+  var name = cname + "=";
+  var decodedCookie = decodeURIComponent(document.cookie);
+  var ca = decodedCookie.split(";");
+  for (var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == " ") {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+},{}],33:[function(require,module,exports){
 var UrlSearchParams = require('url-search-params');
 var queryParams = new UrlSearchParams(window.location.search);
 
@@ -58946,7 +59003,7 @@ queryParams.getUrl = function(uri) {
 }
 
 module.exports = queryParams;
-},{"url-search-params":20}],32:[function(require,module,exports){
+},{"url-search-params":20}],34:[function(require,module,exports){
 var Promise = require("lie");
 
 function TaskQueue() {
@@ -59004,7 +59061,7 @@ function TaskQueue() {
 }
 
 module.exports = TaskQueue;
-},{"lie":11}],33:[function(require,module,exports){
+},{"lie":11}],35:[function(require,module,exports){
 var $ = require('jquery');
 var toastr = require('toastr');
 var angular = require('angular');
@@ -59012,6 +59069,9 @@ var app = angular.module('app', []);
 var submit = require('./modules/submit');
 var queryParams = require('./modules/utils/query-params');
 var sessionRepo = require("./modules/repositories/sessions-repository");
+
+//
+require("./modules/utils/auth");
 
 app.filter('fileSize', function() {
     return function(bytes) {
@@ -59121,4 +59181,4 @@ app.controller('SubmissionsCtrl', ['$scope', '$timeout', function($scope, $timeo
     };
 }]);
 
-},{"./modules/repositories/sessions-repository":29,"./modules/submit":30,"./modules/utils/query-params":31,"angular":2,"jquery":10,"toastr":19}]},{},[33]);
+},{"./modules/repositories/sessions-repository":29,"./modules/submit":30,"./modules/utils/auth":31,"./modules/utils/query-params":33,"angular":2,"jquery":10,"toastr":19}]},{},[35]);

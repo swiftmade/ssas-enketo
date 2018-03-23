@@ -6,6 +6,9 @@ var submit = require('./modules/submit');
 var queryParams = require('./modules/utils/query-params');
 var sessionRepo = require("./modules/repositories/sessions-repository");
 
+//
+require("./modules/utils/auth");
+
 app.filter('fileSize', function() {
     return function(bytes) {
         var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];

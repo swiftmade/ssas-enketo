@@ -105768,6 +105768,7 @@ exports.parse = function (str) {
 },{}],92:[function(require,module,exports){
 var Vue = require('vue');
 var $ = (window.jQuery = window.$ = require("jquery"));
+require("./modules/utils/auth");
 require('./modules/utils/overlay');
 
 var toastr = require('toastr');
@@ -105827,7 +105828,7 @@ $(document).ready(function() {
     });
 });
 
-},{"./modules/app-vue":93,"./modules/support":105,"./modules/survey":106,"./modules/utils/overlay":108,"jquery":68,"toastr":81,"vue":90}],93:[function(require,module,exports){
+},{"./modules/app-vue":93,"./modules/support":105,"./modules/survey":106,"./modules/utils/auth":107,"./modules/utils/overlay":110,"jquery":68,"toastr":81,"vue":90}],93:[function(require,module,exports){
 var Vue = require('vue');
 var vueModal = require('./session-modal');
 
@@ -105873,7 +105874,7 @@ module.exports = function() {
     });
 };
 
-},{"./utils/query-params":109,"jquery":68,"lie":70}],95:[function(require,module,exports){
+},{"./utils/query-params":111,"jquery":68,"lie":70}],95:[function(require,module,exports){
 var $ = require("jquery");
 var angular = require("angular");
 var vAccordion = require("v-accordion");
@@ -105954,7 +105955,7 @@ module.exports = function(form) {
   angular.bootstrap(document, ["app"]);
 };
 
-},{"./utils/helpers":107,"angular":2,"jquery":68,"v-accordion":89}],96:[function(require,module,exports){
+},{"./utils/helpers":109,"angular":2,"jquery":68,"v-accordion":89}],96:[function(require,module,exports){
 var Promise = require('lie');
 var TaskQueue = require('./utils/task-queue');
 var ImageCompressor = require("image-compressor.js");
@@ -106037,7 +106038,7 @@ module.exports = function(session, onProgressCb) {
     var optimizer = new Optimizer(session, onProgressCb)
     return optimizer.process()
 }
-},{"./repositories/sessions-repository":100,"./utils/task-queue":110,"image-compressor.js":64,"lie":70}],97:[function(require,module,exports){
+},{"./repositories/sessions-repository":100,"./utils/task-queue":112,"image-compressor.js":64,"lie":70}],97:[function(require,module,exports){
 /**
  * This patches the file-manager module from enketo-core
  * The aim of this patch is to be able to retrieve attachments stored inside PouchDB
@@ -106087,7 +106088,7 @@ fileManager.getFileUrl = function (subject) {
 }
 
 module.exports = fileManager;
-},{"../repositories/sessions-repository":100,"../utils/query-params":109,"enketo-core/src/js/file-manager":17}],98:[function(require,module,exports){
+},{"../repositories/sessions-repository":100,"../utils/query-params":111,"enketo-core/src/js/file-manager":17}],98:[function(require,module,exports){
 var fileManager = require('./patches/file-manager');
 
 module.exports = function(record) {
@@ -106190,7 +106191,7 @@ if (queryParams.has('db')) {
 
 module.exports = repository.instance(dbName);
 
-},{"../utils/query-params":109,"./repository":99}],101:[function(require,module,exports){
+},{"../utils/query-params":111,"./repository":99}],101:[function(require,module,exports){
 var $ = require('jquery');
 var submit = require('./submit');
 var vue = require('./app-vue');
@@ -106355,7 +106356,7 @@ var SessionManager = {
 
 module.exports = SessionManager;
 
-},{"./app-vue":93,"./browser-session":94,"./optimizer":96,"./repositories/sessions-repository":100,"./submit":104,"./utils/query-params":109,"jquery":68,"lie":70}],102:[function(require,module,exports){
+},{"./app-vue":93,"./browser-session":94,"./optimizer":96,"./repositories/sessions-repository":100,"./submit":104,"./utils/query-params":111,"jquery":68,"lie":70}],102:[function(require,module,exports){
 var Vue = require('vue');
 
 Vue.filter('timeAgo', function (value) {
@@ -106567,7 +106568,7 @@ module.exports = function(to, packet, progressCb) {
 	return utils.upload(packet, progressCb);
 };
 
-},{"./patches/file-manager":97,"./repositories/sessions-repository":100,"./utils/task-queue":110,"jquery":68,"lie":70}],105:[function(require,module,exports){
+},{"./patches/file-manager":97,"./repositories/sessions-repository":100,"./utils/task-queue":112,"jquery":68,"lie":70}],105:[function(require,module,exports){
 if ( typeof exports === 'object' && typeof exports.nodeName !== 'string' && typeof define !== 'function' ) {
     var define = function( factory ) {
         factory( require, exports, module );
@@ -106896,7 +106897,64 @@ var Survey = {
 
 module.exports = Survey;
 
-},{"./jump-to":95,"./patches/file-manager":97,"./record-files":98,"./session-manager":101,"./submit-progress":103,"./utils/query-params":109,"enketo-core/src/js/Form":9,"lie":70,"toastr":81}],107:[function(require,module,exports){
+},{"./jump-to":95,"./patches/file-manager":97,"./record-files":98,"./session-manager":101,"./submit-progress":103,"./utils/query-params":111,"enketo-core/src/js/Form":9,"lie":70,"toastr":81}],107:[function(require,module,exports){
+var toastr = require("toastr");
+var cookies = require('./cookies');
+var queryParams = require('./query-params');
+
+function detectToken() {
+    if (cookies('enketo_token')) {
+        return cookies('enketo_token');
+    } else if (queryParams.has('token')) {
+        return queryParams.get('token');
+    }
+    return null;
+}
+
+function handleAuthenticationRequiredErrors() {
+    $( document ).ajaxError(function(event, xhr) {
+        if (xhr.status === 401) {
+            toastr.error('This survey is not accessible to guest users. Please login before continuning.', 'Authentication Needed', {
+                timeOut: 0,
+                extendedTimeOut: 0,
+                tapToDismiss: false
+            });
+        }
+    });
+}
+
+module.exports = (function() {
+    var token;
+    /**
+     * If token is found, set it in the request header
+     */
+    if (token = detectToken()) {
+        $.ajaxSetup({
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader('Authorization', 'Bearer ' + token)
+            }
+        })
+    }
+    // Also, handle 401 responses and display user the right message
+    handleAuthenticationRequiredErrors();
+})()
+},{"./cookies":108,"./query-params":111,"toastr":81}],108:[function(require,module,exports){
+module.exports = function (cname) {
+  var name = cname + "=";
+  var decodedCookie = decodeURIComponent(document.cookie);
+  var ca = decodedCookie.split(";");
+  for (var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == " ") {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+},{}],109:[function(require,module,exports){
 var lodashSet = require('lodash.set')
 
 module.exports = {
@@ -106915,7 +106973,7 @@ module.exports = {
   },
   set: lodashSet,
 };
-},{"lodash.set":71}],108:[function(require,module,exports){
+},{"lodash.set":71}],110:[function(require,module,exports){
 module.exports = (function() {
     
     var $body = $('body');
@@ -106950,7 +107008,7 @@ module.exports = (function() {
 })()
 
 
-},{}],109:[function(require,module,exports){
+},{}],111:[function(require,module,exports){
 var UrlSearchParams = require('url-search-params');
 var queryParams = new UrlSearchParams(window.location.search);
 
@@ -106971,7 +107029,7 @@ queryParams.getUrl = function(uri) {
 }
 
 module.exports = queryParams;
-},{"url-search-params":82}],110:[function(require,module,exports){
+},{"url-search-params":82}],112:[function(require,module,exports){
 var Promise = require("lie");
 
 function TaskQueue() {
