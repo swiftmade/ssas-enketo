@@ -51,7 +51,6 @@ a:focus {
     }
     .form-header h3 {
         font-size: 12pt !important;
-        overflow: hidden;
     }
 }
 
@@ -160,12 +159,12 @@ a:focus {
 }
 
 
-.form-header h3 {
-    
+.form-header h3 {    
     padding-top: 6px !important;
     margin: 0 !important;
     font-size: 16pt;
     max-height: 1.6em;
+    overflow: hidden;
 }
 
 .form-footer__jump-nav {
