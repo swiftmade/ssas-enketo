@@ -92,7 +92,7 @@ gulp.task('browserify-localization', function() {
 
 gulp.task('watch', function() {
     gulp.watch(Paths.src.js + '**/*.js', gulp.parallel('compile'));
-    gulp.watch(Paths.src.sass + '**/*.scss', gulp.parallel('style'));
+    gulp.watch(Paths.src.sass + '**/*.scss', gulp.parallel('sass'));
 });
 
 gulp.task('compile', gulp.parallel(
