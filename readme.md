@@ -33,6 +33,7 @@ This is where the survey is displayed. It will start with a loading screen until
 | base       | No       | This will be prepended to all of the parameters taking paths (json, online, edit and return).           |
 | novalidate | No       | When this parameter is found, validation will be turned off for that session.                           |	
 | db         | No       | Sets the name of the database used to store sessions. Defaults to "sessions" when not set.              |	
+| token      | No       | Sets the authorization token for the current session. Only needed in browser sessions.                  |	
 
 
 #### 2) submissions.html
@@ -45,3 +46,4 @@ This page will display all the submissions stored offline and let the user uploa
 | server       | Yes      | The path for the OpenRosa server's submission endpoint |
 | base       | No       | This will be prepended to all of the parameters taking paths (server).           |
 | db         | No       | Sets the name of the database used to store sessions. Defaults to "sessions" when not set.              |
+| token      | No       | Sets the authorization token for the current session. Always pass this if the server requires authentication.  |	
