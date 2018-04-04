@@ -3,17 +3,13 @@ var $ = (window.jQuery = window.$ = require("jquery"));
 require("./modules/utils/auth");
 require('./modules/utils/overlay');
 
-var toastr = require('toastr');
 var vue = require('./modules/app-vue');
 var support = require("./modules/support");
+var toastr = require("./modules/utils/toastr");
 // until all plugins are commonJS-friendly, expose jQuery globally
 window.Vue = Vue;
 
 support.touch = true;
-
-toastr.options = {
-    "positionClass": "toast-top-left"
-};
 
 var Survey = require('./modules/survey');
 

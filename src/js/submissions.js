@@ -1,8 +1,8 @@
 var $ = require('jquery');
-var toastr = require('toastr');
 var angular = require('angular');
 var app = angular.module('app', []);
 var submit = require('./modules/submit');
+var toastr = require("./modules/utils/toastr");
 var queryParams = require('./modules/utils/query-params');
 var sessionRepo = require("./modules/repositories/sessions-repository");
 

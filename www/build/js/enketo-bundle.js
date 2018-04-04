@@ -105771,17 +105771,13 @@ var $ = (window.jQuery = window.$ = require("jquery"));
 require("./modules/utils/auth");
 require('./modules/utils/overlay');
 
-var toastr = require('toastr');
 var vue = require('./modules/app-vue');
 var support = require("./modules/support");
+var toastr = require("./modules/utils/toastr");
 // until all plugins are commonJS-friendly, expose jQuery globally
 window.Vue = Vue;
 
 support.touch = true;
-
-toastr.options = {
-    "positionClass": "toast-top-left"
-};
 
 var Survey = require('./modules/survey');
 
@@ -105828,7 +105824,7 @@ $(document).ready(function() {
     });
 });
 
-},{"./modules/app-vue":93,"./modules/support":105,"./modules/survey":106,"./modules/utils/auth":107,"./modules/utils/overlay":110,"jquery":68,"toastr":81,"vue":90}],93:[function(require,module,exports){
+},{"./modules/app-vue":93,"./modules/support":105,"./modules/survey":106,"./modules/utils/auth":107,"./modules/utils/overlay":110,"./modules/utils/toastr":113,"jquery":68,"vue":90}],93:[function(require,module,exports){
 var Vue = require('vue');
 var vueModal = require('./session-modal');
 
@@ -107088,4 +107084,12 @@ function TaskQueue() {
 }
 
 module.exports = TaskQueue;
-},{"lie":70}]},{},[92]);
+},{"lie":70}],113:[function(require,module,exports){
+var toastr = require('toastr');
+
+toastr.options = {
+    "positionClass": "toast-top-left"
+};
+
+module.exports = toastr;
+},{"toastr":81}]},{},[92]);

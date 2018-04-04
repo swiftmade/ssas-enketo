@@ -59063,11 +59063,19 @@ function TaskQueue() {
 
 module.exports = TaskQueue;
 },{"lie":11}],35:[function(require,module,exports){
-var $ = require('jquery');
 var toastr = require('toastr');
+
+toastr.options = {
+    "positionClass": "toast-top-left"
+};
+
+module.exports = toastr;
+},{"toastr":19}],36:[function(require,module,exports){
+var $ = require('jquery');
 var angular = require('angular');
 var app = angular.module('app', []);
 var submit = require('./modules/submit');
+var toastr = require("./modules/utils/toastr");
 var queryParams = require('./modules/utils/query-params');
 var sessionRepo = require("./modules/repositories/sessions-repository");
 
@@ -59210,4 +59218,4 @@ app.controller('SubmissionsCtrl', ['$scope', '$timeout', function($scope, $timeo
     };
 }]);
 
-},{"./modules/repositories/sessions-repository":29,"./modules/submit":30,"./modules/utils/auth":31,"./modules/utils/query-params":33,"angular":2,"jquery":10,"toastr":19}]},{},[35]);
+},{"./modules/repositories/sessions-repository":29,"./modules/submit":30,"./modules/utils/auth":31,"./modules/utils/query-params":33,"./modules/utils/toastr":35,"angular":2,"jquery":10}]},{},[36]);
