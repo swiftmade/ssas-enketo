@@ -28,6 +28,7 @@ module.exports = {
 		"invalid": "ບໍ່ຖືກຕ້ອງ"
 	},
 	"submissions": {
+		"back": "Back",
 		"upload_all": "ອັບໂຫລດທັງຫມົດ",
 		"upload_single": "ອັບໂຫລດ",
 		"title": "ຢູ່ລະຫວ່າງການສົ່ງຂໍ້ມູນ",

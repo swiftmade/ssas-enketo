@@ -28,9 +28,10 @@ module.exports = {
 		"invalid": "Value not allowed"
 	},
 	"submissions": {
+		"back": "Back",
 		"upload_all": "Upload All",
 		"upload_single": "Upload This",
-		"title": "Pending Data Submissions",
+		"title": "Upload Surveys",
 		"uploaded": "Uploaded!",
 		"name": "Name",
 		"hint": "Hint",

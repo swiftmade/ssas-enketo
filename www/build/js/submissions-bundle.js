@@ -58926,6 +58926,7 @@ module.exports = function(to, packet, progressCb) {
 };
 
 },{"./patches/file-manager":27,"./repositories/sessions-repository":29,"./utils/task-queue":34,"jquery":10,"lie":11}],31:[function(require,module,exports){
+var $ = require('jquery');
 var toastr = require("toastr");
 var cookies = require('./cookies');
 var queryParams = require('./query-params');
@@ -58966,7 +58967,7 @@ module.exports = (function() {
     // Also, handle 401 responses and display user the right message
     handleAuthenticationRequiredErrors();
 })()
-},{"./cookies":32,"./query-params":33,"toastr":19}],32:[function(require,module,exports){
+},{"./cookies":32,"./query-params":33,"jquery":10,"toastr":19}],32:[function(require,module,exports){
 module.exports = function (cname) {
   var name = cname + "=";
   var decodedCookie = decodeURIComponent(document.cookie);
@@ -59106,22 +59107,50 @@ app.directive('progress', function() {
 
 app.controller('SubmissionsCtrl', ['$scope', '$timeout', function($scope, $timeout) {
 
-    sessionRepo.all().then(function(sessions) {
-        $scope.packets = sessions
-            .filter(function (session) {
-                return !session.draft && !session.submitted;
-            })
-            .map(function(session) {
-                var xmlSize = session.xml.length * 2;
-                session.size = Object.values(session._attachments)
-                    .reduce(function(total, attachment) {
-                        return total + attachment.length;
-                    }, xmlSize);
-                return session;
-            });
+    function loadPackets(showSubmitted) {
+        return sessionRepo.all().then(function(sessions) {
+            $scope.packets = sessions
+                .filter(function (session) {
+                    if (showSubmitted) {
+                        return !session.draft;
+                    }
+                    return !session.draft && !session.submitted;
+                })
+                .map(function(session) {
+                    var xmlSize = session.xml.length * 2;
+                    session.size = Object.values(session._attachments)
+                        .reduce(function(total, attachment) {
+                            return total + attachment.length;
+                        }, xmlSize);
+                    return session;
+                });
+            $scope.$apply();
+        });
+    }
+    /**
+     * Only shows packets that haven't yet been uploaded
+     */
+    function loadPendingPackets() {
+        return loadPackets(false);
+    }
+    /**
+     * Shows all of the packets regardless of upload status
+     */
+    function loadAllPackets() {
+        return loadPackets(true).then(function() {
+            if(!$scope.packets.length) {
+                alert('No submitted packets were found...')
+            }
+            $('.reveal-all').hide()
+        })
+    }
 
-        $scope.$apply();
-    });
+    // Start by loading pending packets only...
+    loadPendingPackets()
+
+    $scope.revealAll = function() {
+        loadAllPackets()
+    }
 
     $scope.uploadAll = function() {
         angular.forEach($scope.packets, function(packet) {

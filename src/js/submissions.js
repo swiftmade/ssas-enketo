@@ -42,22 +42,50 @@ app.directive('progress', function() {
 
 app.controller('SubmissionsCtrl', ['$scope', '$timeout', function($scope, $timeout) {
 
-    sessionRepo.all().then(function(sessions) {
-        $scope.packets = sessions
-            .filter(function (session) {
-                return !session.draft && !session.submitted;
-            })
-            .map(function(session) {
-                var xmlSize = session.xml.length * 2;
-                session.size = Object.values(session._attachments)
-                    .reduce(function(total, attachment) {
-                        return total + attachment.length;
-                    }, xmlSize);
-                return session;
-            });
+    function loadPackets(showSubmitted) {
+        return sessionRepo.all().then(function(sessions) {
+            $scope.packets = sessions
+                .filter(function (session) {
+                    if (showSubmitted) {
+                        return !session.draft;
+                    }
+                    return !session.draft && !session.submitted;
+                })
+                .map(function(session) {
+                    var xmlSize = session.xml.length * 2;
+                    session.size = Object.values(session._attachments)
+                        .reduce(function(total, attachment) {
+                            return total + attachment.length;
+                        }, xmlSize);
+                    return session;
+                });
+            $scope.$apply();
+        });
+    }
+    /**
+     * Only shows packets that haven't yet been uploaded
+     */
+    function loadPendingPackets() {
+        return loadPackets(false);
+    }
+    /**
+     * Shows all of the packets regardless of upload status
+     */
+    function loadAllPackets() {
+        return loadPackets(true).then(function() {
+            if(!$scope.packets.length) {
+                alert('No submitted packets were found...')
+            }
+            $('.reveal-all').hide()
+        })
+    }
 
-        $scope.$apply();
-    });
+    // Start by loading pending packets only...
+    loadPendingPackets()
+
+    $scope.revealAll = function() {
+        loadAllPackets()
+    }
 
     $scope.uploadAll = function() {
         angular.forEach($scope.packets, function(packet) {

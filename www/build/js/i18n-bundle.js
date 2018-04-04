@@ -1023,9 +1023,10 @@ module.exports = {
 		"invalid": "Value not allowed"
 	},
 	"submissions": {
+		"back": "Back",
 		"upload_all": "Upload All",
 		"upload_single": "Upload This",
-		"title": "Pending Data Submissions",
+		"title": "Upload Surveys",
 		"uploaded": "Uploaded!",
 		"name": "Name",
 		"hint": "Hint",
@@ -1142,6 +1143,7 @@ module.exports = {
 		"invalid": "ບໍ່ຖືກຕ້ອງ"
 	},
 	"submissions": {
+		"back": "Back",
 		"upload_all": "ອັບໂຫລດທັງຫມົດ",
 		"upload_single": "ອັບໂຫລດ",
 		"title": "ຢູ່ລະຫວ່າງການສົ່ງຂໍ້ມູນ",

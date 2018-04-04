@@ -1,3 +1,4 @@
+var $ = require('jquery');
 var toastr = require("toastr");
 var cookies = require('./cookies');
 var queryParams = require('./query-params');

@@ -106898,6 +106898,7 @@ var Survey = {
 module.exports = Survey;
 
 },{"./jump-to":95,"./patches/file-manager":97,"./record-files":98,"./session-manager":101,"./submit-progress":103,"./utils/query-params":111,"enketo-core/src/js/Form":9,"lie":70,"toastr":81}],107:[function(require,module,exports){
+var $ = require('jquery');
 var toastr = require("toastr");
 var cookies = require('./cookies');
 var queryParams = require('./query-params');
@@ -106938,7 +106939,7 @@ module.exports = (function() {
     // Also, handle 401 responses and display user the right message
     handleAuthenticationRequiredErrors();
 })()
-},{"./cookies":108,"./query-params":111,"toastr":81}],108:[function(require,module,exports){
+},{"./cookies":108,"./query-params":111,"jquery":68,"toastr":81}],108:[function(require,module,exports){
 module.exports = function (cname) {
   var name = cname + "=";
   var decodedCookie = decodeURIComponent(document.cookie);

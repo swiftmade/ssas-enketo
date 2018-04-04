@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
     <title>Submissions</title>
-    <link rel="stylesheet" href="build/css/submissions.css?t=1521808940031" />
+    <link rel="stylesheet" href="build/css/submissions.css?t=1522849104338" />
 </head>
 <body>
 
@@ -13,10 +13,10 @@
     <div>
         <div class="pull-right">
             <button class="btn btn-primary" ng-click="uploadAll()">
-                <i class="fa fa-upload"></i><span data-i18n="submissions.upload_all">Upload All</span>
+                <i class="fa fa-upload"></i> <span data-i18n="submissions.upload_all">Upload All</span>
             </button>
-            <a href="index.html" class="btn btn-danger">
-                <i class="fa fa-remove"></i>
+            <a href="index.html" class="btn btn-default">
+                <span data-i18n="submissions.back">Back</span> <i class="fa fa-arrow-right"></i>
             </a>
         </div>
 
@@ -50,9 +50,15 @@
         </tr>
         </tbody>
     </table>
+
+    <div class="reveal-all">
+    <br><br>
+    <hr>
+    <a href="javascript:void(0);"  ng-click="revealAll()">Show packets previously uploaded from this device.</a>
+    </div>
 </div>
 
-<script src="build/js/i18n-bundle.min.js?t=1521808940031"></script>
-<script src="build/js/submissions-bundle.min.js?t=1521808940031"></script>
+<script src="build/js/i18n-bundle.min.js?t=1522849104338"></script>
+<script src="build/js/submissions-bundle.js?t=1522849104338"></script>
 </body>
 </html>
