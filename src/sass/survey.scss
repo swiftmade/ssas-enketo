@@ -49,11 +49,9 @@ a:focus {
         font-size: 11px;
         margin-left:2px;
     }
-}
-
-@media screen and (max-width: 720px) {
-    .main {
-        padding: 60px 0 70px 0 !important;
+    .form-header h3 {
+        font-size: 12pt !important;
+        overflow: hidden;
     }
 }
 
@@ -163,8 +161,11 @@ a:focus {
 
 
 .form-header h3 {
+    
+    padding-top: 6px !important;
+    margin: 0 !important;
     font-size: 16pt;
-    display: inline !important;
+    max-height: 1.6em;
 }
 
 .form-footer__jump-nav {
@@ -307,6 +308,8 @@ h4 input[readonly]:not([type=radio]):not([type=checkbox]) {
 
 .main {
     max-width: 1200px;
+    margin-top: 60px;
+    padding: 0px 0 70px 0 !important;
 }
 
 .btn-primary {
