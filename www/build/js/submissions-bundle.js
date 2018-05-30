@@ -58711,7 +58711,7 @@ fileManager.getFileUrl = function (subject) {
 }
 
 module.exports = fileManager;
-},{"../repositories/sessions-repository":29,"../utils/query-params":33,"enketo-core/src/js/file-manager":5}],28:[function(require,module,exports){
+},{"../repositories/sessions-repository":29,"../utils/query-params":34,"enketo-core/src/js/file-manager":5}],28:[function(require,module,exports){
 var PouchDB = require('pouchdb');
 
 window.PouchDB = PouchDB;
@@ -58794,7 +58794,7 @@ if (queryParams.has('db')) {
 
 module.exports = repository.instance(dbName);
 
-},{"../utils/query-params":33,"./repository":28}],30:[function(require,module,exports){
+},{"../utils/query-params":34,"./repository":28}],30:[function(require,module,exports){
 var $ = require('jquery');
 var Promise = require('lie');
 var TaskQueue = require('./utils/task-queue');
@@ -58925,7 +58925,7 @@ module.exports = function(to, packet, progressCb) {
 	return utils.upload(packet, progressCb);
 };
 
-},{"./patches/file-manager":27,"./repositories/sessions-repository":29,"./utils/task-queue":34,"jquery":10,"lie":11}],31:[function(require,module,exports){
+},{"./patches/file-manager":27,"./repositories/sessions-repository":29,"./utils/task-queue":35,"jquery":10,"lie":11}],31:[function(require,module,exports){
 var $ = require('jquery');
 var toastr = require("toastr");
 var cookies = require('./cookies');
@@ -58967,7 +58967,35 @@ module.exports = (function() {
     // Also, handle 401 responses and display user the right message
     handleAuthenticationRequiredErrors();
 })()
-},{"./cookies":32,"./query-params":33,"jquery":10,"toastr":19}],32:[function(require,module,exports){
+},{"./cookies":33,"./query-params":34,"jquery":10,"toastr":19}],32:[function(require,module,exports){
+var $ = require('jquery');
+var queryParams = require('./query-params');
+
+module.exports = function(selector) {
+    $(document).ready(function() {
+        if ( ! queryParams.has('bg')) {
+            return;
+        }
+
+        var style = "content: ' ';"
+            + "display: block;"
+            + "position: absolute;"
+            + "top: 0;"
+            + "left: 0;"
+            + "width: 100%;"
+            + "height: 100%;"
+            + "opacity: 0.2;"
+            + "z-index: -1;"
+            + "background-image: url('" + queryParams.get('bg') + "');"
+            + "background-size: cover;"
+            + "background-position: center;"
+            + "background-repeat: no-repeat;"
+
+        $('<style>' + selector + ':after { ' + style + '} </style>')
+            .appendTo('head')
+    });
+}
+},{"./query-params":34,"jquery":10}],33:[function(require,module,exports){
 module.exports = function (cname) {
   var name = cname + "=";
   var decodedCookie = decodeURIComponent(document.cookie);
@@ -58983,7 +59011,7 @@ module.exports = function (cname) {
   }
   return "";
 }
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 var UrlSearchParams = require('url-search-params');
 var queryParams = new UrlSearchParams(window.location.search);
 
@@ -59004,7 +59032,7 @@ queryParams.getUrl = function(uri) {
 }
 
 module.exports = queryParams;
-},{"url-search-params":20}],34:[function(require,module,exports){
+},{"url-search-params":20}],35:[function(require,module,exports){
 var Promise = require("lie");
 
 function TaskQueue() {
@@ -59062,7 +59090,7 @@ function TaskQueue() {
 }
 
 module.exports = TaskQueue;
-},{"lie":11}],35:[function(require,module,exports){
+},{"lie":11}],36:[function(require,module,exports){
 var toastr = require('toastr');
 
 toastr.options = {
@@ -59070,7 +59098,7 @@ toastr.options = {
 };
 
 module.exports = toastr;
-},{"toastr":19}],36:[function(require,module,exports){
+},{"toastr":19}],37:[function(require,module,exports){
 var $ = require('jquery');
 var angular = require('angular');
 var app = angular.module('app', []);
@@ -59078,6 +59106,9 @@ var submit = require('./modules/submit');
 var toastr = require("./modules/utils/toastr");
 var queryParams = require('./modules/utils/query-params');
 var sessionRepo = require("./modules/repositories/sessions-repository");
+
+// If there is a bg parameter, set it on the body
+var setBgImage = require('./modules/utils/bg-image')('body')
 
 //
 require("./modules/utils/auth");
@@ -59218,4 +59249,4 @@ app.controller('SubmissionsCtrl', ['$scope', '$timeout', function($scope, $timeo
     };
 }]);
 
-},{"./modules/repositories/sessions-repository":29,"./modules/submit":30,"./modules/utils/auth":31,"./modules/utils/query-params":33,"./modules/utils/toastr":35,"angular":2,"jquery":10}]},{},[36]);
+},{"./modules/repositories/sessions-repository":29,"./modules/submit":30,"./modules/utils/auth":31,"./modules/utils/bg-image":32,"./modules/utils/query-params":34,"./modules/utils/toastr":36,"angular":2,"jquery":10}]},{},[37]);

@@ -6,6 +6,9 @@ var toastr = require("./modules/utils/toastr");
 var queryParams = require('./modules/utils/query-params');
 var sessionRepo = require("./modules/repositories/sessions-repository");
 
+// If there is a bg parameter, set it on the body
+var setBgImage = require('./modules/utils/bg-image')('body')
+
 //
 require("./modules/utils/auth");
 

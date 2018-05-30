@@ -105774,6 +105774,7 @@ require('./modules/utils/overlay');
 var vue = require('./modules/app-vue');
 var support = require("./modules/support");
 var toastr = require("./modules/utils/toastr");
+var setBgImage = require('./modules/utils/bg-image')('#loading-block')
 // until all plugins are commonJS-friendly, expose jQuery globally
 window.Vue = Vue;
 
@@ -105824,7 +105825,7 @@ $(document).ready(function() {
     });
 });
 
-},{"./modules/app-vue":93,"./modules/support":105,"./modules/survey":106,"./modules/utils/auth":107,"./modules/utils/overlay":110,"./modules/utils/toastr":113,"jquery":68,"vue":90}],93:[function(require,module,exports){
+},{"./modules/app-vue":93,"./modules/support":105,"./modules/survey":106,"./modules/utils/auth":107,"./modules/utils/bg-image":108,"./modules/utils/overlay":111,"./modules/utils/toastr":114,"jquery":68,"vue":90}],93:[function(require,module,exports){
 var Vue = require('vue');
 var vueModal = require('./session-modal');
 
@@ -105870,7 +105871,7 @@ module.exports = function() {
     });
 };
 
-},{"./utils/query-params":111,"jquery":68,"lie":70}],95:[function(require,module,exports){
+},{"./utils/query-params":112,"jquery":68,"lie":70}],95:[function(require,module,exports){
 var $ = require("jquery");
 var angular = require("angular");
 var vAccordion = require("v-accordion");
@@ -105951,7 +105952,7 @@ module.exports = function(form) {
   angular.bootstrap(document, ["app"]);
 };
 
-},{"./utils/helpers":109,"angular":2,"jquery":68,"v-accordion":89}],96:[function(require,module,exports){
+},{"./utils/helpers":110,"angular":2,"jquery":68,"v-accordion":89}],96:[function(require,module,exports){
 var Promise = require('lie');
 var TaskQueue = require('./utils/task-queue');
 var ImageCompressor = require("image-compressor.js");
@@ -106034,7 +106035,7 @@ module.exports = function(session, onProgressCb) {
     var optimizer = new Optimizer(session, onProgressCb)
     return optimizer.process()
 }
-},{"./repositories/sessions-repository":100,"./utils/task-queue":112,"image-compressor.js":64,"lie":70}],97:[function(require,module,exports){
+},{"./repositories/sessions-repository":100,"./utils/task-queue":113,"image-compressor.js":64,"lie":70}],97:[function(require,module,exports){
 /**
  * This patches the file-manager module from enketo-core
  * The aim of this patch is to be able to retrieve attachments stored inside PouchDB
@@ -106084,7 +106085,7 @@ fileManager.getFileUrl = function (subject) {
 }
 
 module.exports = fileManager;
-},{"../repositories/sessions-repository":100,"../utils/query-params":111,"enketo-core/src/js/file-manager":17}],98:[function(require,module,exports){
+},{"../repositories/sessions-repository":100,"../utils/query-params":112,"enketo-core/src/js/file-manager":17}],98:[function(require,module,exports){
 var fileManager = require('./patches/file-manager');
 
 module.exports = function(record) {
@@ -106187,7 +106188,7 @@ if (queryParams.has('db')) {
 
 module.exports = repository.instance(dbName);
 
-},{"../utils/query-params":111,"./repository":99}],101:[function(require,module,exports){
+},{"../utils/query-params":112,"./repository":99}],101:[function(require,module,exports){
 var $ = require('jquery');
 var submit = require('./submit');
 var vue = require('./app-vue');
@@ -106352,7 +106353,7 @@ var SessionManager = {
 
 module.exports = SessionManager;
 
-},{"./app-vue":93,"./browser-session":94,"./optimizer":96,"./repositories/sessions-repository":100,"./submit":104,"./utils/query-params":111,"jquery":68,"lie":70}],102:[function(require,module,exports){
+},{"./app-vue":93,"./browser-session":94,"./optimizer":96,"./repositories/sessions-repository":100,"./submit":104,"./utils/query-params":112,"jquery":68,"lie":70}],102:[function(require,module,exports){
 var Vue = require('vue');
 
 Vue.filter('timeAgo', function (value) {
@@ -106564,7 +106565,7 @@ module.exports = function(to, packet, progressCb) {
 	return utils.upload(packet, progressCb);
 };
 
-},{"./patches/file-manager":97,"./repositories/sessions-repository":100,"./utils/task-queue":112,"jquery":68,"lie":70}],105:[function(require,module,exports){
+},{"./patches/file-manager":97,"./repositories/sessions-repository":100,"./utils/task-queue":113,"jquery":68,"lie":70}],105:[function(require,module,exports){
 if ( typeof exports === 'object' && typeof exports.nodeName !== 'string' && typeof define !== 'function' ) {
     var define = function( factory ) {
         factory( require, exports, module );
@@ -106893,7 +106894,7 @@ var Survey = {
 
 module.exports = Survey;
 
-},{"./jump-to":95,"./patches/file-manager":97,"./record-files":98,"./session-manager":101,"./submit-progress":103,"./utils/query-params":111,"enketo-core/src/js/Form":9,"lie":70,"toastr":81}],107:[function(require,module,exports){
+},{"./jump-to":95,"./patches/file-manager":97,"./record-files":98,"./session-manager":101,"./submit-progress":103,"./utils/query-params":112,"enketo-core/src/js/Form":9,"lie":70,"toastr":81}],107:[function(require,module,exports){
 var $ = require('jquery');
 var toastr = require("toastr");
 var cookies = require('./cookies');
@@ -106935,7 +106936,35 @@ module.exports = (function() {
     // Also, handle 401 responses and display user the right message
     handleAuthenticationRequiredErrors();
 })()
-},{"./cookies":108,"./query-params":111,"jquery":68,"toastr":81}],108:[function(require,module,exports){
+},{"./cookies":109,"./query-params":112,"jquery":68,"toastr":81}],108:[function(require,module,exports){
+var $ = require('jquery');
+var queryParams = require('./query-params');
+
+module.exports = function(selector) {
+    $(document).ready(function() {
+        if ( ! queryParams.has('bg')) {
+            return;
+        }
+
+        var style = "content: ' ';"
+            + "display: block;"
+            + "position: absolute;"
+            + "top: 0;"
+            + "left: 0;"
+            + "width: 100%;"
+            + "height: 100%;"
+            + "opacity: 0.2;"
+            + "z-index: -1;"
+            + "background-image: url('" + queryParams.get('bg') + "');"
+            + "background-size: cover;"
+            + "background-position: center;"
+            + "background-repeat: no-repeat;"
+
+        $('<style>' + selector + ':after { ' + style + '} </style>')
+            .appendTo('head')
+    });
+}
+},{"./query-params":112,"jquery":68}],109:[function(require,module,exports){
 module.exports = function (cname) {
   var name = cname + "=";
   var decodedCookie = decodeURIComponent(document.cookie);
@@ -106951,7 +106980,7 @@ module.exports = function (cname) {
   }
   return "";
 }
-},{}],109:[function(require,module,exports){
+},{}],110:[function(require,module,exports){
 var lodashSet = require('lodash.set')
 
 module.exports = {
@@ -106970,7 +106999,7 @@ module.exports = {
   },
   set: lodashSet,
 };
-},{"lodash.set":71}],110:[function(require,module,exports){
+},{"lodash.set":71}],111:[function(require,module,exports){
 module.exports = (function() {
     
     var $body = $('body');
@@ -107005,7 +107034,7 @@ module.exports = (function() {
 })()
 
 
-},{}],111:[function(require,module,exports){
+},{}],112:[function(require,module,exports){
 var UrlSearchParams = require('url-search-params');
 var queryParams = new UrlSearchParams(window.location.search);
 
@@ -107026,7 +107055,7 @@ queryParams.getUrl = function(uri) {
 }
 
 module.exports = queryParams;
-},{"url-search-params":82}],112:[function(require,module,exports){
+},{"url-search-params":82}],113:[function(require,module,exports){
 var Promise = require("lie");
 
 function TaskQueue() {
@@ -107084,7 +107113,7 @@ function TaskQueue() {
 }
 
 module.exports = TaskQueue;
-},{"lie":70}],113:[function(require,module,exports){
+},{"lie":70}],114:[function(require,module,exports){
 var toastr = require('toastr');
 
 toastr.options = {
