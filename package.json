@@ -1,6 +1,6 @@
 {
   "name": "school-mobile",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "school mobile cordova app",
   "main": "gulpfile.js",
   "scripts": {
