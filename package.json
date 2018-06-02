@@ -1,7 +1,7 @@
 {
-  "name": "school-mobile",
-  "version": "1.0.2",
-  "description": "school mobile cordova app",
+  "name": "ssas-enketo",
+  "version": "1.0.0",
+  "description": "ssas enketo module",
   "main": "gulpfile.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,7 +12,7 @@
   },
   "author": "",
   "license": "ISC",
-  "homepage": "https://bitbucket.org/aozisik/school-mobile#readme",
+  "homepage": "https://github.com/swiftmade/ssas-enketo",
   "dependencies": {
     "angular": "1.5.8",
     "enketo-core": "^4.9.0",

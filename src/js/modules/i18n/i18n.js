@@ -1,5 +1,6 @@
 var en = require('./en');
 var lo = require('./lo');
+var zh = require('./zh');
 var _ = require('../utils/helpers');
 
 var Cookies = {
@@ -15,7 +16,8 @@ var i18n = {};
 
 var languages = {
 	"en": en,
-	"lo": lo
+	"lo": lo,
+	"zh": zh,
 };
 
 var fallback = en;
