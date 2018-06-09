@@ -3,7 +3,7 @@ SSAS Enketo
 
 This module is built around [enketo-core](https://github.com/enketo/enketo-core) to facilitate offline and online data collection.
 
-### Features:
+# Features
 
 + Designed to work both in the browser and on mobile devices (Android and iOS). 
 + Uses PouchDB to store sessions and attachments for offline support.
@@ -13,12 +13,12 @@ This module is built around [enketo-core](https://github.com/enketo/enketo-core)
 + Image optimization for large photos.
 
 
-### How to Use
+# How to Use
 
 This module is used by simply loading the necessary html file in the Browser or in a WebView.
 Take a look at the configuration table and pass your parameters in your query string.
 
-#### 1) survey.html
+## 1) survey.html
 
 This is where the survey is displayed. It will start with a loading screen until the survey is loaded (either from disk or from a URL). Then it will prompt the user to create a session or continue from a previous session. You need to pass in necessary configuration for this file to work properly.
 
@@ -27,24 +27,52 @@ This is where the survey is displayed. It will start with a loading screen until
 |------------|----------|---------------------------------------------------------------------------------------------------------|
 | lang       | Yes      | Determines UI and Survey language. Pass in "en" if not sure.                                            |
 | json       | Yes      | Path to your survey json file (previously transformed from xml using enketo-transformer)                |
-| online     | No       | This will skip the session window and the survey will be sent to this path immediately upon submitting. |
+| mode       | Yes      | Options: online, sticky_online, offline. See survey modes section for further explanation.              |
+| submit_url | No       | Required with online mode. Should be the url to receiving OpenRosa server's submission endpoint.        |
 | edit       | No       | Use with online mode only. You need to pass the path to the json file for the submission.               |
 | return     | No       | Upon submission, this url will be loaded. Only available in "online" mode.                              |
 | base       | No       | This will be prepended to all of the parameters taking paths (json, online, edit and return).           |
-| novalidate | No       | When this parameter is found, validation will be turned off for that session.                           |	
-| db         | No       | Sets the name of the database used to store sessions. Defaults to "sessions" when not set.              |	
-| token      | No       | Sets the authorization token for the current session. Only needed in browser sessions.                  |	
-| bg         | No       | Sets the background photo to be shown while the survey is being loaded.                                 |	
+| novalidate | No       | When this parameter is found, validation will be turned off for that session.                           |
+| db         | No       | Sets the name of the database used to store sessions. Defaults to "sessions" when not set.              |
+| token      | No       | Sets the authorization token for the current session. Only needed in browser sessions.                  |
+| bg         | No       | Sets the background photo to be shown while the survey is being loaded.                                 |
 
-#### 2) submissions.html
+
+## 2) submissions.html
 
 This page will display all the submissions stored offline and let the user upload them to the server either one by one or all of them at one go.
 
  Name       | Required | Description                                                                                             |
 |------------|----------|---------------------------------------------------------------------------------------------------------|
 | lang       | Yes      | Determines UI and Survey language. Pass in "en" if not sure.                                            |
-| server       | Yes      | The path for the OpenRosa server's submission endpoint                                                |
+| submit_url       | Yes      | The path for the OpenRosa server's submission endpoint                                                |
 | base       | No       | This will be prepended to all of the parameters taking paths (server).                                  |
 | db         | No       | Sets the name of the database used to store sessions. Defaults to "sessions" when not set.              |
 | token      | No       | Sets the authorization token for the current session. Always pass this if the server requires authentication.  |	
 | bg         | No       | Sets the photo to be shown in the background while this screen is being displayed                       |
+
+
+# Survey Modes
+
+When displaying the questionnaire, you can choose from three survey modes
+
+## online
+
+* No locally stored sessions. When interrupted, all data may be lost.
+* At the end of the survey, the data is submitted to the server.
+* If there's no internet connection, survey may not be completed.
+
+## sticky_online
+
+* Locally stored sessions that stay on the device.
+* Ideal for when a single session will be updated and re-submitted over time.
+* The data is both saved on device and submitted to the server.
+* When submitted, sessions will not be deleted from the device (sticky).
+* Data is submitted to the server upon finishing the survey (online).
+
+## offline
+
+* Sessions are stored on the device.
+* Sessions will not be submitted to the server at the end of the survey.
+* Submissions must be made separately.
+* Submitted sessions will be archived or deleted.
