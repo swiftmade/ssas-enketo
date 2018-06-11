@@ -1,10 +1,9 @@
 var Promise = require('lie');
 
-var submit = require('./submit');
-var Optimizer = require("./optimizer");
-var modes = require('./sessions/_modes');
-var queryParams = require('./utils/query-params');
-var sessionDrivers = require('./sessions/_drivers');
+var modes = require('./modes');
+var Optimizer = require("../optimizer");
+var sessionDrivers = require('./drivers');
+var queryParams = require('../utils/query-params');
 
 var getPreferredMode = function () {
     if ( ! queryParams.has('mode')) {
@@ -91,8 +90,6 @@ var SessionManager = {
             window.location = this.returnUrl ? this.returnUrl : 'index.html';
             throw new Error("redirected!");
         });
-
-        return sessionRepo.update(this.session);
     }
 };
 

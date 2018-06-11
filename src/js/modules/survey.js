@@ -7,7 +7,7 @@ var submitProgress = require("./submit-progress");
 var fileManager = require("./patches/file-manager");
 //
 var JumpTo = require("./jump-to");
-var SessionManager = require("./session-manager");
+var SessionManager = require("./session/manager");
 //
 var $header = $(".form-header");
 

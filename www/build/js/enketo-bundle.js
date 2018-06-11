@@ -105837,7 +105837,7 @@ var vue = new Vue({
 });
 
 module.exports = vue;
-},{"./session-modal":101,"vue":90}],94:[function(require,module,exports){
+},{"./session-modal":100,"vue":90}],94:[function(require,module,exports){
 var $ = require("jquery");
 var angular = require("angular");
 var vAccordion = require("v-accordion");
@@ -106155,13 +106155,244 @@ if (queryParams.has('db')) {
 module.exports = repository.instance(dbName);
 
 },{"../utils/query-params":115,"./repository":98}],100:[function(require,module,exports){
+var Vue = require('vue');
+
+Vue.filter('timeAgo', function (value) {
+    var date = new Date(value);
+    return date.toLocaleString();
+});
+
+function fireSessionEvent(name, payload) {
+    var event = new CustomEvent(name, {
+        detail: payload
+    });
+
+    var elem = document.getElementById("app");
+    elem.dispatchEvent(event);
+}
+
+module.exports = Vue.component('modal', {
+    template: '#modal-template',
+    data: function () {
+        return {
+            name: "",
+            error: "",
+            disabled: false
+        };
+    },
+    props: {
+        show: {
+            type: Boolean,
+            required: true,
+            twoWay: true
+        },
+        sessions: {
+            type: Array,
+            required: true,
+            twoWay: false,
+            default: function () {
+                return []
+            }
+        }
+    },
+    methods: {
+        destroy: function (session) {
+            if (confirm('Do you really want to delete this session') !== true) {
+                return
+            }
+            fireSessionEvent("session:destroy", {
+                "session": session
+            });
+        },
+        load: function (session) {
+            fireSessionEvent("session:load", {
+                "session": session
+            });
+        },
+        create: function () {
+            var name = this.name ? this.name.trim() : "";
+
+            if (name == "") {
+                this.error = "Please name this session";
+                return;
+            }
+
+            this.disabled = true;
+
+            fireSessionEvent("session:create", {
+                name: this.name
+            });
+        }
+    }
+});
+},{"vue":90}],101:[function(require,module,exports){
+var modes = require('./modes');
+var inMemory = require('./drivers/in-memory');
+var persisted = require('./drivers/persisted');
+
+var drivers = {};
+drivers[modes.MODE_STICKY] = persisted;
+drivers[modes.MODE_OFFLINE] = persisted;
+drivers[modes.MODE_EPHEMERAL] = inMemory;
+// Register more session drivers here...
+
+module.exports = {
+    getDriverForMode: function(mode) {
+        return drivers[mode];
+    }
+};
+},{"./drivers/in-memory":102,"./drivers/persisted":103,"./modes":105}],102:[function(require,module,exports){
+var $ = require('jquery');
+var Promise = require('lie');
+var submit = require('../../submit');
+var queryParams = require('../../utils/query-params');
+
+/**
+ * In memory session is not stored anywhere.
+ */
+function InMemory() {
+
+    this.start = function () {
+        // Removes the save button from UI
+        $('.save-progress').remove();
+        if ( ! queryParams.has('edit')) {
+            return Promise.resolve(_getEmptySession());
+        }
+        return _loadSessionFromUrl(queryParams.getPath('edit'));
+    };
+
+    this.save = function(session) {
+        // Do nothing...
+        return session;
+    };
+
+    this.beforeEnd = function (session) {
+        // Before ending the session, submit it to the server.
+        return submit(
+            queryParams.getPath('submit'),
+            session
+        );
+    };
+
+    var _getEmptySession = function () {
+        return {
+            'xml': null,
+            'draft': false,
+            'submitted': false,
+            'browser_mode': true,
+            'instance_id': null,
+            'deprecated_id': null
+        };
+    };
+
+    var _loadSessionFromUrl = function(url) {
+        return new Promise(function(resolve) {
+            $.getJSON(url).done(function (data) {
+                var session = _getEmptySession();
+                session.submitted = true;
+                session.xml = data.instance;
+                session.instance_id = data.instance_id;
+                session.deprecated_id = data.deprecated_id;
+                resolve(session);
+            })
+            .fail(function () {
+                throw new Error("Could not load the document");
+            });
+        });
+    };
+}
+
+module.exports = new InMemory;
+},{"../../submit":107,"../../utils/query-params":115,"jquery":68,"lie":70}],103:[function(require,module,exports){
+var Promise = require('lie');
+var vue = require('../../app-vue');
+var sessionRepo = require("../../repositories/sessions-repository");
+
+/**
+ * Persisted session is stored on the device using IndexedDB (pouchdb)
+ */
+
+ function Persisted() {
+
+    var _this = this;
+
+    this.start = function() {
+        return _loadSessions()
+            .then(_showSessionModal)
+            .then(_onSelectSession);
+    };
+
+    this.save = function (session) {
+        return sessionRepo.update(session);
+    };
+
+    // Save session before ending...
+    this.beforeEnd = this.save;
+
+    var _loadSessions = function() {
+        return sessionRepo.all().then(function (sessions) {
+            // Only display draft sessions
+            sessions = sessions.filter(function (session) {
+                return session.draft;
+            });
+            vue.$set('sessions', sessions);
+            return sessions;
+        });
+    };
+
+    var _showSessionModal = function (sessions) {
+        var that = this;
+        vue.$set('showModal', true);
+
+        return new Promise(function (resolve) {
+            _listenSessionEvents(resolve);
+        });
+    };
+
+    var _listenSessionEvents = function(resolve) {
+        //
+        var that = this;
+        var app = document.getElementById('app');
+
+        app.addEventListener('session:destroy', function (event) {
+            sessionRepo
+                .remove(event.detail.session)
+                .then(_loadSessions);
+        });
+
+        app.addEventListener('session:load', function (event) {
+            resolve(event.detail.session);
+        });
+
+        app.addEventListener("session:create", function (event) {
+            return sessionRepo.create({
+                name: event.detail.name,
+                xml: "",
+                submitted: false,
+                draft: true,
+                last_update: Date.now()
+            }).then(resolve);
+        });
+    };
+
+    var _onSelectSession = function(session) {
+        vue.$set('showModal', false);
+        return new Promise(function(resolve) {
+            setTimeout(function() {
+                resolve(session);
+            }, 50);
+        });
+    };
+}
+
+ module.exports = new Persisted;
+},{"../../app-vue":93,"../../repositories/sessions-repository":99,"lie":70}],104:[function(require,module,exports){
 var Promise = require('lie');
 
-var submit = require('./submit');
-var Optimizer = require("./optimizer");
-var modes = require('./sessions/_modes');
-var queryParams = require('./utils/query-params');
-var sessionDrivers = require('./sessions/_drivers');
+var modes = require('./modes');
+var Optimizer = require("../optimizer");
+var sessionDrivers = require('./drivers');
+var queryParams = require('../utils/query-params');
 
 var getPreferredMode = function () {
     if ( ! queryParams.has('mode')) {
@@ -106248,101 +106479,12 @@ var SessionManager = {
             window.location = this.returnUrl ? this.returnUrl : 'index.html';
             throw new Error("redirected!");
         });
-
-        return sessionRepo.update(this.session);
     }
 };
 
 module.exports = SessionManager;
 
-},{"./optimizer":95,"./sessions/_drivers":102,"./sessions/_modes":103,"./submit":107,"./utils/query-params":115,"lie":70}],101:[function(require,module,exports){
-var Vue = require('vue');
-
-Vue.filter('timeAgo', function (value) {
-    var date = new Date(value);
-    return date.toLocaleString();
-});
-
-function fireSessionEvent(name, payload) {
-    var event = new CustomEvent(name, {
-        detail: payload
-    });
-
-    var elem = document.getElementById("app");
-    elem.dispatchEvent(event);
-}
-
-module.exports = Vue.component('modal', {
-    template: '#modal-template',
-    data: function () {
-        return {
-            name: "",
-            error: "",
-            disabled: false
-        };
-    },
-    props: {
-        show: {
-            type: Boolean,
-            required: true,
-            twoWay: true
-        },
-        sessions: {
-            type: Array,
-            required: true,
-            twoWay: false,
-            default: function () {
-                return []
-            }
-        }
-    },
-    methods: {
-        destroy: function (session) {
-            if (confirm('Do you really want to delete this session') !== true) {
-                return
-            }
-            fireSessionEvent("session:destroy", {
-                "session": session
-            });
-        },
-        load: function (session) {
-            fireSessionEvent("session:load", {
-                "session": session
-            });
-        },
-        create: function () {
-            var name = this.name ? this.name.trim() : "";
-
-            if (name == "") {
-                this.error = "Please name this session";
-                return;
-            }
-
-            this.disabled = true;
-
-            fireSessionEvent("session:create", {
-                name: this.name
-            });
-        }
-    }
-});
-},{"vue":90}],102:[function(require,module,exports){
-var modes = require('./_modes');
-var inMemory = require('./in-memory');
-var persisted = require('./persisted');
-
-var drivers = {};
-drivers[modes.MODE_STICKY] = persisted;
-drivers[modes.MODE_OFFLINE] = persisted;
-drivers[modes.MODE_EPHEMERAL] = inMemory;
-// Register more session drivers here...
-
-module.exports = {
-    getDriverForMode: function(mode) {
-        return drivers[mode];
-    }
-};
-},{"./_modes":103,"./in-memory":104,"./persisted":105}],103:[function(require,module,exports){
+},{"../optimizer":95,"../utils/query-params":115,"./drivers":101,"./modes":105,"lie":70}],105:[function(require,module,exports){
 module.exports = {
     MODE_STICKY: 'sticky',
     MODE_OFFLINE: 'offline',
@@ -106352,147 +106494,7 @@ module.exports = {
         return this.hasOwnProperty(mode);
     },
 };
-},{}],104:[function(require,module,exports){
-var $ = require('jquery');
-var Promise = require('lie');
-var submit = require('../submit');
-var queryParams = require('../utils/query-params');
-
-/**
- * In memory session is not stored anywhere.
- */
-function InMemory() {
-
-    this.start = function () {
-        // Removes the save button from UI
-        $('.save-progress').remove();
-        if ( ! queryParams.has('edit')) {
-            return Promise.resolve(_getEmptySession());
-        }
-        return _loadSessionFromUrl(queryParams.getPath('edit'));
-    };
-
-    this.save = function(session) {
-        // Do nothing...
-        return session;
-    };
-
-    this.beforeEnd = function (session) {
-        // Before ending the session, submit it to the server.
-        return submit(
-            queryParams.getPath('submit'),
-            session
-        );
-    };
-
-    var _getEmptySession = function () {
-        return {
-            'xml': null,
-            'draft': false,
-            'submitted': false,
-            'browser_mode': true,
-            'instance_id': null,
-            'deprecated_id': null
-        };
-    };
-
-    var _loadSessionFromUrl = function(url) {
-        return new Promise(function(resolve) {
-            $.getJSON(url).done(function (data) {
-                var session = _getEmptySession();
-                session.submitted = true;
-                session.xml = data.instance;
-                session.instance_id = data.instance_id;
-                session.deprecated_id = data.deprecated_id;
-                resolve(session);
-            })
-            .fail(function () {
-                throw new Error("Could not load the document");
-            });
-        });
-    };
-}
-
-module.exports = new InMemory;
-},{"../submit":107,"../utils/query-params":115,"jquery":68,"lie":70}],105:[function(require,module,exports){
-var Promise = require('lie');
-var vue = require('../app-vue');
-var sessionRepo = require("../repositories/sessions-repository");
-
-/**
- * Persisted session is stored on the device using IndexedDB (pouchdb)
- */
-
- function Persisted() {
-
-    this.start = function() {
-        return _loadSessions()
-            .then(_showSessionModal)
-            .then(_onSelectSession);
-    };
-
-    this.save = function (session) {
-        return sessionRepo.update(session);
-    };
-    
-    var _loadSessions = function() {
-        return sessionRepo.all().then(function (sessions) {
-            // Only display draft sessions
-            sessions = sessions.filter(function (session) {
-                return session.draft;
-            });
-            vue.$set('sessions', sessions);
-            return sessions;
-        });
-    };
-
-    var _showSessionModal = function (sessions) {
-        var that = this;
-        vue.$set('showModal', true);
-
-        return new Promise(function (resolve) {
-            _listenSessionEvents(resolve);
-        });
-    };
-
-    var _listenSessionEvents = function(resolve) {
-        //
-        var that = this;
-        var app = document.getElementById('app');
-
-        app.addEventListener('session:destroy', function (event) {
-            sessionRepo
-                .remove(event.detail.session)
-                .then(_loadSessions);
-        });
-
-        app.addEventListener('session:load', function (event) {
-            resolve(event.detail.session);
-        });
-
-        app.addEventListener("session:create", function (event) {
-            return sessionRepo.create({
-                name: event.detail.name,
-                xml: "",
-                submitted: false,
-                draft: true,
-                last_update: Date.now()
-            }).then(resolve);
-        });
-    };
-
-    var _onSelectSession = function(session) {
-        vue.$set('showModal', false);
-        return new Promise(function(resolve) {
-            setTimeout(function() {
-                resolve(session);
-            }, 50);
-        });
-    };
-}
-
- module.exports = new Persisted;
-},{"../app-vue":93,"../repositories/sessions-repository":99,"lie":70}],106:[function(require,module,exports){
+},{}],106:[function(require,module,exports){
 module.exports = {
     show: function(msg) {
         $("#submit-progress-text").text(msg);
@@ -106678,7 +106680,7 @@ var submitProgress = require("./submit-progress");
 var fileManager = require("./patches/file-manager");
 //
 var JumpTo = require("./jump-to");
-var SessionManager = require("./session-manager");
+var SessionManager = require("./session/manager");
 //
 var $header = $(".form-header");
 
@@ -106962,7 +106964,7 @@ var Survey = {
 
 module.exports = Survey;
 
-},{"./jump-to":94,"./patches/file-manager":96,"./record-files":97,"./session-manager":100,"./submit-progress":106,"./utils/query-params":115,"enketo-core/src/js/Form":9,"lie":70,"toastr":81}],110:[function(require,module,exports){
+},{"./jump-to":94,"./patches/file-manager":96,"./record-files":97,"./session/manager":104,"./submit-progress":106,"./utils/query-params":115,"enketo-core/src/js/Form":9,"lie":70,"toastr":81}],110:[function(require,module,exports){
 var $ = require('jquery');
 var toastr = require("toastr");
 var cookies = require('./cookies');

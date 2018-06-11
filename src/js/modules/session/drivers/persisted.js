@@ -1,12 +1,14 @@
 var Promise = require('lie');
-var vue = require('../app-vue');
-var sessionRepo = require("../repositories/sessions-repository");
+var vue = require('../../app-vue');
+var sessionRepo = require("../../repositories/sessions-repository");
 
 /**
  * Persisted session is stored on the device using IndexedDB (pouchdb)
  */
 
  function Persisted() {
+
+    var _this = this;
 
     this.start = function() {
         return _loadSessions()
@@ -17,7 +19,10 @@ var sessionRepo = require("../repositories/sessions-repository");
     this.save = function (session) {
         return sessionRepo.update(session);
     };
-    
+
+    // Save session before ending...
+    this.beforeEnd = this.save;
+
     var _loadSessions = function() {
         return sessionRepo.all().then(function (sessions) {
             // Only display draft sessions

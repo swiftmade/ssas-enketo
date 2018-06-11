@@ -1,6 +1,6 @@
-var modes = require('./_modes');
-var inMemory = require('./in-memory');
-var persisted = require('./persisted');
+var modes = require('./modes');
+var inMemory = require('./drivers/in-memory');
+var persisted = require('./drivers/persisted');
 
 var drivers = {};
 drivers[modes.MODE_STICKY] = persisted;

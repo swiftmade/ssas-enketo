@@ -1,7 +1,7 @@
 var $ = require('jquery');
 var Promise = require('lie');
-var submit = require('../submit');
-var queryParams = require('../utils/query-params');
+var submit = require('../../submit');
+var queryParams = require('../../utils/query-params');
 
 /**
  * In memory session is not stored anywhere.
