@@ -37,7 +37,6 @@ This is where the survey is displayed. It will start with a loading screen until
 | token      | No       | Sets the authorization token for the current session. Only needed in browser sessions.                  |
 | bg         | No       | Sets the background photo to be shown while the survey is being loaded.                                 |
 
-
 ## 2) submissions.html
 
 This page will display all the submissions stored offline and let the user upload them to the server either one by one or all of them at one go.
@@ -45,7 +44,7 @@ This page will display all the submissions stored offline and let the user uploa
  Name       | Required | Description                                                                                             |
 |------------|----------|---------------------------------------------------------------------------------------------------------|
 | lang       | Yes      | Determines UI and Survey language. Pass in "en" if not sure.                                            |
-| submit_url       | Yes      | The path for the OpenRosa server's submission endpoint                                                |
+| submit     | Yes      | The path for the OpenRosa server's submission endpoint                                                |
 | base       | No       | This will be prepended to all of the parameters taking paths (server).                                  |
 | db         | No       | Sets the name of the database used to store sessions. Defaults to "sessions" when not set.              |
 | token      | No       | Sets the authorization token for the current session. Always pass this if the server requires authentication.  |	

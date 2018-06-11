@@ -44,7 +44,6 @@ $(document).ready(function() {
             // Successful
             toastr.success("Your submission has been successfully saved on the device");
             $('.submit-form').remove();
-            window.location = "index.html";
         }).catch(function(error) {
             if(error.message == "redirected!") {
                 return;

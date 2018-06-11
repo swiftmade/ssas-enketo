@@ -22,10 +22,8 @@ var SessionManager = {
     driver: null,
     session: null,
     returnUrl: null,
-    browserMode: false, // In browser mode, app submissions are immediate (not persisted on disk)
 
     start: function() {
-
         var _this = this;
         this.returnUrl = queryParams.getPath('return');
 
@@ -71,11 +69,8 @@ var SessionManager = {
         this.session.instance_id = record.instance_id;
         this.session.deprecated_id = record.deprecated_id;
 
-        if (this.browserMode) {
-            return Promise.resolve(this.session);
-        }
-
-        return sessionRepo.update(this.session)
+        return this.driver
+            .save(this.session)
             .then(function(session) {
                 _this.session = session;
             });
@@ -91,13 +86,12 @@ var SessionManager = {
     end: function() {
         this.session.draft = false;
         this.session.last_update = Date.now();
-        if (this.browserMode) {
-            // Immediately submit and return
-            return submit(queryParams.getPath('submit_url'), this.session).then(function() {
-                window.location = this.returnUrl;
-                throw new Error("redirected!");
-            }.bind(this));
-        }
+
+        return this.driver.beforeEnd(this.session).then(function() {
+            window.location = this.returnUrl ? this.returnUrl : 'index.html';
+            throw new Error("redirected!");
+        });
+
         return sessionRepo.update(this.session);
     }
 };

@@ -105812,7 +105812,6 @@ $(document).ready(function() {
             // Successful
             toastr.success("Your submission has been successfully saved on the device");
             $('.submit-form').remove();
-            window.location = "index.html";
         }).catch(function(error) {
             if(error.message == "redirected!") {
                 return;
@@ -106180,10 +106179,8 @@ var SessionManager = {
     driver: null,
     session: null,
     returnUrl: null,
-    browserMode: false, // In browser mode, app submissions are immediate (not persisted on disk)
 
     start: function() {
-
         var _this = this;
         this.returnUrl = queryParams.getPath('return');
 
@@ -106229,11 +106226,8 @@ var SessionManager = {
         this.session.instance_id = record.instance_id;
         this.session.deprecated_id = record.deprecated_id;
 
-        if (this.browserMode) {
-            return Promise.resolve(this.session);
-        }
-
-        return sessionRepo.update(this.session)
+        return this.driver
+            .save(this.session)
             .then(function(session) {
                 _this.session = session;
             });
@@ -106249,13 +106243,12 @@ var SessionManager = {
     end: function() {
         this.session.draft = false;
         this.session.last_update = Date.now();
-        if (this.browserMode) {
-            // Immediately submit and return
-            return submit(queryParams.getPath('submit_url'), this.session).then(function() {
-                window.location = this.returnUrl;
-                throw new Error("redirected!");
-            }.bind(this));
-        }
+
+        return this.driver.beforeEnd(this.session).then(function() {
+            window.location = this.returnUrl ? this.returnUrl : 'index.html';
+            throw new Error("redirected!");
+        });
+
         return sessionRepo.update(this.session);
     }
 };
@@ -106362,6 +106355,7 @@ module.exports = {
 },{}],104:[function(require,module,exports){
 var $ = require('jquery');
 var Promise = require('lie');
+var submit = require('../submit');
 var queryParams = require('../utils/query-params');
 
 /**
@@ -106370,16 +106364,25 @@ var queryParams = require('../utils/query-params');
 function InMemory() {
 
     this.start = function () {
-        // TODO: Get rid of this
-        this.browserMode = true;
         // Removes the save button from UI
         $('.save-progress').remove();
-
         if ( ! queryParams.has('edit')) {
             return Promise.resolve(_getEmptySession());
         }
-
         return _loadSessionFromUrl(queryParams.getPath('edit'));
+    };
+
+    this.save = function(session) {
+        // Do nothing...
+        return session;
+    };
+
+    this.beforeEnd = function (session) {
+        // Before ending the session, submit it to the server.
+        return submit(
+            queryParams.getPath('submit'),
+            session
+        );
     };
 
     var _getEmptySession = function () {
@@ -106411,7 +106414,7 @@ function InMemory() {
 }
 
 module.exports = new InMemory;
-},{"../utils/query-params":115,"jquery":68,"lie":70}],105:[function(require,module,exports){
+},{"../submit":107,"../utils/query-params":115,"jquery":68,"lie":70}],105:[function(require,module,exports){
 var Promise = require('lie');
 var vue = require('../app-vue');
 var sessionRepo = require("../repositories/sessions-repository");
@@ -106428,6 +106431,10 @@ var sessionRepo = require("../repositories/sessions-repository");
             .then(_onSelectSession);
     };
 
+    this.save = function (session) {
+        return sessionRepo.update(session);
+    };
+    
     var _loadSessions = function() {
         return sessionRepo.all().then(function (sessions) {
             // Only display draft sessions

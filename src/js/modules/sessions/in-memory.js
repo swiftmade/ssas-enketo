@@ -1,5 +1,6 @@
 var $ = require('jquery');
 var Promise = require('lie');
+var submit = require('../submit');
 var queryParams = require('../utils/query-params');
 
 /**
@@ -8,16 +9,25 @@ var queryParams = require('../utils/query-params');
 function InMemory() {
 
     this.start = function () {
-        // TODO: Get rid of this
-        this.browserMode = true;
         // Removes the save button from UI
         $('.save-progress').remove();
-
         if ( ! queryParams.has('edit')) {
             return Promise.resolve(_getEmptySession());
         }
-
         return _loadSessionFromUrl(queryParams.getPath('edit'));
+    };
+
+    this.save = function(session) {
+        // Do nothing...
+        return session;
+    };
+
+    this.beforeEnd = function (session) {
+        // Before ending the session, submit it to the server.
+        return submit(
+            queryParams.getPath('submit'),
+            session
+        );
     };
 
     var _getEmptySession = function () {

@@ -14,6 +14,10 @@ var sessionRepo = require("../repositories/sessions-repository");
             .then(_onSelectSession);
     };
 
+    this.save = function (session) {
+        return sessionRepo.update(session);
+    };
+    
     var _loadSessions = function() {
         return sessionRepo.all().then(function (sessions) {
             // Only display draft sessions
