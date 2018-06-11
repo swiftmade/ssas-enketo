@@ -47,8 +47,8 @@ var Survey = {
             $(window).scrollTop(0);
             resolve();
           });
-        });
-      }).catch(reject);
+        }).catch(reject);
+      });
     });
   },
 

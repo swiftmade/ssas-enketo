@@ -106485,13 +106485,19 @@ var SessionManager = {
 module.exports = SessionManager;
 
 },{"../optimizer":95,"../utils/query-params":115,"./drivers":101,"./modes":105,"lie":70}],105:[function(require,module,exports){
+var modes = [
+    'sticky',
+    'offline',
+    'ephemeral',
+];
+
 module.exports = {
-    MODE_STICKY: 'sticky',
-    MODE_OFFLINE: 'offline',
-    MODE_EPHEMERAL: 'ephemeral',
+    MODE_STICKY: modes[0],
+    MODE_OFFLINE: modes[1],
+    MODE_EPHEMERAL: modes[2],
     // Checks if the given mode is valid
     isValidMode: function(mode) {
-        return this.hasOwnProperty(mode);
+        return modes.indexOf(mode) >= 0;
     },
 };
 },{}],106:[function(require,module,exports){
@@ -106720,8 +106726,8 @@ var Survey = {
             $(window).scrollTop(0);
             resolve();
           });
-        });
-      }).catch(reject);
+        }).catch(reject);
+      });
     });
   },
 
