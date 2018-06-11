@@ -1,98 +1,40 @@
-var $ = require('jquery');
-var submit = require('./submit');
-var vue = require('./app-vue');
 var Promise = require('lie');
+
+var submit = require('./submit');
 var Optimizer = require("./optimizer");
-var BrowserSession = require('./browser-session');
+var modes = require('./sessions/_modes');
 var queryParams = require('./utils/query-params');
-var sessionRepo = require("./repositories/sessions-repository");
+var sessionDrivers = require('./sessions/_drivers');
+
+var getPreferredMode = function () {
+    if ( ! queryParams.has('mode')) {
+        return modes.MODE_OFFLINE;
+    }
+    var mode = queryParams.get('mode');
+    if ( ! modes.isValidMode(mode)) {
+        throw new Error('Invalid mode: ' + mode);
+    }
+    return mode;
+};
 
 var SessionManager = {
     //
+    driver: null,
     session: null,
     returnUrl: null,
     browserMode: false, // In browser mode, app submissions are immediate (not persisted on disk)
-    activeSessionIndex: null,
 
-    activateBrowserMode: function() {
-        var that = this;
-        this.browserMode = true;
+    start: function() {
+
+        var _this = this;
         this.returnUrl = queryParams.getPath('return');
 
-        $('.save-progress').remove();
+        var mode = getPreferredMode();
+        this.driver = sessionDrivers.getDriverForMode(mode);
 
-        return BrowserSession().then(function(session) {
-            that.session = session;
+        return this.driver.start().then(function(session) {
+            _this.session = session;
             return session;
-        });
-    },
-    //
-    start: function() {
-        var that = this;
-
-        if (queryParams.has('online')) {
-            return this.activateBrowserMode();
-        }
-
-        return this.loadSessions().then(function() {
-            return new Promise(function(resolve) {
-                that.selectSession().then(function(session) {
-                    that.session = session;
-                    vue.$set('showModal', false);
-                    setTimeout(function() {
-                        resolve(session);
-                    }, 50);
-                });
-            });
-        });
-    },
-
-    selectSession: function() {
-        var that = this;
-        vue.$set('showModal', true);
-
-        return new Promise(function(resolve) {
-            that.listenSessionEvents(resolve);
-        });
-    },
-
-    listenSessionEvents: function(resolve) {
-        //
-        var that = this;
-        var app = document.getElementById('app');
-
-        app.addEventListener('session:destroy', function(event) {
-            sessionRepo.remove(event.detail.session).then(function() {
-                return that.loadSessions();
-            });
-        });
-
-        app.addEventListener('session:load', function(event) {
-            resolve(event.detail.session);
-        });
-
-        app.addEventListener("session:create", function(event) {
-            return sessionRepo.create({
-                name: event.detail.name,
-                xml: "",
-                submitted: false,
-                draft: true,
-                last_update: Date.now()
-            }).then(function(session) {
-                resolve(session);
-            });
-        });
-    },
-
-    loadSessions: function() {
-        return sessionRepo.all().then(function(sessions) {
-            // Only display draft sessions
-            sessions = sessions.filter(function(session) {
-                return session.draft;
-            });
-
-            vue.$set('sessions', sessions);
-            return sessions;
         });
     },
 
@@ -151,7 +93,7 @@ var SessionManager = {
         this.session.last_update = Date.now();
         if (this.browserMode) {
             // Immediately submit and return
-            return submit(queryParams.getPath('online'), this.session).then(function() {
+            return submit(queryParams.getPath('submit_url'), this.session).then(function() {
                 window.location = this.returnUrl;
                 throw new Error("redirected!");
             }.bind(this));

@@ -26,12 +26,12 @@ This is where the survey is displayed. It will start with a loading screen until
 | Name       | Required | Description                                                                                             |
 |------------|----------|---------------------------------------------------------------------------------------------------------|
 | lang       | Yes      | Determines UI and Survey language. Pass in "en" if not sure.                                            |
-| json       | Yes      | Path to your survey json file (previously transformed from xml using enketo-transformer)                |
-| mode       | Yes      | Options: online, sticky_online, offline. See survey modes section for further explanation.              |
-| submit_url | No       | Required with online mode. Should be the url to receiving OpenRosa server's submission endpoint.        |
+| survey     | Yes      | Path to your survey json file (previously transformed from xml using enketo-transformer)                |
+| mode       | Yes      | Options: ephemeral, sticky, offline. See survey modes section for further explanation.                  |
+| submit     | No       | Required with online mode. Should be the url to receiving OpenRosa server's submission endpoint.        |
 | edit       | No       | Use with online mode only. You need to pass the path to the json file for the submission.               |
-| return     | No       | Upon submission, this url will be loaded. Only available in "online" mode.                              |
-| base       | No       | This will be prepended to all of the parameters taking paths (json, online, edit and return).           |
+| return     | No       | Upon submission, this url will be loaded.                                                               |
+| base       | No       | This will be prepended to all of the parameters taking paths (survey, submit, edit and return).         |
 | novalidate | No       | When this parameter is found, validation will be turned off for that session.                           |
 | db         | No       | Sets the name of the database used to store sessions. Defaults to "sessions" when not set.              |
 | token      | No       | Sets the authorization token for the current session. Only needed in browser sessions.                  |
@@ -56,23 +56,22 @@ This page will display all the submissions stored offline and let the user uploa
 
 When displaying the questionnaire, you can choose from three survey modes
 
-## online
+## ephemeral
 
 * No locally stored sessions. When interrupted, all data may be lost.
 * At the end of the survey, the data is submitted to the server.
 * If there's no internet connection, survey may not be completed.
 
-## sticky_online
+## offline
+
+* Sessions are stored on the device.
+* Sessions will not be submitted to the server at the end of the survey.
+* Sessions must be sent to the server separately (via `submissions.html`)
+
+## sticky
 
 * Locally stored sessions that stay on the device.
 * Ideal for when a single session will be updated and re-submitted over time.
 * The data is both saved on device and submitted to the server.
 * When submitted, sessions will not be deleted from the device (sticky).
 * Data is submitted to the server upon finishing the survey (online).
-
-## offline
-
-* Sessions are stored on the device.
-* Sessions will not be submitted to the server at the end of the survey.
-* Submissions must be made separately.
-* Submitted sessions will be archived or deleted.

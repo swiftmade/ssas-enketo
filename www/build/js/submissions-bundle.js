@@ -59222,7 +59222,7 @@ app.controller('SubmissionsCtrl', ['$scope', '$timeout', function($scope, $timeo
                 });
             };
 
-            submit(queryParams.getPath("server"), packet, onUploadProgress)
+            submit(queryParams.getPath('submit_url'), packet, onUploadProgress)
                 .then(function(result) {
                     return sessionRepo.get(packet._id);
                 })

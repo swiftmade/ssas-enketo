@@ -48,7 +48,7 @@ var Survey = {
             resolve();
           });
         });
-      });
+      }).catch(reject);
     });
   },
 

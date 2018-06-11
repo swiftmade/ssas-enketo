@@ -105825,7 +105825,7 @@ $(document).ready(function() {
     });
 });
 
-},{"./modules/app-vue":93,"./modules/support":105,"./modules/survey":106,"./modules/utils/auth":107,"./modules/utils/bg-image":108,"./modules/utils/overlay":111,"./modules/utils/toastr":114,"jquery":68,"vue":90}],93:[function(require,module,exports){
+},{"./modules/app-vue":93,"./modules/support":108,"./modules/survey":109,"./modules/utils/auth":110,"./modules/utils/bg-image":111,"./modules/utils/overlay":114,"./modules/utils/toastr":117,"jquery":68,"vue":90}],93:[function(require,module,exports){
 var Vue = require('vue');
 var vueModal = require('./session-modal');
 
@@ -105838,40 +105838,7 @@ var vue = new Vue({
 });
 
 module.exports = vue;
-},{"./session-modal":102,"vue":90}],94:[function(require,module,exports){
-var $ = require('jquery');
-var Promise = require('lie');
-var queryParams = require('./utils/query-params');
-
-module.exports = function() {
-    var session = {
-        'xml': null,
-        'draft': false,
-        'submitted': false,
-        'browser_mode': true,
-        'instance_id': null,
-        'deprecated_id': null
-    };
-    return new Promise(function(resolve) {
-        if ( ! queryParams.has('edit')) {
-            resolve(session);
-            return;
-        }
-        $.getJSON(queryParams.getPath('edit'))
-            .done(function(data) {
-                session.submitted = true;
-                session.xml = data.instance;
-                session.instance_id = data.instance_id;
-                session.deprecated_id = data.deprecated_id;
-                resolve(session);
-            })
-            .fail(function() {
-                throw new Error("Could not load the document");
-            });
-    });
-};
-
-},{"./utils/query-params":112,"jquery":68,"lie":70}],95:[function(require,module,exports){
+},{"./session-modal":101,"vue":90}],94:[function(require,module,exports){
 var $ = require("jquery");
 var angular = require("angular");
 var vAccordion = require("v-accordion");
@@ -105952,7 +105919,7 @@ module.exports = function(form) {
   angular.bootstrap(document, ["app"]);
 };
 
-},{"./utils/helpers":110,"angular":2,"jquery":68,"v-accordion":89}],96:[function(require,module,exports){
+},{"./utils/helpers":113,"angular":2,"jquery":68,"v-accordion":89}],95:[function(require,module,exports){
 var Promise = require('lie');
 var TaskQueue = require('./utils/task-queue');
 var ImageCompressor = require("image-compressor.js");
@@ -106035,7 +106002,7 @@ module.exports = function(session, onProgressCb) {
     var optimizer = new Optimizer(session, onProgressCb)
     return optimizer.process()
 }
-},{"./repositories/sessions-repository":100,"./utils/task-queue":113,"image-compressor.js":64,"lie":70}],97:[function(require,module,exports){
+},{"./repositories/sessions-repository":99,"./utils/task-queue":116,"image-compressor.js":64,"lie":70}],96:[function(require,module,exports){
 /**
  * This patches the file-manager module from enketo-core
  * The aim of this patch is to be able to retrieve attachments stored inside PouchDB
@@ -106085,7 +106052,7 @@ fileManager.getFileUrl = function (subject) {
 }
 
 module.exports = fileManager;
-},{"../repositories/sessions-repository":100,"../utils/query-params":112,"enketo-core/src/js/file-manager":17}],98:[function(require,module,exports){
+},{"../repositories/sessions-repository":99,"../utils/query-params":115,"enketo-core/src/js/file-manager":17}],97:[function(require,module,exports){
 var fileManager = require('./patches/file-manager');
 
 module.exports = function(record) {
@@ -106105,7 +106072,7 @@ module.exports = function(record) {
     record.files = files
     return Promise.resolve(record)
 }
-},{"./patches/file-manager":97}],99:[function(require,module,exports){
+},{"./patches/file-manager":96}],98:[function(require,module,exports){
 var PouchDB = require('pouchdb');
 
 window.PouchDB = PouchDB;
@@ -106176,7 +106143,7 @@ module.exports = {
     }
 };
 
-},{"pouchdb":74}],100:[function(require,module,exports){
+},{"pouchdb":74}],99:[function(require,module,exports){
 var repository = require('./repository');
 var queryParams = require('../utils/query-params');
 
@@ -106188,102 +106155,44 @@ if (queryParams.has('db')) {
 
 module.exports = repository.instance(dbName);
 
-},{"../utils/query-params":112,"./repository":99}],101:[function(require,module,exports){
-var $ = require('jquery');
-var submit = require('./submit');
-var vue = require('./app-vue');
+},{"../utils/query-params":115,"./repository":98}],100:[function(require,module,exports){
 var Promise = require('lie');
+
+var submit = require('./submit');
 var Optimizer = require("./optimizer");
-var BrowserSession = require('./browser-session');
+var modes = require('./sessions/_modes');
 var queryParams = require('./utils/query-params');
-var sessionRepo = require("./repositories/sessions-repository");
+var sessionDrivers = require('./sessions/_drivers');
+
+var getPreferredMode = function () {
+    if ( ! queryParams.has('mode')) {
+        return modes.MODE_OFFLINE;
+    }
+    var mode = queryParams.get('mode');
+    if ( ! modes.isValidMode(mode)) {
+        throw new Error('Invalid mode: ' + mode);
+    }
+    return mode;
+};
 
 var SessionManager = {
     //
+    driver: null,
     session: null,
     returnUrl: null,
     browserMode: false, // In browser mode, app submissions are immediate (not persisted on disk)
-    activeSessionIndex: null,
 
-    activateBrowserMode: function() {
-        var that = this;
-        this.browserMode = true;
+    start: function() {
+
+        var _this = this;
         this.returnUrl = queryParams.getPath('return');
 
-        $('.save-progress').remove();
+        var mode = getPreferredMode();
+        this.driver = sessionDrivers.getDriverForMode(mode);
 
-        return BrowserSession().then(function(session) {
-            that.session = session;
+        return this.driver.start().then(function(session) {
+            _this.session = session;
             return session;
-        });
-    },
-    //
-    start: function() {
-        var that = this;
-
-        if (queryParams.has('online')) {
-            return this.activateBrowserMode();
-        }
-
-        return this.loadSessions().then(function() {
-            return new Promise(function(resolve) {
-                that.selectSession().then(function(session) {
-                    that.session = session;
-                    vue.$set('showModal', false);
-                    setTimeout(function() {
-                        resolve(session);
-                    }, 50);
-                });
-            });
-        });
-    },
-
-    selectSession: function() {
-        var that = this;
-        vue.$set('showModal', true);
-
-        return new Promise(function(resolve) {
-            that.listenSessionEvents(resolve);
-        });
-    },
-
-    listenSessionEvents: function(resolve) {
-        //
-        var that = this;
-        var app = document.getElementById('app');
-
-        app.addEventListener('session:destroy', function(event) {
-            sessionRepo.remove(event.detail.session).then(function() {
-                return that.loadSessions();
-            });
-        });
-
-        app.addEventListener('session:load', function(event) {
-            resolve(event.detail.session);
-        });
-
-        app.addEventListener("session:create", function(event) {
-            return sessionRepo.create({
-                name: event.detail.name,
-                xml: "",
-                submitted: false,
-                draft: true,
-                last_update: Date.now()
-            }).then(function(session) {
-                resolve(session);
-            });
-        });
-    },
-
-    loadSessions: function() {
-        return sessionRepo.all().then(function(sessions) {
-            // Only display draft sessions
-            sessions = sessions.filter(function(session) {
-                return session.draft;
-            });
-
-            vue.$set('sessions', sessions);
-            return sessions;
         });
     },
 
@@ -106342,7 +106251,7 @@ var SessionManager = {
         this.session.last_update = Date.now();
         if (this.browserMode) {
             // Immediately submit and return
-            return submit(queryParams.getPath('online'), this.session).then(function() {
+            return submit(queryParams.getPath('submit_url'), this.session).then(function() {
                 window.location = this.returnUrl;
                 throw new Error("redirected!");
             }.bind(this));
@@ -106353,7 +106262,7 @@ var SessionManager = {
 
 module.exports = SessionManager;
 
-},{"./app-vue":93,"./browser-session":94,"./optimizer":96,"./repositories/sessions-repository":100,"./submit":104,"./utils/query-params":112,"jquery":68,"lie":70}],102:[function(require,module,exports){
+},{"./optimizer":95,"./sessions/_drivers":102,"./sessions/_modes":103,"./submit":107,"./utils/query-params":115,"lie":70}],101:[function(require,module,exports){
 var Vue = require('vue');
 
 Vue.filter('timeAgo', function (value) {
@@ -106424,7 +106333,159 @@ module.exports = Vue.component('modal', {
         }
     }
 });
-},{"vue":90}],103:[function(require,module,exports){
+},{"vue":90}],102:[function(require,module,exports){
+var modes = require('./_modes');
+var inMemory = require('./in-memory');
+var persisted = require('./persisted');
+
+var drivers = {};
+drivers[modes.MODE_STICKY] = persisted;
+drivers[modes.MODE_OFFLINE] = persisted;
+drivers[modes.MODE_EPHEMERAL] = inMemory;
+// Register more session drivers here...
+
+module.exports = {
+    getDriverForMode: function(mode) {
+        return drivers[mode];
+    }
+};
+},{"./_modes":103,"./in-memory":104,"./persisted":105}],103:[function(require,module,exports){
+module.exports = {
+    MODE_STICKY: 'sticky',
+    MODE_OFFLINE: 'offline',
+    MODE_EPHEMERAL: 'ephemeral',
+    // Checks if the given mode is valid
+    isValidMode: function(mode) {
+        return this.hasOwnProperty(mode);
+    },
+};
+},{}],104:[function(require,module,exports){
+var $ = require('jquery');
+var Promise = require('lie');
+var queryParams = require('../utils/query-params');
+
+/**
+ * In memory session is not stored anywhere.
+ */
+function InMemory() {
+
+    this.start = function () {
+        // TODO: Get rid of this
+        this.browserMode = true;
+        // Removes the save button from UI
+        $('.save-progress').remove();
+
+        if ( ! queryParams.has('edit')) {
+            return Promise.resolve(_getEmptySession());
+        }
+
+        return _loadSessionFromUrl(queryParams.getPath('edit'));
+    };
+
+    var _getEmptySession = function () {
+        return {
+            'xml': null,
+            'draft': false,
+            'submitted': false,
+            'browser_mode': true,
+            'instance_id': null,
+            'deprecated_id': null
+        };
+    };
+
+    var _loadSessionFromUrl = function(url) {
+        return new Promise(function(resolve) {
+            $.getJSON(url).done(function (data) {
+                var session = _getEmptySession();
+                session.submitted = true;
+                session.xml = data.instance;
+                session.instance_id = data.instance_id;
+                session.deprecated_id = data.deprecated_id;
+                resolve(session);
+            })
+            .fail(function () {
+                throw new Error("Could not load the document");
+            });
+        });
+    };
+}
+
+module.exports = new InMemory;
+},{"../utils/query-params":115,"jquery":68,"lie":70}],105:[function(require,module,exports){
+var Promise = require('lie');
+var vue = require('../app-vue');
+var sessionRepo = require("../repositories/sessions-repository");
+
+/**
+ * Persisted session is stored on the device using IndexedDB (pouchdb)
+ */
+
+ function Persisted() {
+
+    this.start = function() {
+        return _loadSessions()
+            .then(_showSessionModal)
+            .then(_onSelectSession);
+    };
+
+    var _loadSessions = function() {
+        return sessionRepo.all().then(function (sessions) {
+            // Only display draft sessions
+            sessions = sessions.filter(function (session) {
+                return session.draft;
+            });
+            vue.$set('sessions', sessions);
+            return sessions;
+        });
+    };
+
+    var _showSessionModal = function (sessions) {
+        var that = this;
+        vue.$set('showModal', true);
+
+        return new Promise(function (resolve) {
+            _listenSessionEvents(resolve);
+        });
+    };
+
+    var _listenSessionEvents = function(resolve) {
+        //
+        var that = this;
+        var app = document.getElementById('app');
+
+        app.addEventListener('session:destroy', function (event) {
+            sessionRepo
+                .remove(event.detail.session)
+                .then(_loadSessions);
+        });
+
+        app.addEventListener('session:load', function (event) {
+            resolve(event.detail.session);
+        });
+
+        app.addEventListener("session:create", function (event) {
+            return sessionRepo.create({
+                name: event.detail.name,
+                xml: "",
+                submitted: false,
+                draft: true,
+                last_update: Date.now()
+            }).then(resolve);
+        });
+    };
+
+    var _onSelectSession = function(session) {
+        vue.$set('showModal', false);
+        return new Promise(function(resolve) {
+            setTimeout(function() {
+                resolve(session);
+            }, 50);
+        });
+    };
+}
+
+ module.exports = new Persisted;
+},{"../app-vue":93,"../repositories/sessions-repository":99,"lie":70}],106:[function(require,module,exports){
 module.exports = {
     show: function(msg) {
         $("#submit-progress-text").text(msg);
@@ -106434,7 +106495,7 @@ module.exports = {
         $('#submit-progress').overlay('hide');
     }
 }
-},{}],104:[function(require,module,exports){
+},{}],107:[function(require,module,exports){
 var $ = require('jquery');
 var Promise = require('lie');
 var TaskQueue = require('./utils/task-queue');
@@ -106565,7 +106626,7 @@ module.exports = function(to, packet, progressCb) {
 	return utils.upload(packet, progressCb);
 };
 
-},{"./patches/file-manager":97,"./repositories/sessions-repository":100,"./utils/task-queue":113,"jquery":68,"lie":70}],105:[function(require,module,exports){
+},{"./patches/file-manager":96,"./repositories/sessions-repository":99,"./utils/task-queue":116,"jquery":68,"lie":70}],108:[function(require,module,exports){
 if ( typeof exports === 'object' && typeof exports.nodeName !== 'string' && typeof define !== 'function' ) {
     var define = function( factory ) {
         factory( require, exports, module );
@@ -106600,7 +106661,7 @@ define( function( require, exports, module ) {
     module.exports = features;
 } );
 
-},{}],106:[function(require,module,exports){
+},{}],109:[function(require,module,exports){
 var toastr = require("toastr");
 var Promise = require("lie");
 var Form = require("enketo-core/src/js/Form");
@@ -106651,7 +106712,7 @@ var Survey = {
             resolve();
           });
         });
-      });
+      }).catch(reject);
     });
   },
 
@@ -106894,7 +106955,7 @@ var Survey = {
 
 module.exports = Survey;
 
-},{"./jump-to":95,"./patches/file-manager":97,"./record-files":98,"./session-manager":101,"./submit-progress":103,"./utils/query-params":112,"enketo-core/src/js/Form":9,"lie":70,"toastr":81}],107:[function(require,module,exports){
+},{"./jump-to":94,"./patches/file-manager":96,"./record-files":97,"./session-manager":100,"./submit-progress":106,"./utils/query-params":115,"enketo-core/src/js/Form":9,"lie":70,"toastr":81}],110:[function(require,module,exports){
 var $ = require('jquery');
 var toastr = require("toastr");
 var cookies = require('./cookies');
@@ -106936,7 +106997,7 @@ module.exports = (function() {
     // Also, handle 401 responses and display user the right message
     handleAuthenticationRequiredErrors();
 })()
-},{"./cookies":109,"./query-params":112,"jquery":68,"toastr":81}],108:[function(require,module,exports){
+},{"./cookies":112,"./query-params":115,"jquery":68,"toastr":81}],111:[function(require,module,exports){
 var $ = require('jquery');
 var queryParams = require('./query-params');
 
@@ -106964,7 +107025,7 @@ module.exports = function(selector) {
             .appendTo('head')
     });
 }
-},{"./query-params":112,"jquery":68}],109:[function(require,module,exports){
+},{"./query-params":115,"jquery":68}],112:[function(require,module,exports){
 module.exports = function (cname) {
   var name = cname + "=";
   var decodedCookie = decodeURIComponent(document.cookie);
@@ -106980,7 +107041,7 @@ module.exports = function (cname) {
   }
   return "";
 }
-},{}],110:[function(require,module,exports){
+},{}],113:[function(require,module,exports){
 var lodashSet = require('lodash.set')
 
 module.exports = {
@@ -106999,7 +107060,7 @@ module.exports = {
   },
   set: lodashSet,
 };
-},{"lodash.set":71}],111:[function(require,module,exports){
+},{"lodash.set":71}],114:[function(require,module,exports){
 module.exports = (function() {
     
     var $body = $('body');
@@ -107034,7 +107095,7 @@ module.exports = (function() {
 })()
 
 
-},{}],112:[function(require,module,exports){
+},{}],115:[function(require,module,exports){
 var UrlSearchParams = require('url-search-params');
 var queryParams = new UrlSearchParams(window.location.search);
 
@@ -107055,7 +107116,7 @@ queryParams.getUrl = function(uri) {
 }
 
 module.exports = queryParams;
-},{"url-search-params":82}],113:[function(require,module,exports){
+},{"url-search-params":82}],116:[function(require,module,exports){
 var Promise = require("lie");
 
 function TaskQueue() {
@@ -107113,7 +107174,7 @@ function TaskQueue() {
 }
 
 module.exports = TaskQueue;
-},{"lie":70}],114:[function(require,module,exports){
+},{"lie":70}],117:[function(require,module,exports){
 var toastr = require('toastr');
 
 toastr.options = {
