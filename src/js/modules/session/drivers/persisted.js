@@ -1,5 +1,5 @@
 var Promise = require('lie');
-var vue = require('../../app-vue');
+var vue = require('../ui/session-vue');
 var sessionRepo = require("../../repositories/sessions-repository");
 
 /**

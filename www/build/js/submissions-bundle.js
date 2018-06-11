@@ -31793,6 +31793,281 @@ function argsArray(fun) {
 }
 },{}],4:[function(require,module,exports){
 'use strict';
+var immediate = require('immediate');
+
+/* istanbul ignore next */
+function INTERNAL() {}
+
+var handlers = {};
+
+var REJECTED = ['REJECTED'];
+var FULFILLED = ['FULFILLED'];
+var PENDING = ['PENDING'];
+
+module.exports = Promise;
+
+function Promise(resolver) {
+  if (typeof resolver !== 'function') {
+    throw new TypeError('resolver must be a function');
+  }
+  this.state = PENDING;
+  this.queue = [];
+  this.outcome = void 0;
+  if (resolver !== INTERNAL) {
+    safelyResolveThenable(this, resolver);
+  }
+}
+
+Promise.prototype["finally"] = function (callback) {
+  if (typeof callback !== 'function') {
+    return this;
+  }
+  var p = this.constructor;
+  return this.then(resolve, reject);
+
+  function resolve(value) {
+    function yes () {
+      return value;
+    }
+    return p.resolve(callback()).then(yes);
+  }
+  function reject(reason) {
+    function no () {
+      throw reason;
+    }
+    return p.resolve(callback()).then(no);
+  }
+};
+Promise.prototype["catch"] = function (onRejected) {
+  return this.then(null, onRejected);
+};
+Promise.prototype.then = function (onFulfilled, onRejected) {
+  if (typeof onFulfilled !== 'function' && this.state === FULFILLED ||
+    typeof onRejected !== 'function' && this.state === REJECTED) {
+    return this;
+  }
+  var promise = new this.constructor(INTERNAL);
+  if (this.state !== PENDING) {
+    var resolver = this.state === FULFILLED ? onFulfilled : onRejected;
+    unwrap(promise, resolver, this.outcome);
+  } else {
+    this.queue.push(new QueueItem(promise, onFulfilled, onRejected));
+  }
+
+  return promise;
+};
+function QueueItem(promise, onFulfilled, onRejected) {
+  this.promise = promise;
+  if (typeof onFulfilled === 'function') {
+    this.onFulfilled = onFulfilled;
+    this.callFulfilled = this.otherCallFulfilled;
+  }
+  if (typeof onRejected === 'function') {
+    this.onRejected = onRejected;
+    this.callRejected = this.otherCallRejected;
+  }
+}
+QueueItem.prototype.callFulfilled = function (value) {
+  handlers.resolve(this.promise, value);
+};
+QueueItem.prototype.otherCallFulfilled = function (value) {
+  unwrap(this.promise, this.onFulfilled, value);
+};
+QueueItem.prototype.callRejected = function (value) {
+  handlers.reject(this.promise, value);
+};
+QueueItem.prototype.otherCallRejected = function (value) {
+  unwrap(this.promise, this.onRejected, value);
+};
+
+function unwrap(promise, func, value) {
+  immediate(function () {
+    var returnValue;
+    try {
+      returnValue = func(value);
+    } catch (e) {
+      return handlers.reject(promise, e);
+    }
+    if (returnValue === promise) {
+      handlers.reject(promise, new TypeError('Cannot resolve promise with itself'));
+    } else {
+      handlers.resolve(promise, returnValue);
+    }
+  });
+}
+
+handlers.resolve = function (self, value) {
+  var result = tryCatch(getThen, value);
+  if (result.status === 'error') {
+    return handlers.reject(self, result.value);
+  }
+  var thenable = result.value;
+
+  if (thenable) {
+    safelyResolveThenable(self, thenable);
+  } else {
+    self.state = FULFILLED;
+    self.outcome = value;
+    var i = -1;
+    var len = self.queue.length;
+    while (++i < len) {
+      self.queue[i].callFulfilled(value);
+    }
+  }
+  return self;
+};
+handlers.reject = function (self, error) {
+  self.state = REJECTED;
+  self.outcome = error;
+  var i = -1;
+  var len = self.queue.length;
+  while (++i < len) {
+    self.queue[i].callRejected(error);
+  }
+  return self;
+};
+
+function getThen(obj) {
+  // Make sure we only access the accessor once as required by the spec
+  var then = obj && obj.then;
+  if (obj && (typeof obj === 'object' || typeof obj === 'function') && typeof then === 'function') {
+    return function appyThen() {
+      then.apply(obj, arguments);
+    };
+  }
+}
+
+function safelyResolveThenable(self, thenable) {
+  // Either fulfill, reject or reject with error
+  var called = false;
+  function onError(value) {
+    if (called) {
+      return;
+    }
+    called = true;
+    handlers.reject(self, value);
+  }
+
+  function onSuccess(value) {
+    if (called) {
+      return;
+    }
+    called = true;
+    handlers.resolve(self, value);
+  }
+
+  function tryToUnwrap() {
+    thenable(onSuccess, onError);
+  }
+
+  var result = tryCatch(tryToUnwrap);
+  if (result.status === 'error') {
+    onError(result.value);
+  }
+}
+
+function tryCatch(func, value) {
+  var out = {};
+  try {
+    out.value = func(value);
+    out.status = 'success';
+  } catch (e) {
+    out.status = 'error';
+    out.value = e;
+  }
+  return out;
+}
+
+Promise.resolve = resolve;
+function resolve(value) {
+  if (value instanceof this) {
+    return value;
+  }
+  return handlers.resolve(new this(INTERNAL), value);
+}
+
+Promise.reject = reject;
+function reject(reason) {
+  var promise = new this(INTERNAL);
+  return handlers.reject(promise, reason);
+}
+
+Promise.all = all;
+function all(iterable) {
+  var self = this;
+  if (Object.prototype.toString.call(iterable) !== '[object Array]') {
+    return this.reject(new TypeError('must be an array'));
+  }
+
+  var len = iterable.length;
+  var called = false;
+  if (!len) {
+    return this.resolve([]);
+  }
+
+  var values = new Array(len);
+  var resolved = 0;
+  var i = -1;
+  var promise = new this(INTERNAL);
+
+  while (++i < len) {
+    allResolver(iterable[i], i);
+  }
+  return promise;
+  function allResolver(value, i) {
+    self.resolve(value).then(resolveFromAll, function (error) {
+      if (!called) {
+        called = true;
+        handlers.reject(promise, error);
+      }
+    });
+    function resolveFromAll(outValue) {
+      values[i] = outValue;
+      if (++resolved === len && !called) {
+        called = true;
+        handlers.resolve(promise, values);
+      }
+    }
+  }
+}
+
+Promise.race = race;
+function race(iterable) {
+  var self = this;
+  if (Object.prototype.toString.call(iterable) !== '[object Array]') {
+    return this.reject(new TypeError('must be an array'));
+  }
+
+  var len = iterable.length;
+  var called = false;
+  if (!len) {
+    return this.resolve([]);
+  }
+
+  var i = -1;
+  var promise = new this(INTERNAL);
+
+  while (++i < len) {
+    resolver(iterable[i]);
+  }
+  return promise;
+  function resolver(value) {
+    self.resolve(value).then(function (response) {
+      if (!called) {
+        called = true;
+        handlers.resolve(promise, response);
+      }
+    }, function (error) {
+      if (!called) {
+        called = true;
+        handlers.reject(promise, error);
+      }
+    });
+  }
+}
+
+},{"immediate":9}],5:[function(require,module,exports){
+'use strict';
 
 // This is NOT a complete list of all enketo-core UI strings. Use a parser to find 
 // all strings. E.g. https://github.com/i18next/i18next-parser
@@ -31902,7 +32177,7 @@ module.exports = {
     t: t
 };
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 'use strict';
 /**
  * Simple file manager with cross-browser support. That uses the FileReader
@@ -31936,23 +32211,22 @@ fileManager.isWaitingForPermissions = function() {
 };
 
 /**
- * Obtains a an ObjectURL that can be used to show a preview of the file when used
+ * Obtains a URL that can be used to show a preview of the file when used
  * as a src attribute.
+ * 
+ * It is meant for media previews and media downloads.
  *
  * @param  {?string|Object} subject File or filename in local storage
- * @param  {?string}        fileNameOverride value to override filename with in
- *                          generated URL.  This is not used in the default
- *                          implementation.
  * @return {[type]}         promise url string or rejection with Error
  */
-fileManager.getFileUrl = function( subject /*, fileNameOverride*/ ) {
+fileManager.getFileUrl = function( subject ) {
     return new Promise( function( resolve, reject ) {
         var error;
 
         if ( !subject ) {
             resolve( null );
         } else if ( typeof subject === 'string' ) {
-            // TODO obtain from storage
+            // TODO obtain from storage as http URL or objectURL
             reject( 'no!' );
         } else if ( typeof subject === 'object' ) {
             if ( fileManager.isTooLarge( subject ) ) {
@@ -31964,6 +32238,37 @@ fileManager.getFileUrl = function( subject /*, fileNameOverride*/ ) {
         } else {
             reject( new Error( 'Unknown error occurred' ) );
         }
+    } );
+};
+
+/**
+ * Similar to getFileURL, except that this one is guaranteed to return an objectURL
+ * 
+ * It is meant for loading images into a canvas.
+ * 
+ * @param  {?string|Object} subject File or filename in local storage
+ * @return {[type]}         promise url string or rejection with Error
+ */
+fileManager.getObjectUrl = function( subject ) {
+    return fileManager.getFileUrl( subject )
+        .then( function( url ) {
+            if ( /https?:\/\//.test( url ) ) {
+                return fileManager.urlToBlob( url ).then( URL.createObjectURL );
+            }
+            return url;
+        } );
+};
+
+fileManager.urlToBlob = function( url ) {
+    var xhr = new XMLHttpRequest();
+
+    return new Promise( function( resolve ) {
+        xhr.open( 'GET', url );
+        xhr.responseType = 'blob';
+        xhr.onload = function() {
+            resolve( xhr.response );
+        };
+        xhr.send();
     } );
 };
 
@@ -32025,7 +32330,7 @@ fileManager.getMaxSizeReadable = function() {
 
 module.exports = fileManager;
 
-},{"./utils":6,"enketo/translator":4,"jquery":10,"lie":11}],6:[function(require,module,exports){
+},{"./utils":7,"enketo/translator":5,"jquery":11,"lie":4}],7:[function(require,module,exports){
 /* global ArrayBuffer, Uint8Array */
 'use strict';
 
@@ -32056,9 +32361,9 @@ function parseFunctionFromExpression( expr, func ) {
         openBrackets = 1;
         args = [];
         start = result.index;
-        index = findFunc.lastIndex;
-        argStart = index;
-        while ( openBrackets !== 0 ) {
+        argStart = findFunc.lastIndex;
+        index = argStart - 1;
+        while ( openBrackets !== 0 && index < expr.length ) {
             index++;
             if ( expr[ index ] === '(' ) {
                 openBrackets++;
@@ -32070,7 +32375,9 @@ function parseFunctionFromExpression( expr, func ) {
             }
         }
         // add last argument
-        args.push( expr.substring( argStart, index ).trim() );
+        if ( argStart < index ) {
+            args.push( expr.substring( argStart, index ).trim() );
+        }
 
         // add [ 'function( a ,b)', ['a','b'] ] to result array
         results.push( [ expr.substring( start, index + 1 ), args ] );
@@ -32176,6 +32483,11 @@ function dataUriToBlobSync( dataURI ) {
     } );
 }
 
+function getPasteData( event ) {
+    var clipboardData = event.originalEvent.clipboardData || window.clipboardData; // modern || IE11
+    return ( clipboardData ) ? clipboardData.getData( 'text' ) : null;
+}
+
 module.exports = {
     parseFunctionFromExpression: parseFunctionFromExpression,
     stripQuotes: stripQuotes,
@@ -32183,10 +32495,11 @@ module.exports = {
     toArray: toArray,
     isNumber: isNumber,
     readCookie: readCookie,
-    dataUriToBlobSync: dataUriToBlobSync
+    dataUriToBlobSync: dataUriToBlobSync,
+    getPasteData: getPasteData
 };
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -32707,7 +33020,7 @@ function functionBindPolyfill(context) {
   };
 }
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 (function (global){
 'use strict';
 var Mutation = global.MutationObserver || global.WebKitMutationObserver;
@@ -32780,7 +33093,7 @@ function immediate(task) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -32805,7 +33118,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.3.1
  * https://jquery.com/
@@ -43171,282 +43484,9 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
-},{}],11:[function(require,module,exports){
-'use strict';
-var immediate = require('immediate');
-
-/* istanbul ignore next */
-function INTERNAL() {}
-
-var handlers = {};
-
-var REJECTED = ['REJECTED'];
-var FULFILLED = ['FULFILLED'];
-var PENDING = ['PENDING'];
-
-module.exports = Promise;
-
-function Promise(resolver) {
-  if (typeof resolver !== 'function') {
-    throw new TypeError('resolver must be a function');
-  }
-  this.state = PENDING;
-  this.queue = [];
-  this.outcome = void 0;
-  if (resolver !== INTERNAL) {
-    safelyResolveThenable(this, resolver);
-  }
-}
-
-Promise.prototype["finally"] = function (callback) {
-  if (typeof callback !== 'function') {
-    return this;
-  }
-  var p = this.constructor;
-  return this.then(resolve, reject);
-
-  function resolve(value) {
-    function yes () {
-      return value;
-    }
-    return p.resolve(callback()).then(yes);
-  }
-  function reject(reason) {
-    function no () {
-      throw reason;
-    }
-    return p.resolve(callback()).then(no);
-  }
-};
-Promise.prototype["catch"] = function (onRejected) {
-  return this.then(null, onRejected);
-};
-Promise.prototype.then = function (onFulfilled, onRejected) {
-  if (typeof onFulfilled !== 'function' && this.state === FULFILLED ||
-    typeof onRejected !== 'function' && this.state === REJECTED) {
-    return this;
-  }
-  var promise = new this.constructor(INTERNAL);
-  if (this.state !== PENDING) {
-    var resolver = this.state === FULFILLED ? onFulfilled : onRejected;
-    unwrap(promise, resolver, this.outcome);
-  } else {
-    this.queue.push(new QueueItem(promise, onFulfilled, onRejected));
-  }
-
-  return promise;
-};
-function QueueItem(promise, onFulfilled, onRejected) {
-  this.promise = promise;
-  if (typeof onFulfilled === 'function') {
-    this.onFulfilled = onFulfilled;
-    this.callFulfilled = this.otherCallFulfilled;
-  }
-  if (typeof onRejected === 'function') {
-    this.onRejected = onRejected;
-    this.callRejected = this.otherCallRejected;
-  }
-}
-QueueItem.prototype.callFulfilled = function (value) {
-  handlers.resolve(this.promise, value);
-};
-QueueItem.prototype.otherCallFulfilled = function (value) {
-  unwrap(this.promise, this.onFulfilled, value);
-};
-QueueItem.prototype.callRejected = function (value) {
-  handlers.reject(this.promise, value);
-};
-QueueItem.prototype.otherCallRejected = function (value) {
-  unwrap(this.promise, this.onRejected, value);
-};
-
-function unwrap(promise, func, value) {
-  immediate(function () {
-    var returnValue;
-    try {
-      returnValue = func(value);
-    } catch (e) {
-      return handlers.reject(promise, e);
-    }
-    if (returnValue === promise) {
-      handlers.reject(promise, new TypeError('Cannot resolve promise with itself'));
-    } else {
-      handlers.resolve(promise, returnValue);
-    }
-  });
-}
-
-handlers.resolve = function (self, value) {
-  var result = tryCatch(getThen, value);
-  if (result.status === 'error') {
-    return handlers.reject(self, result.value);
-  }
-  var thenable = result.value;
-
-  if (thenable) {
-    safelyResolveThenable(self, thenable);
-  } else {
-    self.state = FULFILLED;
-    self.outcome = value;
-    var i = -1;
-    var len = self.queue.length;
-    while (++i < len) {
-      self.queue[i].callFulfilled(value);
-    }
-  }
-  return self;
-};
-handlers.reject = function (self, error) {
-  self.state = REJECTED;
-  self.outcome = error;
-  var i = -1;
-  var len = self.queue.length;
-  while (++i < len) {
-    self.queue[i].callRejected(error);
-  }
-  return self;
-};
-
-function getThen(obj) {
-  // Make sure we only access the accessor once as required by the spec
-  var then = obj && obj.then;
-  if (obj && (typeof obj === 'object' || typeof obj === 'function') && typeof then === 'function') {
-    return function appyThen() {
-      then.apply(obj, arguments);
-    };
-  }
-}
-
-function safelyResolveThenable(self, thenable) {
-  // Either fulfill, reject or reject with error
-  var called = false;
-  function onError(value) {
-    if (called) {
-      return;
-    }
-    called = true;
-    handlers.reject(self, value);
-  }
-
-  function onSuccess(value) {
-    if (called) {
-      return;
-    }
-    called = true;
-    handlers.resolve(self, value);
-  }
-
-  function tryToUnwrap() {
-    thenable(onSuccess, onError);
-  }
-
-  var result = tryCatch(tryToUnwrap);
-  if (result.status === 'error') {
-    onError(result.value);
-  }
-}
-
-function tryCatch(func, value) {
-  var out = {};
-  try {
-    out.value = func(value);
-    out.status = 'success';
-  } catch (e) {
-    out.status = 'error';
-    out.value = e;
-  }
-  return out;
-}
-
-Promise.resolve = resolve;
-function resolve(value) {
-  if (value instanceof this) {
-    return value;
-  }
-  return handlers.resolve(new this(INTERNAL), value);
-}
-
-Promise.reject = reject;
-function reject(reason) {
-  var promise = new this(INTERNAL);
-  return handlers.reject(promise, reason);
-}
-
-Promise.all = all;
-function all(iterable) {
-  var self = this;
-  if (Object.prototype.toString.call(iterable) !== '[object Array]') {
-    return this.reject(new TypeError('must be an array'));
-  }
-
-  var len = iterable.length;
-  var called = false;
-  if (!len) {
-    return this.resolve([]);
-  }
-
-  var values = new Array(len);
-  var resolved = 0;
-  var i = -1;
-  var promise = new this(INTERNAL);
-
-  while (++i < len) {
-    allResolver(iterable[i], i);
-  }
-  return promise;
-  function allResolver(value, i) {
-    self.resolve(value).then(resolveFromAll, function (error) {
-      if (!called) {
-        called = true;
-        handlers.reject(promise, error);
-      }
-    });
-    function resolveFromAll(outValue) {
-      values[i] = outValue;
-      if (++resolved === len && !called) {
-        called = true;
-        handlers.resolve(promise, values);
-      }
-    }
-  }
-}
-
-Promise.race = race;
-function race(iterable) {
-  var self = this;
-  if (Object.prototype.toString.call(iterable) !== '[object Array]') {
-    return this.reject(new TypeError('must be an array'));
-  }
-
-  var len = iterable.length;
-  var called = false;
-  if (!len) {
-    return this.resolve([]);
-  }
-
-  var i = -1;
-  var promise = new this(INTERNAL);
-
-  while (++i < len) {
-    resolver(iterable[i]);
-  }
-  return promise;
-  function resolver(value) {
-    self.resolve(value).then(function (response) {
-      if (!called) {
-        called = true;
-        handlers.resolve(promise, response);
-      }
-    }, function (error) {
-      if (!called) {
-        called = true;
-        handlers.reject(promise, error);
-      }
-    });
-  }
-}
-
-},{"immediate":8}],12:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
+arguments[4][4][0].apply(exports,arguments)
+},{"dup":4,"immediate":9}],13:[function(require,module,exports){
 /**
  * Helpers.
  */
@@ -43600,7 +43640,7 @@ function plural(ms, n, name) {
   return Math.ceil(ms / n) + ' ' + name + 's';
 }
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -55964,7 +56004,7 @@ PouchDB.plugin(IDBPouch)
 module.exports = PouchDB;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"argsarray":3,"debug":14,"events":7,"immediate":8,"inherits":9,"lie":16,"spark-md5":18,"uuid":21,"vuvuzela":26}],14:[function(require,module,exports){
+},{"argsarray":3,"debug":15,"events":8,"immediate":9,"inherits":10,"lie":17,"spark-md5":19,"uuid":22,"vuvuzela":27}],15:[function(require,module,exports){
 (function (process){
 /**
  * This is the web browser implementation of `debug()`.
@@ -56163,7 +56203,7 @@ function localstorage() {
 }
 
 }).call(this,require('_process'))
-},{"./debug":15,"_process":17}],15:[function(require,module,exports){
+},{"./debug":16,"_process":18}],16:[function(require,module,exports){
 
 /**
  * This is the common logic for both the Node.js and web browser
@@ -56390,7 +56430,7 @@ function coerce(val) {
   return val;
 }
 
-},{"ms":12}],16:[function(require,module,exports){
+},{"ms":13}],17:[function(require,module,exports){
 'use strict';
 var immediate = require('immediate');
 
@@ -56645,7 +56685,7 @@ function race(iterable) {
   }
 }
 
-},{"immediate":8}],17:[function(require,module,exports){
+},{"immediate":9}],18:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -56831,7 +56871,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 (function (factory) {
     if (typeof exports === 'object') {
         // Node/CommonJS
@@ -57584,7 +57624,7 @@ process.umask = function() { return 0; };
     return SparkMD5;
 }));
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /*
  * Toastr
  * Copyright 2012-2015
@@ -58062,7 +58102,7 @@ process.umask = function() { return 0; };
     }
 }));
 
-},{"jquery":10}],20:[function(require,module,exports){
+},{"jquery":11}],21:[function(require,module,exports){
 (function (global){
 /*!
 Copyright (C) 2015 by WebReflection
@@ -58275,7 +58315,7 @@ URLSearchParamsProto.toString = function toString() {
 
 module.exports = global.URLSearchParams || URLSearchParams;
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 var v1 = require('./v1');
 var v4 = require('./v4');
 
@@ -58285,7 +58325,7 @@ uuid.v4 = v4;
 
 module.exports = uuid;
 
-},{"./v1":24,"./v4":25}],22:[function(require,module,exports){
+},{"./v1":25,"./v4":26}],23:[function(require,module,exports){
 /**
  * Convert array of 16 byte values to UUID string format of the form:
  * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
@@ -58310,7 +58350,7 @@ function bytesToUuid(buf, offset) {
 
 module.exports = bytesToUuid;
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 // Unique ID creation requires a high quality random # generator.  In the
 // browser this is a little complicated due to unknown quality of Math.random()
 // and inconsistent support for the `crypto` API.  We do the best we can via
@@ -58344,7 +58384,7 @@ if (getRandomValues) {
   };
 }
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 var rng = require('./lib/rng');
 var bytesToUuid = require('./lib/bytesToUuid');
 
@@ -58455,7 +58495,7 @@ function v1(options, buf, offset) {
 
 module.exports = v1;
 
-},{"./lib/bytesToUuid":22,"./lib/rng":23}],25:[function(require,module,exports){
+},{"./lib/bytesToUuid":23,"./lib/rng":24}],26:[function(require,module,exports){
 var rng = require('./lib/rng');
 var bytesToUuid = require('./lib/bytesToUuid');
 
@@ -58486,7 +58526,7 @@ function v4(options, buf, offset) {
 
 module.exports = v4;
 
-},{"./lib/bytesToUuid":22,"./lib/rng":23}],26:[function(require,module,exports){
+},{"./lib/bytesToUuid":23,"./lib/rng":24}],27:[function(require,module,exports){
 'use strict';
 
 /**
@@ -58661,7 +58701,7 @@ exports.parse = function (str) {
   }
 };
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 /**
  * This patches the file-manager module from enketo-core
  * The aim of this patch is to be able to retrieve attachments stored inside PouchDB
@@ -58711,7 +58751,7 @@ fileManager.getFileUrl = function (subject) {
 }
 
 module.exports = fileManager;
-},{"../repositories/sessions-repository":29,"../utils/query-params":34,"enketo-core/src/js/file-manager":5}],28:[function(require,module,exports){
+},{"../repositories/sessions-repository":30,"../utils/query-params":35,"enketo-core/src/js/file-manager":6}],29:[function(require,module,exports){
 var PouchDB = require('pouchdb');
 
 window.PouchDB = PouchDB;
@@ -58782,7 +58822,7 @@ module.exports = {
     }
 };
 
-},{"pouchdb":13}],29:[function(require,module,exports){
+},{"pouchdb":14}],30:[function(require,module,exports){
 var repository = require('./repository');
 var queryParams = require('../utils/query-params');
 
@@ -58794,7 +58834,7 @@ if (queryParams.has('db')) {
 
 module.exports = repository.instance(dbName);
 
-},{"../utils/query-params":34,"./repository":28}],30:[function(require,module,exports){
+},{"../utils/query-params":35,"./repository":29}],31:[function(require,module,exports){
 var $ = require('jquery');
 var Promise = require('lie');
 var TaskQueue = require('./utils/task-queue');
@@ -58925,7 +58965,7 @@ module.exports = function(to, packet, progressCb) {
 	return utils.upload(packet, progressCb);
 };
 
-},{"./patches/file-manager":27,"./repositories/sessions-repository":29,"./utils/task-queue":35,"jquery":10,"lie":11}],31:[function(require,module,exports){
+},{"./patches/file-manager":28,"./repositories/sessions-repository":30,"./utils/task-queue":36,"jquery":11,"lie":12}],32:[function(require,module,exports){
 var $ = require('jquery');
 var toastr = require("toastr");
 var cookies = require('./cookies');
@@ -58967,7 +59007,7 @@ module.exports = (function() {
     // Also, handle 401 responses and display user the right message
     handleAuthenticationRequiredErrors();
 })()
-},{"./cookies":33,"./query-params":34,"jquery":10,"toastr":19}],32:[function(require,module,exports){
+},{"./cookies":34,"./query-params":35,"jquery":11,"toastr":20}],33:[function(require,module,exports){
 var $ = require('jquery');
 var queryParams = require('./query-params');
 
@@ -58995,7 +59035,7 @@ module.exports = function(selector) {
             .appendTo('head')
     });
 }
-},{"./query-params":34,"jquery":10}],33:[function(require,module,exports){
+},{"./query-params":35,"jquery":11}],34:[function(require,module,exports){
 module.exports = function (cname) {
   var name = cname + "=";
   var decodedCookie = decodeURIComponent(document.cookie);
@@ -59011,7 +59051,7 @@ module.exports = function (cname) {
   }
   return "";
 }
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 var UrlSearchParams = require('url-search-params');
 var queryParams = new UrlSearchParams(window.location.search);
 
@@ -59032,7 +59072,7 @@ queryParams.getUrl = function(uri) {
 }
 
 module.exports = queryParams;
-},{"url-search-params":20}],35:[function(require,module,exports){
+},{"url-search-params":21}],36:[function(require,module,exports){
 var Promise = require("lie");
 
 function TaskQueue() {
@@ -59090,7 +59130,7 @@ function TaskQueue() {
 }
 
 module.exports = TaskQueue;
-},{"lie":11}],36:[function(require,module,exports){
+},{"lie":12}],37:[function(require,module,exports){
 var toastr = require('toastr');
 
 toastr.options = {
@@ -59098,7 +59138,7 @@ toastr.options = {
 };
 
 module.exports = toastr;
-},{"toastr":19}],37:[function(require,module,exports){
+},{"toastr":20}],38:[function(require,module,exports){
 var $ = require('jquery');
 var angular = require('angular');
 var app = angular.module('app', []);
@@ -59249,4 +59289,4 @@ app.controller('SubmissionsCtrl', ['$scope', '$timeout', function($scope, $timeo
     };
 }]);
 
-},{"./modules/repositories/sessions-repository":29,"./modules/submit":30,"./modules/utils/auth":31,"./modules/utils/bg-image":32,"./modules/utils/query-params":34,"./modules/utils/toastr":36,"angular":2,"jquery":10}]},{},[37]);
+},{"./modules/repositories/sessions-repository":30,"./modules/submit":31,"./modules/utils/auth":32,"./modules/utils/bg-image":33,"./modules/utils/query-params":35,"./modules/utils/toastr":37,"angular":2,"jquery":11}]},{},[38]);

@@ -503,9 +503,9 @@ boom@5.x.x:
   dependencies:
     hoek "4.x.x"
 
-bootstrap-datepicker@1.7.x:
-  version "1.7.1"
-  resolved "https://registry.yarnpkg.com/bootstrap-datepicker/-/bootstrap-datepicker-1.7.1.tgz#4ee7faf34888dbec7834fbf9dbe7c4277e01ddaf"
+bootstrap-datepicker@1.8.x:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/bootstrap-datepicker/-/bootstrap-datepicker-1.8.0.tgz#c63513931e6f09f16ae9f11b62f32d950df3958e"
   dependencies:
     jquery ">=1.7.1 <4.0.0"
 
@@ -1564,22 +1564,24 @@ engine.io@~3.1.0:
     uws "~9.14.0"
 
 enketo-core@^4.9.0:
-  version "4.47.2"
-  resolved "https://registry.yarnpkg.com/enketo-core/-/enketo-core-4.47.2.tgz#46d0488b082696c71a6b62f003f3722a112a6e3a"
+  version "4.52.3"
+  resolved "https://registry.yarnpkg.com/enketo-core/-/enketo-core-4.52.3.tgz#2bec0810bc2beb8a878d17e4f9ab501ddce7cb39"
   dependencies:
-    bootstrap-datepicker "1.7.x"
+    bootstrap-datepicker "1.8.x"
     bootstrap-slider-basic "3.3.x"
-    enketo-xpathjs "1.6.2"
+    enketo-xpathjs "1.8.0"
     jquery "3.3.x"
     jquery-touchswipe "^1.6.18"
-    leaflet "0.7.x"
-    lie "3.2.x"
+    leaflet "1.3.x"
+    leaflet-draw "^1.0.2"
+    leaflet.gridlayer.googlemutant "0.7.x"
+    lie "3.3.x"
     mergexml "1.1.2"
     signature_pad "2.3.x"
 
-enketo-xpathjs@1.6.2:
-  version "1.6.2"
-  resolved "https://registry.yarnpkg.com/enketo-xpathjs/-/enketo-xpathjs-1.6.2.tgz#822cdc188523509d03e7ecb8301eb2bd5e57ebd8"
+enketo-xpathjs@1.8.0:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/enketo-xpathjs/-/enketo-xpathjs-1.8.0.tgz#0fd2b64dac98d9c8f7505cef36c1dac76db6a507"
 
 entities@1.0:
   version "1.0.0"
@@ -3018,9 +3020,17 @@ lead@^1.0.0:
   dependencies:
     flush-write-stream "^1.0.2"
 
-leaflet@0.7.x:
-  version "0.7.7"
-  resolved "https://registry.yarnpkg.com/leaflet/-/leaflet-0.7.7.tgz#1e352ba54e63d076451fa363c900890cb2cf75ee"
+leaflet-draw@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/leaflet-draw/-/leaflet-draw-1.0.2.tgz#212d1d958a53b849bec19a2135d39c13ed012559"
+
+leaflet.gridlayer.googlemutant@0.7.x:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/leaflet.gridlayer.googlemutant/-/leaflet.gridlayer.googlemutant-0.7.0.tgz#cd64dd0e33720fb44ac8d3e13a11c44a72843d28"
+
+leaflet@1.3.x:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/leaflet/-/leaflet-1.3.1.tgz#86f336d2fb0e2d0ff446677049a5dc34cf0ea60e"
 
 level-codec@7.0.1:
   version "7.0.1"
@@ -3107,6 +3117,12 @@ lie@3.1.1:
 lie@3.2.x:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/lie/-/lie-3.2.0.tgz#4f13f2f8bbb027d383db338c43043545791aa8dc"
+  dependencies:
+    immediate "~3.0.5"
+
+lie@3.3.x:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/lie/-/lie-3.3.0.tgz#dcf82dee545f46074daf200c7c1c5a08e0f40f6a"
   dependencies:
     immediate "~3.0.5"
 

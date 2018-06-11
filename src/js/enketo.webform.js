@@ -3,7 +3,7 @@ var $ = (window.jQuery = window.$ = require("jquery"));
 require("./modules/utils/auth");
 require('./modules/utils/overlay');
 
-var vue = require('./modules/app-vue');
+var vue = require('./modules/session/ui/session-vue');
 var support = require("./modules/support");
 var toastr = require("./modules/utils/toastr");
 var setBgImage = require('./modules/utils/bg-image')('#loading-block')
@@ -16,7 +16,7 @@ var Survey = require('./modules/survey');
 
 $(document).ready(function() {
     $('html').addClass('touch');
-    Survey.initializeSurvey();
+    Survey.boot();
     
     $('.save-progress').click(function() {
         Survey.saveSession(true);
