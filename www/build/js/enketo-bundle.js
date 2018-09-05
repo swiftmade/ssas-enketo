@@ -111398,9 +111398,8 @@ var inMemory = require('./drivers/in-memory');
 var persisted = require('./drivers/persisted');
 
 var drivers = {};
-drivers[modes.MODE_STICKY] = persisted;
+drivers[modes.MODE_ONLINE] = inMemory;
 drivers[modes.MODE_OFFLINE] = persisted;
-drivers[modes.MODE_EPHEMERAL] = inMemory;
 // Register more session drivers here...
 
 module.exports = {
@@ -111653,15 +111652,13 @@ module.exports = SessionManager;
 
 },{"../optimizer":100,"../utils/query-params":119,"./drivers":104,"./modes":108,"lie":76}],108:[function(require,module,exports){
 var modes = [
-    'sticky',
+    'online',
     'offline',
-    'ephemeral',
 ];
 
 module.exports = {
-    MODE_STICKY: modes[0],
+    MODE_ONLINE: modes[0],
     MODE_OFFLINE: modes[1],
-    MODE_EPHEMERAL: modes[2],
     // Checks if the given mode is valid
     isValidMode: function(mode) {
         return modes.indexOf(mode) >= 0;

@@ -27,7 +27,7 @@ This is where the survey is displayed. It will start with a loading screen until
 |------------|----------|---------------------------------------------------------------------------------------------------------|
 | lang       | Yes      | Determines UI and Survey language. Pass in "en" if not sure.                                            |
 | survey     | Yes      | Path to your survey json file (previously transformed from xml using enketo-transformer)                |
-| mode       | Yes      | Options: ephemeral, sticky, offline. See survey modes section for further explanation.                  |
+| mode       | Yes      | Options: online, offline (default). See survey modes section for further explanation.                  |
 | submit     | No       | Required with online mode. Should be the url to receiving OpenRosa server's submission endpoint.        |
 | edit       | No       | Use with online mode only. You need to pass the path to the json file for the submission.               |
 | return     | No       | Upon submission, this url will be loaded.                                                               |
@@ -55,7 +55,7 @@ This page will display all the submissions stored offline and let the user uploa
 
 When displaying the questionnaire, you can choose from three survey modes
 
-## ephemeral
+## online
 
 * No locally stored sessions. When interrupted, all data may be lost.
 * At the end of the survey, the data is submitted to the server.
@@ -66,11 +66,3 @@ When displaying the questionnaire, you can choose from three survey modes
 * Sessions are stored on the device.
 * Sessions will not be submitted to the server at the end of the survey.
 * Sessions must be sent to the server separately (via `submissions.html`)
-
-## sticky
-
-* Locally stored sessions that stay on the device.
-* Ideal for when a single session will be updated and re-submitted over time.
-* The data is both saved on device and submitted to the server.
-* When submitted, sessions will not be deleted from the device (sticky).
-* Data is submitted to the server upon finishing the survey (online).
