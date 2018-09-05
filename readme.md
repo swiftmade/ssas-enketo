@@ -27,15 +27,28 @@ This is where the survey is displayed. It will start with a loading screen until
 |------------|----------|---------------------------------------------------------------------------------------------------------|
 | lang       | Yes      | Determines UI and Survey language. Pass in "en" if not sure.                                            |
 | survey     | Yes      | Path to your survey json file (previously transformed from xml using enketo-transformer)                |
-| mode       | Yes      | Options: online, offline (default). See survey modes section for further explanation.                  |
-| submit     | No       | Required with online mode. Should be the url to receiving OpenRosa server's submission endpoint.        |
-| edit       | No       | Use with online mode only. You need to pass the path to the json file for the submission.               |
-| return     | No       | Upon submission, this url will be loaded.                                                               |
+| mode       | Yes      | Options: online, offline (default). See survey modes section for further explanation.                   |
 | base       | No       | This will be prepended to all of the parameters taking paths (survey, submit, edit and return).         |
-| novalidate | No       | When this parameter is found, validation will be turned off for that session.                           |
-| db         | No       | Sets the name of the database used to store sessions. Defaults to "sessions" when not set.              |
-| token      | No       | Sets the authorization token for the current session. Only needed in browser sessions.                  |
+| return     | No       | Upon submission, this url will be loaded.                                                               |
 | bg         | No       | Sets the background photo to be shown while the survey is being loaded.                                 |
+| novalidate | No       | When this parameter is found, validation will be turned off for that session.                           |
+
+Based on your mode, further parameters may apply.
+
+### 1) A. Extra parameters for "online" mode
+
+| Name       | Required | Description                                                                                             |
+|------------|----------|---------------------------------------------------------------------------------------------------------|
+| submit     | Yes      | Required with online mode. Should be the url to receiving OpenRosa server's submission endpoint.        |
+| token      | No       | Sets the authorization token for the current session. Only applicable in online mode.                   |
+| edit       | No       | Use with online mode only. You need to pass the path to the json file for the submission.               |
+
+### 1) B. Extra parameters for "offline" mode
+
+| Name       | Required | Description                                                                                             |
+|------------|----------|---------------------------------------------------------------------------------------------------------|
+| session    | No       | Name of the session to create or continue. If you provide this, session modal will be skipped.          |
+| db         | No       | Sets the name of the database used to store sessions. Defaults to "sessions" when not set.              |
 
 ## 2) submissions.html
 
