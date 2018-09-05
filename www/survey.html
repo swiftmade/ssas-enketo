@@ -1,104 +1,108 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js">
+
 <head>
     <title>SSA</title>
     <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" />
     <link rel="stylesheet" href="build/css/survey.css?t=1528732679714" />
 </head>
+
 <body>
-<div class="main">
-    <article class="paper">
-        <!--
+    <div class="main">
+        <article class="paper">
+            <!--
             This section is to be removed in application
         -->
-        <!--
+            <!--
             This form header (markup/css) can be changed in the application.
             Just make sure to keep a .form-language-selector element into which the form language selector (<select>)
             will be appended by Enketo Core.
         -->
-        <header class="form-header" style="background-color:white">
-            <div class="form-progress"></div>
-            <div class="pull-right">
-                <button class="save-progress"><i class="fa fa-save"></i></button>
-                <button class="validate-form"><i class="fa fa-check"></i></button>
-                <button class="first-page-alias"><i class="fa fa-backward"></i></button>
-                <button class="last-page-alias"><i class="fa fa-forward"></i></button>
-                <button id="jump-to"><i class="fa fa-search"></i></button>
-                <button id="close-button"><i class="fa fa-remove"></i></button>
-            </div>
-            <div class="clearfix"></div>
-        </header>
+            <header class="form-header" style="background-color:white">
+                <div class="form-progress"></div>
+                <div class="pull-right">
+                    <button class="save-progress"><i class="fa fa-save"></i></button>
+                    <button class="validate-form"><i class="fa fa-check"></i></button>
+                    <button class="first-page-alias"><i class="fa fa-backward"></i></button>
+                    <button class="last-page-alias"><i class="fa fa-forward"></i></button>
+                    <button id="jump-to"><i class="fa fa-search"></i></button>
+                    <button id="close-button"><i class="fa fa-remove"></i></button>
+                </div>
+                <div class="clearfix"></div>
+            </header>
 
-        <!-- The comment below is used in enketo-core-performance-monitor. -->
-        <!-- {{<form>}} -->
+            <!-- The comment below is used in enketo-core-performance-monitor. -->
+            <!-- {{<form>}} -->
 
-        <section class="form-footer">
-            <!--
+            <section class="form-footer">
+                <!--
             Used some quick-and-dirty inline CSS styles here because the form-footer should be styled in the
             mother application. The HTML markup can be changed as well.
             -->
-            <a class="first-page" style="display:none"></a>
-            <a class="last-page" style="display:none"></a>
-            <button id="validate-form" class="btn btn-primary submit-form"
-                    style="width:200px; margin-left: calc(50% - 100px);" data-i18n="survey.submit">Validate &amp; Submit
-            </button>
-            <div class="enketo-power" style="margin-bottom: 30px;">&nbsp;</div>
-            <div class="form-footer__jump-nav" style="display: flex; flex-direction: row;">
-                <a href="#" class="btn btn-default disabled previous-page" style="flex: 1; border-radius: 0;" data-i18n="survey.back">Back</a>
-                <a href="#" class="btn btn-default disabled next-page" style="flex: 1; border-radius: 0;" data-i18n="survey.next">Next</a>
+                <a class="first-page" style="display:none"></a>
+                <a class="last-page" style="display:none"></a>
+                <button id="validate-form" class="btn btn-primary submit-form" style="width:200px; margin-left: calc(50% - 100px);"
+                    data-i18n="survey.submit">Validate &amp; Submit
+                </button>
+                <div class="enketo-power" style="margin-bottom: 30px;">&nbsp;</div>
+                <div class="form-footer__jump-nav" style="display: flex; flex-direction: row;">
+                    <a href="#" class="btn btn-default disabled previous-page" style="flex: 1; border-radius: 0;"
+                        data-i18n="survey.back">Back</a>
+                    <a href="#" class="btn btn-default disabled next-page" style="flex: 1; border-radius: 0;" data-i18n="survey.next">Next</a>
+                </div>
+            </section>
+
+        </article>
+    </div>
+
+    <div id="jump-to-block" class="overlay">
+        <div class="wrapper">
+            <div id="jump-to-header">
+                <h3 data-i18n="survey.jump_to">Jump To</h3>
+                <a href="javascript:void(0);" id="jump-to-close"><i class="fa fa-close"></i> Close</a>
             </div>
-        </section>
 
-    </article>
-</div>
+            <div id="jump-to-body">
 
-<div id="jump-to-block" class="overlay">
-    <div class="wrapper">
-        <div id="jump-to-header">
-            <h3 data-i18n="survey.jump_to">Jump To</h3>
-            <a href="javascript:void(0);" id="jump-to-close"><i class="fa fa-close"></i> Close</a>
-        </div>
-
-        <div id="jump-to-body">
-        
-            <!--
+                <!--
             <input type="text" ng-model="search.label" style="padding:22px;font-size:14pt;border:1px solid #b4b4b4;width:100%;"
                 placeholder="Filter Results"/>
                 -->
-            <div style="height:80%;overflow-x:hidden;overflow-y:auto;">
-                <v-accordion class="vAccordion--default" control="accordion">
-                    <v-pane ng-repeat="(id, page) in pages track by $index">
-                        <v-pane-header>
-                            {{ page.label }}
-                        </v-pane-header>
-                        <v-pane-content>
-                            <a href="javascript:void(0);" ng-click="jump(page)"><span data-i18n="survey.jump"></span> {{ page.label }}</a>
-                            <div ng-if="page.items">
-                                <ng-include src="'accordion.html'"/>
-                            </div>
-                        </v-pane-content>
-                    </v-pane>
-                </v-accordion>
+                <div style="height:80%;overflow-x:hidden;overflow-y:auto;">
+                    <v-accordion class="vAccordion--default" control="accordion">
+                        <v-pane ng-repeat="(id, page) in pages track by $index">
+                            <v-pane-header>
+                                {{ page.label }}
+                            </v-pane-header>
+                            <v-pane-content>
+                                <a href="javascript:void(0);" ng-click="jump(page)"><span data-i18n="survey.jump"></span>
+                                    {{ page.label }}</a>
+                                <div ng-if="page.items">
+                                    <ng-include src="'accordion.html'" />
+                                </div>
+                            </v-pane-content>
+                        </v-pane>
+                    </v-accordion>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<div id="loading-block" class="overlay">
-    <h3 data-i18n="survey.loading"></h3>
-    <p data-i18n="survey.wait"></p>
-</div>
+    <div id="loading-block" class="overlay">
+        <h3 data-i18n="survey.loading"></h3>
+        <p data-i18n="survey.wait"></p>
+    </div>
 
-<div id="submit-progress" class="overlay">
-    <i class="fa fa-circle-o-notch fa-spin fa-3x"></i>
-    <h5 id="submit-progress-text">Saving...</h5>
-</div>
+    <div id="submit-progress" class="overlay">
+        <i class="fa fa-circle-o-notch fa-spin fa-3x"></i>
+        <h5 id="submit-progress-text">Saving...</h5>
+    </div>
 
-<div id="app">
+    <div id="app">
 
-    <modal :show.sync="showModal" :sessions.sync="sessions"></modal>
-    <!-- template for the modal component -->
-    <script type="x/template" id="modal-template">
-        <div class="modal-mask" v-show="show" transition="modal">
+        <modal :show.sync="showModal" :sessions.sync="sessions"></modal>
+        <!-- template for the modal component -->
+        <script type="x/template" id="modal-template">
+            <div class="modal-mask" v-show="show" transition="modal">
             <div class="modal-container">
                 <div class="modal-header">
                     <div class="pull-right">
@@ -143,10 +147,11 @@
             </div>
         </div>
     </script>
-</div>
+    </div>
 
-<script type="text/javascript" src="build/js/i18n-bundle.js?t=1528732679714"></script>
-<script type="text/javascript" src="build/js/enketo-bundle.js?t=1528732679714"></script>
+    <script type="text/javascript" src="build/js/i18n-bundle.min.js?t=1528732679714"></script>
+    <script type="text/javascript" src="build/js/enketo-bundle.min.js?t=1528732679714"></script>
 
 </body>
+
 </html>
