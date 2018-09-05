@@ -306,8 +306,7 @@ label.geo {
 .pages.or .or-repeat {
   display: inherit; }
 
-*:not(.or-appearance-field-list) .question,
-.or-appearance-field-list {
+.question {
   page-break-inside: avoid; }
 
 h3,
@@ -395,16 +394,6 @@ h4 {
 
 .question {
   padding-bottom: 10px; }
-  .question .question-label,
-  .question .option-label,
-  .question label.geo {
-    line-height: 10px;
-    font-size: 10px; }
-  .question input:not([type=radio]):not([type=checkbox]),
-  .question .geopicker.widget input[type=number] {
-    font-size: 10px;
-    line-height: 10px;
-    height: 20px; }
   .question textarea {
     height: 45px; }
 
@@ -470,6 +459,9 @@ h4 {
   vertical-align: top; }
   .or .question:not(.invalid-required):not(.invalid-constraint) {
     border-top: 1px solid black; }
+
+.pages.or [role="page"].current:not(.question) {
+  display: inherit; }
 
 @media print, screen and (min-width: 700px) {
   .or-appearance-w1 {

@@ -303,8 +303,7 @@ label.geo {
 .pages.or .or-repeat {
   display: inherit; }
 
-*:not(.or-appearance-field-list) .question,
-.or-appearance-field-list {
+.question {
   page-break-inside: avoid; }
 
 h3,
