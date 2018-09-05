@@ -111709,6 +111709,7 @@ var SessionManager = {
 
     end: function() {
         this.session.draft = false;
+        this.session.submitted = false;
         this.session.last_update = Date.now();
 
         return this.driver.beforeEnd(this.session).then(function() {
@@ -111832,12 +111833,12 @@ module.exports = {
 var $ = require('jquery');
 var Promise = require('lie');
 var TaskQueue = require('./utils/task-queue');
-var fileManager = require('./patches/file-manager');
 var sessionRepo = require("./repositories/sessions-repository");
 
 var utils = {
 	form: function(packet) {
 		var form = new FormData();
+		form.append('Extra', JSON.stringify(packet.extra));
 		form.append('Date', new Date().toUTCString());
 		form.append('xml_submission_file', new Blob([packet.xml]));
 		return form;
@@ -111959,7 +111960,7 @@ module.exports = function(to, packet, progressCb) {
 	return utils.upload(packet, progressCb);
 };
 
-},{"./patches/file-manager":101,"./repositories/sessions-repository":105,"./utils/task-queue":123,"jquery":72,"lie":76}],115:[function(require,module,exports){
+},{"./repositories/sessions-repository":105,"./utils/task-queue":123,"jquery":72,"lie":76}],115:[function(require,module,exports){
 if ( typeof exports === 'object' && typeof exports.nodeName !== 'string' && typeof define !== 'function' ) {
     var define = function( factory ) {
         factory( require, exports, module );

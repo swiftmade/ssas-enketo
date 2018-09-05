@@ -1,12 +1,12 @@
 var $ = require('jquery');
 var Promise = require('lie');
 var TaskQueue = require('./utils/task-queue');
-var fileManager = require('./patches/file-manager');
 var sessionRepo = require("./repositories/sessions-repository");
 
 var utils = {
 	form: function(packet) {
 		var form = new FormData();
+		form.append('Extra', JSON.stringify(packet.extra));
 		form.append('Date', new Date().toUTCString());
 		form.append('xml_submission_file', new Blob([packet.xml]));
 		return form;
