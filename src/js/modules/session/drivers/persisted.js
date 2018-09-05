@@ -37,7 +37,6 @@ var sessionRepo = require("../../repositories/sessions-repository");
     };
 
     var _startSessionByName = function(sessions, name) {
-        console.log(sessions)
         
         // If possible, return existing session.
         for (var i = 0; i < sessions.length; i++) {
@@ -45,7 +44,7 @@ var sessionRepo = require("../../repositories/sessions-repository");
                 return sessions[i];
             }
         }
-        
+    
         return _createSessionByName(name)
     }
 

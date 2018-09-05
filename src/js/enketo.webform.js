@@ -19,7 +19,7 @@ $(document).ready(function() {
     Survey.boot();
     
     $('.save-progress').click(function() {
-        Survey.saveSession(true);
+        Survey.save(true);
     });
 
     $('#close-button').click(function() {

@@ -111058,7 +111058,7 @@ $(document).ready(function() {
     Survey.boot();
     
     $('.save-progress').click(function() {
-        Survey.saveSession(true);
+        Survey.save(true);
     });
 
     $('#close-button').click(function() {
@@ -111095,7 +111095,7 @@ $(document).ready(function() {
     });
 });
 
-},{"./modules/session/ui/session-vue":110,"./modules/support":112,"./modules/survey":113,"./modules/utils/auth":114,"./modules/utils/bg-image":115,"./modules/utils/overlay":118,"./modules/utils/toastr":121,"jquery":72,"vue":96}],99:[function(require,module,exports){
+},{"./modules/session/ui/session-vue":112,"./modules/support":115,"./modules/survey":116,"./modules/utils/auth":117,"./modules/utils/bg-image":118,"./modules/utils/overlay":121,"./modules/utils/toastr":124,"jquery":72,"vue":96}],99:[function(require,module,exports){
 var $ = require("jquery");
 var angular = require("angular");
 var vAccordion = require("v-accordion");
@@ -111176,7 +111176,7 @@ module.exports = function(form) {
   angular.bootstrap(document, ["app"]);
 };
 
-},{"./utils/helpers":117,"angular":2,"jquery":72,"v-accordion":95}],100:[function(require,module,exports){
+},{"./utils/helpers":120,"angular":2,"jquery":72,"v-accordion":95}],100:[function(require,module,exports){
 var Promise = require('lie');
 var TaskQueue = require('./utils/task-queue');
 var ImageCompressor = require("image-compressor.js");
@@ -111259,7 +111259,7 @@ module.exports = function(session, onProgressCb) {
     var optimizer = new Optimizer(session, onProgressCb)
     return optimizer.process()
 }
-},{"./repositories/sessions-repository":103,"./utils/task-queue":120,"image-compressor.js":68,"lie":76}],101:[function(require,module,exports){
+},{"./repositories/sessions-repository":105,"./utils/task-queue":123,"image-compressor.js":68,"lie":76}],101:[function(require,module,exports){
 /**
  * This patches the file-manager module from enketo-core
  * The aim of this patch is to be able to retrieve attachments stored inside PouchDB
@@ -111309,7 +111309,42 @@ fileManager.getFileUrl = function (subject) {
 }
 
 module.exports = fileManager;
-},{"../repositories/sessions-repository":103,"../utils/query-params":119,"enketo-core/src/js/file-manager":18}],102:[function(require,module,exports){
+},{"../repositories/sessions-repository":105,"../utils/query-params":122,"enketo-core/src/js/file-manager":18}],102:[function(require,module,exports){
+var fileManager = require('./patches/file-manager');
+
+module.exports = function(record) {
+
+    /**
+     * Get currently attached files from Enketo
+    */
+    var files = fileManager.getCurrentFiles();
+
+    /**
+     * Also append previously uploaded files, but as strings.
+     */
+    $('form.or input[type="file"][data-loaded-file-name]').each(function() {
+        files.push($(this).data('loaded-file-name'));
+    });    
+
+    record.files = files
+    return Promise.resolve(record)
+}
+},{"./patches/file-manager":101}],103:[function(require,module,exports){
+var appendRecordFiles = require('./record-files');
+
+module.exports = function(form) {
+
+    const record = {
+        instance_id: form.instanceID,
+        deprecated_id: form.deprecatedID,
+        xml: form.getDataStr()
+    };
+
+    return appendRecordFiles(
+        record
+    );
+};
+},{"./record-files":102}],104:[function(require,module,exports){
 var PouchDB = require('pouchdb');
 
 window.PouchDB = PouchDB;
@@ -111380,7 +111415,7 @@ module.exports = {
     }
 };
 
-},{"pouchdb":80}],103:[function(require,module,exports){
+},{"pouchdb":80}],105:[function(require,module,exports){
 var repository = require('./repository');
 var queryParams = require('../utils/query-params');
 
@@ -111392,7 +111427,7 @@ if (queryParams.has('db')) {
 
 module.exports = repository.instance(dbName);
 
-},{"../utils/query-params":119,"./repository":102}],104:[function(require,module,exports){
+},{"../utils/query-params":122,"./repository":104}],106:[function(require,module,exports){
 var modes = require('./modes');
 var inMemory = require('./drivers/in-memory');
 var persisted = require('./drivers/persisted');
@@ -111407,7 +111442,7 @@ module.exports = {
         return drivers[mode];
     }
 };
-},{"./drivers/in-memory":105,"./drivers/persisted":106,"./modes":108}],105:[function(require,module,exports){
+},{"./drivers/in-memory":107,"./drivers/persisted":108,"./modes":110}],107:[function(require,module,exports){
 var $ = require('jquery');
 var Promise = require('lie');
 var submit = require('../../submit');
@@ -111469,7 +111504,7 @@ function InMemory() {
 }
 
 module.exports = new InMemory;
-},{"../../submit":111,"../../utils/query-params":119,"jquery":72,"lie":76}],106:[function(require,module,exports){
+},{"../../submit":114,"../../utils/query-params":122,"jquery":72,"lie":76}],108:[function(require,module,exports){
 var Promise = require('lie');
 var vue = require('../ui/session-vue');
 var queryParams = require('../../utils/query-params');
@@ -111509,7 +111544,6 @@ var sessionRepo = require("../../repositories/sessions-repository");
     };
 
     var _startSessionByName = function(sessions, name) {
-        console.log(sessions)
         
         // If possible, return existing session.
         for (var i = 0; i < sessions.length; i++) {
@@ -111517,7 +111551,7 @@ var sessionRepo = require("../../repositories/sessions-repository");
                 return sessions[i];
             }
         }
-        
+    
         return _createSessionByName(name)
     }
 
@@ -111583,7 +111617,7 @@ var sessionRepo = require("../../repositories/sessions-repository");
 }
 
  module.exports = new Persisted;
-},{"../../repositories/sessions-repository":103,"../../utils/query-params":119,"../ui/session-vue":110,"lie":76}],107:[function(require,module,exports){
+},{"../../repositories/sessions-repository":105,"../../utils/query-params":122,"../ui/session-vue":112,"lie":76}],109:[function(require,module,exports){
 var Promise = require('lie');
 
 var modes = require('./modes');
@@ -111681,7 +111715,7 @@ var SessionManager = {
 
 module.exports = SessionManager;
 
-},{"../optimizer":100,"../utils/query-params":119,"./drivers":104,"./modes":108,"lie":76}],108:[function(require,module,exports){
+},{"../optimizer":100,"../utils/query-params":122,"./drivers":106,"./modes":110,"lie":76}],110:[function(require,module,exports){
 var modes = [
     'online',
     'offline',
@@ -111695,7 +111729,7 @@ module.exports = {
         return modes.indexOf(mode) >= 0;
     },
 };
-},{}],109:[function(require,module,exports){
+},{}],111:[function(require,module,exports){
 var Vue = require('vue');
 
 Vue.filter('timeAgo', function (value) {
@@ -111766,7 +111800,7 @@ module.exports = Vue.component('modal', {
         }
     }
 });
-},{"vue":96}],110:[function(require,module,exports){
+},{"vue":96}],112:[function(require,module,exports){
 var Vue = require('vue');
 var vueModal = require('./session-modal');
 
@@ -111779,7 +111813,17 @@ var vue = new Vue({
 });
 
 module.exports = vue;
-},{"./session-modal":109,"vue":96}],111:[function(require,module,exports){
+},{"./session-modal":111,"vue":96}],113:[function(require,module,exports){
+module.exports = {
+    show: function(msg) {
+        $("#submit-progress-text").text(msg);
+        $("#submit-progress").overlay('show');
+    },
+    hide: function() {
+        $('#submit-progress').overlay('hide');
+    }
+}
+},{}],114:[function(require,module,exports){
 var $ = require('jquery');
 var Promise = require('lie');
 var TaskQueue = require('./utils/task-queue');
@@ -111910,7 +111954,7 @@ module.exports = function(to, packet, progressCb) {
 	return utils.upload(packet, progressCb);
 };
 
-},{"./patches/file-manager":101,"./repositories/sessions-repository":103,"./utils/task-queue":120,"jquery":72,"lie":76}],112:[function(require,module,exports){
+},{"./patches/file-manager":101,"./repositories/sessions-repository":105,"./utils/task-queue":123,"jquery":72,"lie":76}],115:[function(require,module,exports){
 if ( typeof exports === 'object' && typeof exports.nodeName !== 'string' && typeof define !== 'function' ) {
     var define = function( factory ) {
         factory( require, exports, module );
@@ -111945,11 +111989,14 @@ define( function( require, exports, module ) {
     module.exports = features;
 } );
 
-},{}],113:[function(require,module,exports){
+},{}],116:[function(require,module,exports){
 var $ = require('jquery');
+var toastr = require("toastr");
 var Form = require('enketo-core/src/js/Form');
 
 var JumpTo = require("./jump-to");
+var getRecord = require('./record');
+var submitProgress = require("./submit-progress");
 var queryParams = require('./utils/query-params');
 var SessionManager = require("./session/manager");
 
@@ -111957,6 +112004,7 @@ function Survey() {
 
     var _this = this;
     this.form = null;
+    this.saving = null;
     this.session = null;
 
     var $header = $(".form-header");
@@ -112038,11 +112086,155 @@ function Survey() {
         $("#loading-block").remove();
         $(window).scrollTop(0);
     };
+
+    /**
+     * VALIDATE SURVEY SESSION
+     */
+    this.validate = function () {
+        // Return the active validation promise
+        // If a check is already going on
+        if (this.validating) {
+            return this.validating;
+        }
+        // You can add ?novalidate=1 to the url to disable validation for that session
+        if (queryParams.has("novalidate")) {
+            return Promise.resolve(true);
+        }
+
+        var previousContent = $(".submit-form").html();
+
+        function disableSubmitButton() {
+            $(".submit-form")
+                .attr("disabled", "disabled")
+                .html("Validating...");
+            return new Promise(function (resolve) {
+                setTimeout(resolve);
+            });
+        }
+
+        var _this = this;
+
+        this.validating = disableSubmitButton()
+            .then(function () {
+                return _this.form.validate();
+            })
+            .then(function (valid) {
+                _this.validating = null;
+                $(".submit-form")
+                    .html(previousContent)
+                    .removeAttr("disabled");
+                return valid;
+            })
+            .then(function (valid) {
+                if (!valid) {
+                    throw new Error("Validation failed");
+                }
+            });
+
+        return this.validating;
+    }
+
+    /**
+     * SAVE SURVEY SESSION
+     */
+    var _finishSaving = function(outcome, message) {
+        _this.saving = null;
+        var $saveProgress = $(".save-progress");
+        $saveProgress.html('<i class="fa fa-save"></i>');
+        $saveProgress.removeAttr("disabled", "disabled");
+
+        if (message) {
+            toastr[outcome](message);
+        }
+    }        
+
+    this.save = function(showMsg) {
+        
+        if (this.saving !== null) {
+            // Prevent triggering a save repeatedly.
+            return this.saving;
+        }
+
+        var _this = this;
+        var $saveProgress = $(".save-progress");
+        $saveProgress.html('<i class="fa fa-spinner fa-spin"></i>');
+        $saveProgress.attr("disabled", "disabled");
+
+        this.saving = getRecord(_this.form)
+            .then(function(record) {
+                return SessionManager.save(record)
+            })
+            .then(function() {
+                _finishSaving("success", showMsg ? i18n._("survey.saved") : null);
+            })
+            .catch(function(error) {
+                _finishSaving("error", "An error occured while saving this sesssion...");
+                throw error;
+            });
+
+        return this.saving;
+    };
+
+    this.saveAndExit = function() {
+        this.save(false)
+            .then(function () {
+                if (queryParams.has('return')) {
+                    window.location(queryParams.getUrl('return'))
+                    return
+                }
+                window.location = 'index.html'
+            });
+    }
+
+    /**
+     * SUBMIT SURVEY
+     */
+
+     var _stopLeaveCheck = function () {
+        window.onbeforeunload = null;
+    };
+    
+    this.submit = function() {
+        
+        return this.validate()
+            .then(function () {
+                submitProgress.show("Saving your session...");
+                return _this.save();
+            })
+            .then(function () {
+                submitProgress.show("Optimizing attachments...");
+                return SessionManager.optimize(function (progress) {
+                    submitProgress.show(
+                        "Optimizing attachments " + progress.done + "/" + progress.total
+                    );
+                });
+            })
+            .then(function () {
+                submitProgress.show("Finalizing your submission...");
+                _stopLeaveCheck();
+                return SessionManager.end();
+            })
+            .catch(function (error) {
+                if (error.message == "redirected!") {
+                    throw error;
+                }
+                console.error(error);
+
+                setTimeout(function () {
+                    submitProgress.hide();
+                    // TODO: Re-implement autosave
+                    // _this.toggleAutosave(true);
+                }, 250);
+
+                throw new Error(i18n._("survey.errors"));
+            });
+    
+        }; 
 };
 
 module.exports = new Survey;
 
-},{"./jump-to":99,"./session/manager":107,"./utils/query-params":119,"enketo-core/src/js/Form":10,"jquery":72}],114:[function(require,module,exports){
+},{"./jump-to":99,"./record":103,"./session/manager":109,"./submit-progress":113,"./utils/query-params":122,"enketo-core/src/js/Form":10,"jquery":72,"toastr":87}],117:[function(require,module,exports){
 var $ = require('jquery');
 var toastr = require("toastr");
 var cookies = require('./cookies');
@@ -112084,7 +112276,7 @@ module.exports = (function() {
     // Also, handle 401 responses and display user the right message
     handleAuthenticationRequiredErrors();
 })()
-},{"./cookies":116,"./query-params":119,"jquery":72,"toastr":87}],115:[function(require,module,exports){
+},{"./cookies":119,"./query-params":122,"jquery":72,"toastr":87}],118:[function(require,module,exports){
 var $ = require('jquery');
 var queryParams = require('./query-params');
 
@@ -112112,7 +112304,7 @@ module.exports = function(selector) {
             .appendTo('head')
     });
 }
-},{"./query-params":119,"jquery":72}],116:[function(require,module,exports){
+},{"./query-params":122,"jquery":72}],119:[function(require,module,exports){
 module.exports = function (cname) {
   var name = cname + "=";
   var decodedCookie = decodeURIComponent(document.cookie);
@@ -112128,7 +112320,7 @@ module.exports = function (cname) {
   }
   return "";
 }
-},{}],117:[function(require,module,exports){
+},{}],120:[function(require,module,exports){
 var lodashSet = require('lodash.set')
 
 module.exports = {
@@ -112147,7 +112339,7 @@ module.exports = {
   },
   set: lodashSet,
 };
-},{"lodash.set":77}],118:[function(require,module,exports){
+},{"lodash.set":77}],121:[function(require,module,exports){
 module.exports = (function() {
     
     var $body = $('body');
@@ -112182,7 +112374,7 @@ module.exports = (function() {
 })()
 
 
-},{}],119:[function(require,module,exports){
+},{}],122:[function(require,module,exports){
 var UrlSearchParams = require('url-search-params');
 var queryParams = new UrlSearchParams(window.location.search);
 
@@ -112203,7 +112395,7 @@ queryParams.getUrl = function(uri) {
 }
 
 module.exports = queryParams;
-},{"url-search-params":88}],120:[function(require,module,exports){
+},{"url-search-params":88}],123:[function(require,module,exports){
 var Promise = require("lie");
 
 function TaskQueue() {
@@ -112261,7 +112453,7 @@ function TaskQueue() {
 }
 
 module.exports = TaskQueue;
-},{"lie":76}],121:[function(require,module,exports){
+},{"lie":76}],124:[function(require,module,exports){
 var toastr = require('toastr');
 
 toastr.options = {
