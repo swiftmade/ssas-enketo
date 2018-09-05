@@ -48,6 +48,7 @@ Based on your mode, further parameters may apply.
 | Name       | Required | Description                                                                                             |
 |------------|----------|---------------------------------------------------------------------------------------------------------|
 | session    | No       | Name of the session to create or continue. If you provide this, session modal will be skipped.          |
+| session_extra | No    | Pass a json string to be served alongside with the session. Will be submitted to the server.         |
 | db         | No       | Sets the name of the database used to store sessions. Defaults to "sessions" when not set.              |
 
 ## 2) submissions.html

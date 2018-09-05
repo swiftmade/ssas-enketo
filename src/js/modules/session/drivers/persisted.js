@@ -66,12 +66,20 @@ var sessionRepo = require("../../repositories/sessions-repository");
     };
 
     var _createSessionByName = function(name) {
+
+        let sessionExtra = null
+        
+        if (queryParams.has('session_extra')) {
+            sessionExtra = JSON.parse(queryParams.get('session_extra'))
+        }
+
         return sessionRepo.create({
             name: name,
             xml: "",
             submitted: false,
             draft: true,
-            last_update: Date.now()
+            last_update: Date.now(),
+            extra: sessionExtra,
         });
     }
 
