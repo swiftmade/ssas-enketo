@@ -111556,20 +111556,17 @@ var sessionRepo = require("../../repositories/sessions-repository");
     }
 
     var _loadSessions = function() {
-        return sessionRepo.all().then(function (sessions) {
-            // Only display draft sessions
-            sessions = sessions.filter(function (session) {
-                return session.draft;
-            });
-            vue.$set('sessions', sessions);
-            return sessions;
-        });
+        return sessionRepo.all();
     };
 
     var _startSessionViaUI = function (sessions) {
         var that = this;
         vue.$set('showModal', true);
-
+        // Display only draft sessions
+        vue.$set('sessions', sessions.filter(function (session) {
+            return session.draft;
+        }));
+        
         return new Promise(function (resolve) {
             _listenSessionEvents(resolve);
         });
