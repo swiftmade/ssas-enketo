@@ -84,6 +84,7 @@ var SessionManager = {
 
     end: function() {
         this.session.draft = false;
+        this.session.submitted = false;
         this.session.last_update = Date.now();
 
         return this.driver.beforeEnd(this.session).then(function() {
