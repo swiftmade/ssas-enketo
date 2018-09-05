@@ -67,7 +67,7 @@ var sessionRepo = require("../../repositories/sessions-repository");
 
     var _createSessionByName = function(name) {
 
-        let sessionExtra = null
+        var sessionExtra = null;
         
         if (queryParams.has('session_extra')) {
             sessionExtra = JSON.parse(queryParams.get('session_extra'))
