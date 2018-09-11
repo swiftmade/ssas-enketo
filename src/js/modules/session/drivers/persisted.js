@@ -52,13 +52,17 @@ var sessionRepo = require("../../repositories/sessions-repository");
         return sessionRepo.all();
     };
 
+    var _showSessionsInUI = function (sessions) {
+        vue.$set('sessions', sessions.filter(function (session) {
+            return session.draft;
+        }));
+    };
+
     var _startSessionViaUI = function (sessions) {
         var that = this;
         vue.$set('showModal', true);
         // Display only draft sessions
-        vue.$set('sessions', sessions.filter(function (session) {
-            return session.draft;
-        }));
+        _showSessionsInUI(sessions);
         
         return new Promise(function (resolve) {
             _listenSessionEvents(resolve);
@@ -91,7 +95,8 @@ var sessionRepo = require("../../repositories/sessions-repository");
         app.addEventListener('session:destroy', function (event) {
             sessionRepo
                 .remove(event.detail.session)
-                .then(_loadSessions);
+                .then(_loadSessions)
+                .then(_showSessionsInUI);
         });
 
         app.addEventListener('session:load', function (event) {
