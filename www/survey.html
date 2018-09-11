@@ -102,8 +102,8 @@
         <modal :show.sync="showModal" :sessions.sync="sessions"></modal>
         <!-- template for the modal component -->
         <script type="x/template" id="modal-template">
-            <div class="modal-mask" v-show="show" transition="modal">
-            <div class="modal-container">
+            <div class="modal-mask" v-if="show" transition="modal">
+            <div class="modal-container" id="surveyModal">
                 <div class="modal-header">
                     <div class="pull-right">
                         <a href="index.html"><i class="fa fa-remove"></i></a>
@@ -124,14 +124,14 @@
                     <ul class="previous-sessions">
                         <li v-for="session in sessions">
                             <div class="pull-right">
-                                <button class="sm-button" v-on:click="destroy(session)">
+                                <button class="sm-button action--delete_session" v-on:click="destroy(session)">
                                     <i class="fa fa-trash"></i>
                                 </button>
-                                <button class="sm-button" v-on:click="load(session)">
+                                <button class="sm-button action--load_session" v-on:click="load(session)">
                                     <i class="fa fa-arrow-circle-right"></i>
                                 </button>
                             </div>
-                            <a href="javascript:void(0);" v-on:click="load(session)">
+                            <a href="javascript:void(0);" class="action--load_session" v-on:click="load(session)">
                                 <div class="session-name">
                                     {{ session.name }}
                                 </div>
