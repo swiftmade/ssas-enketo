@@ -19,6 +19,7 @@
     "enketo-core": "^4.9.0",
     "font-awesome": "4.7",
     "image-compressor.js": "^1.1.1",
+    "intro.js": "^2.9.3",
     "lie": "3.2.x",
     "lodash.set": "^4.3.2",
     "pouchdb": "^6.4.3",
