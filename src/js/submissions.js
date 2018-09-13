@@ -1,3 +1,6 @@
+require('../sass/submissions.scss')
+require('./modules/i18n/i18n')
+
 var $ = require('jquery');
 var angular = require('angular');
 var app = angular.module('app', []);

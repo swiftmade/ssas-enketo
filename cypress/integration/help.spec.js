@@ -1,7 +1,7 @@
 describe('Help Tour', () => {
 
   it('is disabled by default', () => {
-      cy.visit('/survey.html?survey=test.json&mode=online')
+      cy.visit('/survey.dev.html?survey=test.json&mode=online')
           .get('#helpModal').should('not.exist')
   })
 
