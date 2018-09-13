@@ -30,7 +30,7 @@ function Survey() {
             // Additional/custom UI features
             .then(_initializeJumpTo)
             .then(_showSurvey)
-        
+
             // TODO: File manager set session
     };
 

@@ -1,16 +1,16 @@
+import '../sass/survey.scss'
+
 var Vue = require('vue');
 var $ = (window.jQuery = window.$ = require("jquery"));
 require("./modules/utils/auth");
 require('./modules/utils/overlay');
 
 var vue = require('./modules/session/ui/session-vue');
-var support = require("./modules/support");
 var toastr = require("./modules/utils/toastr");
 var setBgImage = require('./modules/utils/bg-image')('#loading-block')
 // until all plugins are commonJS-friendly, expose jQuery globally
 window.Vue = Vue;
 
-support.touch = true;
 
 var Survey = require('./modules/survey');
 
