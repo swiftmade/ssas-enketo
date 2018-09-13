@@ -1,4 +1,6 @@
-import '../sass/survey.scss'
+require('../sass/survey.scss')
+
+require('./modules/i18n/i18n')
 
 var Vue = require('vue');
 var $ = (window.jQuery = window.$ = require("jquery"));

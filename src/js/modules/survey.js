@@ -1,7 +1,6 @@
 var $ = require('jquery');
 var toastr = require("toastr");
 var Form = require('enketo-core/src/js/Form');
-
 var JumpTo = require("./jump-to");
 var getRecord = require('./record');
 var submitProgress = require("./submit-progress");

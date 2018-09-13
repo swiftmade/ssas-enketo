@@ -1,22 +1,42 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
-module.exports = {
+const inProduction = process.env.NODE_ENV === 'production'
+
+const getFilename = (name, extension) => {
+    if (inProduction) {
+        return name + '.' + extension
+    }
+    return name + '.dev.' + extension
+}
+
+const webpackConfig = {
     entry: {
         'survey': path.join(__dirname, 'src/js', 'enketo.webform.js')
     },
     output: {
         path: path.join(__dirname, 'www/build/js'),
-        filename: '[name].js'
+        filename: getFilename('[name]', 'js'),
+        libraryTarget: 'umd',
     },
     plugins: [
         new HtmlWebpackPlugin({
-            filename: '../../survey.html',
+            filename: getFilename('../../survey', 'html'),
             template: __dirname + '/src/html/survey.html',
         }),
     ],
+    resolve: {
+        mainFields: ['browser', 'main', 'module']
+    },
     module: {
         rules: [
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: "babel-loader"
+                }
+            },
             {
                 test: /\.scss$/,
                 exclude: /node_modules/,
@@ -32,7 +52,7 @@ module.exports = {
                     loader: 'file-loader',
                     options: {
                         name: '[name].[ext]',
-                        outputPath: '../fonts/'
+                        outputPath: '../../fonts/'
                     }
                 }]
             },
@@ -46,5 +66,10 @@ module.exports = {
                 }]
             }
         ]
+    },
+    optimization: {
+        minimize: inProduction
     }
 }
+
+module.exports = webpackConfig

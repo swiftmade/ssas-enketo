@@ -1,7 +1,7 @@
 var Promise = require('lie');
 var vue = require('../ui/session-vue');
 var queryParams = require('../../utils/query-params');
-var sessionRepo = require("../../repositories/sessions-repository");
+import sessionRepo from '../../repositories/sessions-repository'
 
 /**
  * Persisted session is stored on the device using IndexedDB (pouchdb)
@@ -119,4 +119,4 @@ var sessionRepo = require("../../repositories/sessions-repository");
     };
 }
 
- module.exports = new Persisted;
+export default new Persisted

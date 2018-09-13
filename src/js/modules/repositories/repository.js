@@ -1,4 +1,4 @@
-var PouchDB = require('pouchdb');
+import PouchDB from 'pouchdb'
 
 window.PouchDB = PouchDB;
 
@@ -59,11 +59,9 @@ function Storage(dbName) {
     };
 }
 
-module.exports = {
-    instance: function(name) {
-        if ( ! instances.hasOwnProperty(name)) {
-            instances[name] = new Storage(name)
-        }
-        return instances[name]
+export const getInstance = (name) => {
+    if ( ! instances.hasOwnProperty(name)) {
+        instances[name] = new Storage(name)
     }
-};
+    return instances[name]
+}
