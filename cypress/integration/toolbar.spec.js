@@ -27,5 +27,8 @@ describe('Toolbar', () => {
         cy
             .get('#jump-to').click()
             .get('#jump-to-block').should('be.visible')
+            .get('#jump-to-close').should('be.visible')
+            .get('#jump-to-close').click()
+            .get('#jump-to-block').should('not.be.visible')
     })
 })
