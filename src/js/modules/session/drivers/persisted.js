@@ -71,19 +71,19 @@ import sessionRepo from '../../repositories/sessions-repository'
 
     var _createSessionByName = function(name) {
 
-        var sessionExtra = null;
-        
+        var payload = {};
+
         if (queryParams.has('session_extra')) {
-            sessionExtra = JSON.parse(queryParams.get('session_extra'))
+            payload = JSON.parse(queryParams.get('session_extra'));
         }
 
         return sessionRepo.create({
-            name: name,
-            xml: "",
-            submitted: false,
+            name,
+            xml: '',
+            payload,
             draft: true,
+            submitted: false,
             last_update: Date.now(),
-            extra: sessionExtra,
         });
     }
 

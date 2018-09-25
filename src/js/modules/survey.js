@@ -64,6 +64,7 @@ function Survey() {
             modelStr: survey.model,
             instanceStr: _this.session.xml,
             submitted: _this.session.submitted,
+            session: _this.session.payload
         });
     };
 
