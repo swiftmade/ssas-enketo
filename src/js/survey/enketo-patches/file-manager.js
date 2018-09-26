@@ -14,15 +14,15 @@ var originalGetFileUrl = fileManager.getFileUrl;
 
 fileManager.setSession = function(session) {
     this.session = session;
-};
+}
 
 fileManager.getFileUrlFromDatabase = function(subject) {
-    return sessionRepo
+    return sessionRepository
         .getAttachment(this.session._id, subject)
         .then(function(attachment) {
             return URL.createObjectURL(attachment);
         });
-};
+}
 
 fileManager.getFileUrlOnServer = function(subject) {
     return Promise.resolve(
@@ -32,7 +32,7 @@ fileManager.getFileUrlOnServer = function(subject) {
             + "/photo/" + subject
         )
     );
-};
+}
 
 fileManager.getFileUrl = function (subject) {
     if (subject && typeof subject === 'string') {

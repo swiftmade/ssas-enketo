@@ -22,6 +22,7 @@ class EnketoForm {
         this._newFormInstance()
         this._initFormInstance()
         this._localizeForm()
+        this._setSessionInFileManager()
 
         emitter.emit('EnketoForm.initialized')
     }
@@ -49,6 +50,10 @@ class EnketoForm {
         }
         var lang = i18n.get()
         this.form.langs.setAll(lang)
+    }
+
+    _setSessionInFileManager() {
+        fileManager.setSession(SessionManager.session)
     }
 
     async save() {
