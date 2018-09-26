@@ -15,6 +15,7 @@ const getFilename = (name, extension) => {
 
 const webpackConfig = {
     entry: {
+        polyfill: 'babel-polyfill',
         'survey': path.join(__dirname, 'src/js', 'survey'),
         'submissions': path.join(__dirname, 'src/js', 'submissions'),
     },

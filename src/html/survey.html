@@ -90,12 +90,8 @@
         <h5 id="submit-progress-text">Saving...</h5>
     </div>
 
-    <div id="app">
-
-        <modal :show.sync="showModal" :sessions.sync="sessions"></modal>
-        <!-- template for the modal component -->
-        <script type="x/template" id="modal-template">
-            <div class="modal-mask" v-if="show" transition="modal">
+    <div id="session-modal">
+        <div class="modal-mask">
             <div class="modal-container" id="surveyModal">
                 <div class="modal-header">
                     <div class="pull-right">
@@ -106,16 +102,15 @@
 
                 <div class="modal-body">
 
-
                     <p><b data-i18n="session.description">Start a New Session</b></p>
                     <label data-i18n="session.name">Name</label>
-                    <input type="text" v-model="name" style="width:100%;"/>
+                    <input type="text" v-model="name" style="width:100%;" />
                     <p v-show="error">{{ error }}</p>
                     <button class="md-button" v-on:click="create()" :disabled="disabled" data-i18n="session.start">Start</button>
-                    <hr/>
+                    <hr />
 
                     <ul class="previous-sessions">
-                        <li v-for="session in sessions">
+                        <li v-for="session in sessions" :key="session">
                             <div class="pull-right">
                                 <button class="sm-button action--delete_session" v-on:click="destroy(session)">
                                     <i class="fa fa-trash"></i>
@@ -135,11 +130,9 @@
                             <div class="clearfix"></div>
                         </li>
                     </ul>
-
                 </div>
             </div>
         </div>
-    </script>
     </div>
 </body>
 </html>
