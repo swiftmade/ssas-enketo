@@ -7,7 +7,14 @@ class SessionManager
     }
 
     async start() {
-        await this.driver.start()
+        this.session = await this.driver.start()
+    }
+
+    async save() {
+        if (!this.driver.canSave()) {
+            throw new Exception('This driver does not support saving!')
+        }
+        return this.driver.save(this.session)
     }
 }
 

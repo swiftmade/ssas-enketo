@@ -55,4 +55,4 @@ app.controller('Controller', $scope => {
     }
 })
 
-export default app
+angular.bootstrap(document.getElementById('sessionModal'), ['sessionModal'])

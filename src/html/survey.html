@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="no-js">
+<html lang="en" class="no-js touch">
 <head>
     <title>SSA</title>
     <!-- webpack scripts will go here -->
@@ -48,7 +48,7 @@
         </article>
     </div>
 
-    <div id="jump-to-block" class="overlay">
+    <div id="jump-to-block" ng-controller="jumpCtrl" class="overlay">
         <div class="wrapper">
             <div id="jump-to-header">
                 <h3 data-i18n="survey.jump_to">Jump To</h3>
@@ -86,7 +86,7 @@
         <h5 id="submit-progress-text">Saving...</h5>
     </div>
 
-    <div ng-app="sessionModal" ng-controller="Controller" ng-cloak="true">
+    <div id="sessionModal" ng-controller="Controller" ng-cloak="true">
         <div class="modal-mask" ng-show="show">
             <div class="modal-container" id="surveyModal">
                 <div class="modal-header">

@@ -1,6 +1,6 @@
 var $ = require('jquery')
 //var submit = require('../../submit')
-
+import Server from '../../../common/Server'
 import queryParams from '../../../common/QueryParams'
 
 var _getEmptySession = function () {
@@ -12,23 +12,7 @@ var _getEmptySession = function () {
         'instance_id': null,
         'deprecated_id': null
     };
-};
-
-var _loadSessionFromUrl = function (url) {
-    return new Promise(function (resolve) {
-        $.getJSON(url).done(function (data) {
-                var session = _getEmptySession();
-                session.submitted = true;
-                session.xml = data.instance;
-                session.instance_id = data.instance_id;
-                session.deprecated_id = data.deprecated_id;
-                resolve(session);
-            })
-            .fail(function () {
-                throw new Error("Could not load the document");
-            });
-    });
-};
+}
 
 /**
  * In memory session is not stored anywhere.
@@ -36,17 +20,14 @@ var _loadSessionFromUrl = function (url) {
 export default class InMemory {
 
     start() {
-        // Removes the save button from UI
-        $('.save-progress').remove();
         if ( ! queryParams.has('edit')) {
             return Promise.resolve(_getEmptySession());
         }
-        return _loadSessionFromUrl(queryParams.getPath('edit'));
+        return this._loadSessionFromUrl(queryParams.getPath('edit'))
     }
 
-    save(session) {
-        // Do nothing...
-        return session;
+    canSave() {
+        return false
     }
 
     beforeEnd(session) {
@@ -57,5 +38,16 @@ export default class InMemory {
         );
     }
 
+    async _loadSessionFromUrl(url) {
+        const session = _getEmptySession()
+        const data = await Server.json(url)
 
+        return {
+            ...session,
+            submitted: true,
+            xml: data.instance,
+            instance_id: data.instance_id,
+            deprecated_id: data.deprecated_id,
+        }
+    }
 }

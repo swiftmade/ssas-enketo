@@ -10,8 +10,11 @@ import sessionRepository from '../../../common/repositories/SessionRepository'
 
     async start() {
         await this._loadSessions()
-        await this._chooseSession()
-        // TODO: .then(_onSelectSession)
+        return this._chooseSession()
+    }
+
+    canSave() {
+        return true
     }
 
     save(session) {
