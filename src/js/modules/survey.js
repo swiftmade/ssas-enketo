@@ -7,6 +7,8 @@ var submitProgress = require("./submit-progress");
 var queryParams = require('./utils/query-params');
 var SessionManager = require("./session/manager");
 
+require('./patches/form-model')
+
 function Survey() {
 
     var _this = this;
