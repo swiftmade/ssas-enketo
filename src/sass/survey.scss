@@ -11,6 +11,10 @@ html, body {
     padding: 0;
 }
 
+[ng-cloak] {
+    display: none;
+}
+
 .noScroll {
     overflow-y:hidden;
     height: 100%;

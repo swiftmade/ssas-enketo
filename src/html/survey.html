@@ -57,10 +57,6 @@
 
             <div id="jump-to-body">
 
-                <!--
-            <input type="text" ng-model="search.label" style="padding:22px;font-size:14pt;border:1px solid #b4b4b4;width:100%;"
-                placeholder="Filter Results"/>
-                -->
                 <div style="height:80%;overflow-x:hidden;overflow-y:auto;">
                     <v-accordion class="vAccordion--default" control="accordion">
                         <v-pane ng-repeat="(id, page) in pages track by $index">
@@ -90,8 +86,8 @@
         <h5 id="submit-progress-text">Saving...</h5>
     </div>
 
-    <div id="session-modal">
-        <div class="modal-mask">
+    <div ng-app="sessionModal" ng-controller="Controller" ng-cloak="true">
+        <div class="modal-mask" ng-show="show">
             <div class="modal-container" id="surveyModal">
                 <div class="modal-header">
                     <div class="pull-right">
@@ -104,22 +100,22 @@
 
                     <p><b data-i18n="session.description">Start a New Session</b></p>
                     <label data-i18n="session.name">Name</label>
-                    <input type="text" v-model="name" style="width:100%;" />
-                    <p v-show="error">{{ error }}</p>
-                    <button class="md-button" v-on:click="create()" :disabled="disabled" data-i18n="session.start">Start</button>
+                    <input type="text" ng-model="sessionName" style="width:100%;" />
+                    <p id="session-modal__error"></p>
+                    <button class="md-button" ng-click="createSession()" ng-disabled="disableCreateButton" data-i18n="session.start">Start</button>
                     <hr />
 
                     <ul class="previous-sessions">
-                        <li v-for="session in sessions" :key="session">
+                        <li ng-repeat="session in sessions">
                             <div class="pull-right">
-                                <button class="sm-button action--delete_session" v-on:click="destroy(session)">
+                                <button class="sm-button action--delete_session" ng-click="delete(session)">
                                     <i class="fa fa-trash"></i>
                                 </button>
-                                <button class="sm-button action--load_session" v-on:click="load(session)">
+                                <button class="sm-button action--load_session" ng-click="select(session)">
                                     <i class="fa fa-arrow-circle-right"></i>
                                 </button>
                             </div>
-                            <a href="javascript:void(0);" class="action--load_session" v-on:click="load(session)">
+                            <a href="javascript:void(0);" class="action--load_session" ng-click="select(session)">
                                 <div class="session-name">
                                     {{ session.name }}
                                 </div>
