@@ -1,6 +1,8 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const HtmlWebpackExcludeAssetsPlugin = require('html-webpack-exclude-assets-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin")
+const HtmlWebpackExcludeAssetsPlugin = require('html-webpack-exclude-assets-plugin')
 
 const inProduction = process.env.NODE_ENV === 'production'
 
@@ -13,7 +15,7 @@ const getFilename = (name, extension) => {
 
 const webpackConfig = {
     entry: {
-        'survey': path.join(__dirname, 'src/js', 'enketo.webform.js'),
+        'survey': path.join(__dirname, 'src/js', 'survey'),
         'submissions': path.join(__dirname, 'src/js', 'submissions'),
     },
     output: {
@@ -34,7 +36,11 @@ const webpackConfig = {
             filename: getFilename('../../submissions', 'html'),
             template: __dirname + '/src/html/submissions.html',
         }),
-        new HtmlWebpackExcludeAssetsPlugin()
+        new HtmlWebpackExcludeAssetsPlugin(),
+        new MiniCssExtractPlugin({
+            filename: getFilename('../css/[name]', 'css'),
+            chunkFilename: getFilename('../css/[name]', 'css'),
+        }),
     ],
     resolve: {
         mainFields: ['browser', 'main', 'module']
@@ -52,9 +58,11 @@ const webpackConfig = {
                 test: /\.scss$/,
                 exclude: /node_modules/,
                 use: [
-                    'style-loader',
+                    {
+                        loader: MiniCssExtractPlugin.loader,
+                    },
                     'css-loader',
-                    'sass-loader'
+                    'sass-loader',
                 ]
             },
             {
@@ -79,7 +87,10 @@ const webpackConfig = {
         ]
     },
     optimization: {
-        minimize: inProduction,        
+        minimize: inProduction,
+        minimizer: [
+            new OptimizeCSSAssetsPlugin({})
+        ]
     }
 }
 
