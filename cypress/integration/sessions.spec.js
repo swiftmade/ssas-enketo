@@ -44,4 +44,40 @@ describe('Survey session', () => {
       .get('.session-name').should('not.exist')
   })
 
+  it('can be saved', () => {
+
+    indexedDB.deleteDatabase('_pouch_sessions')
+    
+    cy.visit('/survey.html?survey=test.json&mode=offline&session=test')
+      .get('input[name="/data/TEST1"]').should('have.value', '').type('Hello World!')
+      .get('.save-progress').click()
+      .reload()
+      .get('input[name="/data/TEST1"]').should('have.value', 'Hello World!')
+
+  })
+
+  it('disappears once submitted, and appears in submissions', () => {
+
+    // Make sure submissions page is empty
+    cy.visit('/submissions.html')
+      .get('#packet-rows').children().should('have.length', 0)
+
+    // Start the survey and submit it.
+    cy.visit('/survey.html?survey=test.json&mode=offline')
+      .get('#surveyModal').should('be.visible')
+      .get('.session-name').contains('test').click()
+      .get('.submit-form').click()
+      .location('pathname').should('eq', '/index.html')
+    
+    // Make sure when the survey page is reloaded, the session is not there
+    cy.visit('/survey.html?survey=test.json&mode=offline')
+      .get('#surveyModal').should('be.visible')
+      .get('.session-name').should('not.visible')
+    
+    // And the submitted session should now appear in submissions page
+    cy
+      .visit('/submissions.html')
+      .get('#packet-rows').children().should('have.length', 1)
+  })
+
 })

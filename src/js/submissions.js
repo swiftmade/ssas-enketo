@@ -7,8 +7,7 @@ var app = angular.module('app', []);
 var submit = require('./modules/submit');
 var toastr = require("./modules/utils/toastr");
 var queryParams = require('./modules/utils/query-params');
-var sessionRepo = require("./modules/repositories/sessions-repository");
-
+import sessionRepo from './modules/repositories/sessions-repository'
 // If there is a bg parameter, set it on the body
 var setBgImage = require('./modules/utils/bg-image')('body')
 
