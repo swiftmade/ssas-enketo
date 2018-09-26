@@ -1,3 +1,6 @@
+import './enketo-patches/form-model'
+import fileManager from './enketo-patches/file-manager'
+
 const Form = require('enketo-core/src/js/Form')
 const emitter = require('tiny-emitter/instance')
 
@@ -23,7 +26,7 @@ class EnketoForm {
             modelStr: SurveyManager.survey.model,
             instanceStr: SessionManager.session.xml,
             submitted: SessionManager.session.submitted,
-            session: SessionManager.session.payload
+            session: SessionManager.session.payload,
         })
     }
 
@@ -41,6 +44,29 @@ class EnketoForm {
         }
         var lang = i18n.get()
         this.form.langs.setAll(lang)
+    }
+
+    async record() {
+        return {
+            xml: this.form.getDataStr(),
+            files: await this.formFiles(),
+            instance_id: this.form.instanceID,
+            deprecated_id: this.form.deprecatedID,
+        }
+    }
+
+    formFiles() {
+        /**
+         * Get currently attached files from Enketo
+         */
+        let files = fileManager.getCurrentFiles()
+        /**
+         * Also append previously uploaded files, but as strings.
+         */
+        $('form.or input[type="file"][data-loaded-file-name]').each(function() {
+            files.push($(this).data('loaded-file-name'));
+        });
+        return files
     }
 
 }
