@@ -1,5 +1,6 @@
 import EnketoForm from './EnketoForm'
-import SurveyManager from './SurveyManager'
+import queryParams from '../common/QueryParams'
+const emitter = require('tiny-emitter/instance')
 import SessionManager from './sessions/SessionManager'
 
 class Kernel {
@@ -13,8 +14,12 @@ class Kernel {
         EnketoForm.init()
     }
 
-    save() {
-
+    async exit() {
+        await EnketoForm.save()
+        if (queryParams.has('return')) {
+            return window.location(queryParams.getUrl('return'))
+        }
+        window.location = 'index.html'
     }
 }
 

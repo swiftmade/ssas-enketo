@@ -1,22 +1,20 @@
 import * as $ from 'jquery'
+import Kernel from '../Kernel'
+import EnketoForm from '../EnketoForm'
 
 $(document).ready(function() {
 
     $('.save-progress').click(function () {
-        Survey.save(true);
-    });
+        EnketoForm.save()
+    })
 
     $('#close-button').click(function () {
-        Survey.saveAndExit();
-    });
+        Kernel.exit()
+    })
 
     $('.validate-form').on('click', function () {
-        Survey.validate().then(function () {
-            toastr.success("The data looks valid!");
-            $('.last-page').click();
-        }).catch(function (error) {
-            toastr.error(error.message ? error.message : "An unknown error occured");
-        });
+
+        EnketoForm.validate()
     });
 
     $('.first-page-alias').click(function () {

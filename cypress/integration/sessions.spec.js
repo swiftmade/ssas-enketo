@@ -18,7 +18,6 @@ describe('Survey session', () => {
     cy.visit('/survey.html?survey=test.json&mode=offline&session=test')
       .get('#surveyModal').should('not.exist')
       // Make sure the save button is visible
-      .get('#surveyModal').should('not.be.visible')
       .get('.save-progress').should('visible');
   })
 
@@ -30,7 +29,7 @@ describe('Survey session', () => {
       .get('.modal-body input').type('Test session')
       .get('.modal-body button').contains('Start').click()
       // Make sure the save button is visible
-      .get('#surveyModal').should('not.be.visible')
+      .get('#surveyModal').should('not.exist')
       .get('.save-progress').should('visible');
   })
 

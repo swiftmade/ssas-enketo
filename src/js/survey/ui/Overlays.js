@@ -1,4 +1,5 @@
 import * as $ from 'jquery'
+import toastr from 'toastr'
 const emitter = require('tiny-emitter/instance')
 import queryParams from '../../common/QueryParams'
 import SessionManager from '../sessions/SessionManager'
@@ -8,6 +9,14 @@ import SessionManager from '../sessions/SessionManager'
  */
 $(document).ready(() => setBackgroundImage())
 emitter.once('EnketoForm.initialized', () => showSurvey())
+
+emitter.on('EnketoForm.saving', () => saving())
+emitter.on('EnketoForm.saveFailed', () => saveFailed())
+emitter.on('EnketoForm.saveSucceded', () => saveSucceded())
+
+emitter.on('EnketoForm.validating', () => validating())
+emitter.on('EnketoForm.validationFailed', () => validationFailed())
+emitter.on('EnketoForm.validationSucceeded', () => validationSucceeded())
 
 /**
  * Callbacks
@@ -45,5 +54,51 @@ const showSurvey = () => {
     document.querySelector('#submit-progress').style.display = 'none'
     document.querySelector('#loading-block').remove()
     window.scrollTo(0, 0)
+}
 
+const saving = () => {
+    var $saveProgress = $(".save-progress");
+    $saveProgress.html('<i class="fa fa-spinner fa-spin"></i>');
+    $saveProgress.attr("disabled", "disabled");
+}
+
+var _finishSaving = function (outcome, message) {
+    var $saveProgress = $(".save-progress");
+    $saveProgress.html('<i class="fa fa-save"></i>');
+    $saveProgress.removeAttr("disabled", "disabled");
+
+    if (message) {
+        toastr[outcome](message);
+    }
+}
+
+const saveFailed = () => {
+    _finishSaving("error", "An error occured while saving this sesssion...");
+}
+
+const saveSucceded = () => {
+    _finishSaving("success", i18n._("survey.saved"));
+}
+
+const validating = () => {
+    $(".submit-form")
+        .data('original-content', $('.submit-form').text())
+        .attr("disabled", "disabled")
+        .text("Validating...")
+}
+
+const _finishValidating = (outcome, message) => {
+    $(".submit-form")
+        .removeAttr('disabled')
+        .text($('.submit-form').data('original-content'))
+    toastr[outcome](message)
+}
+
+const validationFailed = () => {
+    _finishValidating('error', 'The form contains validation errors.')
+}
+
+const validationSucceeded = () => {
+    _finishValidating('success', 'The data looks valid!')
+    $('.last-page').click()
 }

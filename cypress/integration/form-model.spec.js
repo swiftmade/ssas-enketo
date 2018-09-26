@@ -1,3 +1,4 @@
+/*
 import sessionRepository from '../../src/js/modules/repositories/sessions-repository'
 
 
@@ -26,3 +27,4 @@ describe('Patched Enketo Form Model', () => {
     })
 
 })
+*/

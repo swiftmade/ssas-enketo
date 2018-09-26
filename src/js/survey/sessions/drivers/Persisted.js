@@ -17,8 +17,9 @@ import sessionRepository from '../../../common/repositories/SessionRepository'
         return true
     }
 
-    save(session) {
-        return sessionRepository.update(session)
+    save(session, newSession) {
+        newSession._attachments = this._normalizedAttachments(session, newSession)
+        return sessionRepository.update(newSession)
     }
 
     // Save session before ending...
@@ -80,6 +81,28 @@ import sessionRepository from '../../../common/repositories/SessionRepository'
             submitted: false,
             last_update: Date.now(),
         })
+    }
+
+    _normalizedAttachments(session, newSession) {
+        
+        var attachments = {}
+
+        newSession._attachments.forEach(file => {
+            // Mark already existing attachments as stub
+            if (typeof file === 'string') {
+                if (session.hasOwnProperty('_attachments') && session._attachments.hasOwnProperty(file)) {
+                    attachments[file] = session['_attachments'][file]
+                    attachments[file].stub = true
+                }
+                return
+            }
+            attachments[file.name] = {
+                data: file,
+                content_type: file.type,
+            }
+        })
+
+        return attachments
     }
 
 }

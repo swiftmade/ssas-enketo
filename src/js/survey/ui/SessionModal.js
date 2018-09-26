@@ -12,6 +12,9 @@ app.filter('timeAgo', () => {
 
 app.controller('Controller', $scope => {
 
+    $scope.form = {
+        name: ''
+    }
     $scope.show = false
     $scope.sessions = []
     $scope.disableCreateButton = false
@@ -31,13 +34,13 @@ app.controller('Controller', $scope => {
      * UI Event Handlers
      */
     $scope.createSession = () => {
-        var name = $scope.sessionName.trim()
-        
+        var name = $scope.form.name.trim()
+
         if (!name) {
-            $scope.sessionName = ''
+            $scope.name = ''
             return alert('Please enter a session name')
         }
-        
+
         $scope.show = false
         $scope.disableCreateButton = true
         emitter.emit('Session.create', name)

@@ -31,4 +31,4 @@ import * as $ from 'jquery'
         return this;
     };
 
-})
+})()

@@ -10,11 +10,24 @@ class SessionManager
         this.session = await this.driver.start()
     }
 
-    async save() {
+    async save(record) {
         if (!this.driver.canSave()) {
             throw new Exception('This driver does not support saving!')
         }
-        return this.driver.save(this.session)
+        this.session = await this.driver.save(
+            this.session,
+            this.sessionUpdate(record)
+        )
+    }
+
+    sessionUpdate(record) {
+        return {
+            ...this.session,
+            xml: record.xml,
+            _attachments: record.files,
+            instance_id: record.instance_id,
+            deprecated_id: record.deprecated_id,
+        }
     }
 }
 

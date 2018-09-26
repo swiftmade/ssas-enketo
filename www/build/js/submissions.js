@@ -8,16 +8,28 @@
 		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
 	}
 })(window, function() {
-return (window["webpackJsonp"] = window["webpackJsonp"] || []).push([[2],{
+return (window["webpackJsonp"] = window["webpackJsonp"] || []).push([[4],{
 
-/***/ 3:
-/***/ (function(module, exports) {
+/***/ 458:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _sass_submissions_scss__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(459);
+/* harmony import */ var _sass_submissions_scss__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_sass_submissions_scss__WEBPACK_IMPORTED_MODULE_0__);
 /**
  * Entrypoint for submissions.html
  */
 
+
+/***/ }),
+
+/***/ 459:
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
 /***/ })
 
-},[[3,0]]]);
+},[[458,0]]]);
 });

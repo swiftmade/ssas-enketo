@@ -87,7 +87,7 @@
     </div>
 
     <div id="sessionModal" ng-controller="Controller" ng-cloak="true">
-        <div class="modal-mask" ng-show="show">
+        <div class="modal-mask" ng-if="show">
             <div class="modal-container" id="surveyModal">
                 <div class="modal-header">
                     <div class="pull-right">
@@ -100,7 +100,7 @@
 
                     <p><b data-i18n="session.description">Start a New Session</b></p>
                     <label data-i18n="session.name">Name</label>
-                    <input type="text" ng-model="sessionName" style="width:100%;" />
+                    <input type="text" ng-model="form.name" style="width:100%;" />
                     <p id="session-modal__error"></p>
                     <button class="md-button" ng-click="createSession()" ng-disabled="disableCreateButton" data-i18n="session.start">Start</button>
                     <hr />

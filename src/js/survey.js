@@ -12,6 +12,8 @@ import './i18n/i18n'
  * Misc. Plug-ins
  */
 import './plugins/overlay'
+import toastr from 'toastr'
+toastr.options = {"positionClass": "toast-top-left"}
 
 /**
  * UI Controllers

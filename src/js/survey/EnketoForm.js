@@ -1,3 +1,4 @@
+import * as $ from 'jquery'
 import './enketo-patches/form-model'
 import fileManager from './enketo-patches/file-manager'
 
@@ -11,6 +12,10 @@ import SessionManager from './sessions/SessionManager'
 class EnketoForm {
 
     async init() {
+        
+        this.saving = false
+        this.validating = false
+        
         await SurveyManager.loadAndAttach()
         await SessionManager.start()
       
@@ -46,16 +51,43 @@ class EnketoForm {
         this.form.langs.setAll(lang)
     }
 
-    async record() {
+    async save() {
+
+        if (this.saving) {
+            return null
+        }
+
+        this.saving = true
+        emitter.emit('EnketoForm.saving')
+
+        try {
+            await this._saveSession()
+        } catch(e) {
+            this.saving = false
+            emitter.emit('EnketoForm.saveFailed')
+            throw e
+        }
+
+        this.saving = false
+        emitter.emit('EnketoForm.saveSucceded')        
+    }
+
+    async _saveSession() {
+        await SessionManager.save(
+            await this._record()
+        )
+    }
+
+    async _record() {
         return {
             xml: this.form.getDataStr(),
-            files: await this.formFiles(),
+            files: await this._formFiles(),
             instance_id: this.form.instanceID,
             deprecated_id: this.form.deprecatedID,
         }
     }
 
-    formFiles() {
+    _formFiles() {
         /**
          * Get currently attached files from Enketo
          */
@@ -69,6 +101,31 @@ class EnketoForm {
         return files
     }
 
+    _validateForm() {
+        // You can add ?novalidate=1 to the url to disable validation for that session
+        if (queryParams.has("novalidate")) {
+            return Promise.resolve(true);
+        }
+        return this.form.validate()
+    }
+
+    async validate() {
+
+        if (this.validating) {
+            return
+        }
+
+        this.validating = true
+        emitter.emit('EnketoForm.validating')
+        const outcome = await this._validateForm()
+        
+        emitter.emit(outcome
+            ? 'EnketoForm.validationSucceeded'
+            : 'EnketoForm.validationFailed'
+        )
+
+        this.validating = false
+    }
 }
 
 export default new EnketoForm
