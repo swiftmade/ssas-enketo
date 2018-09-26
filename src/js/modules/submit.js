@@ -1,7 +1,10 @@
+import config from './config'
+import sessionRepo from "./repositories/sessions-repository"
+
 var $ = require('jquery');
 var Promise = require('lie');
 var TaskQueue = require('./utils/task-queue');
-var sessionRepo = require("./repositories/sessions-repository");
+
 
 var utils = {
 	form: function(packet) {
@@ -27,7 +30,7 @@ var utils = {
 		var index = 0;
 		var size = 0;
 		// TODO: learn this from the server
-		var maxSize = 50 * 1024 * 1024;
+		var maxSize = config.SERVER_MAX_UPLOAD_SIZE;
 
 		for (var name in files) {
 			var file = files[name];

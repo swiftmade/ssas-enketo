@@ -13,7 +13,6 @@ var setBgImage = require('./modules/utils/bg-image')('#loading-block')
 // until all plugins are commonJS-friendly, expose jQuery globally
 window.Vue = Vue;
 
-
 var Survey = require('./modules/survey');
 
 $(document).ready(function() {

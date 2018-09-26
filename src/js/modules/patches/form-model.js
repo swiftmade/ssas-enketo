@@ -1,6 +1,10 @@
+/**
+ * This patches the Form-model module from enketo-core
+ * The aim of this patch is to allow arbitrarily adding session parameters to the survey file
+ * https://github.com/enketo/enketo-core/blob/master/src/js/form-model.js
+ */
 var FormModel = require("enketo-core/src/js/Form-model");
 var parser = new DOMParser();
-
 
 FormModel.prototype.createSession = function( id, sessObj ) {
     var instance;

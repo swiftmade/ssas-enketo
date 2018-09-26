@@ -9,9 +9,8 @@ function getStorageDriver(name) {
         revs_limit: 1,
         // Get rid of redundant documents after each write
         auto_compaction: true
-    });
-
-    return storage;
+    })
+    return storage
 }
 
 var instances = {}

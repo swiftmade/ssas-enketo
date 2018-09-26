@@ -1,6 +1,6 @@
-var Promise = require('lie');
-var vue = require('../ui/session-vue');
-var queryParams = require('../../utils/query-params');
+var Promise = require('lie')
+var vue = require('../ui/session-vue')
+var queryParams = require('../../utils/query-params')
 import sessionRepo from '../../repositories/sessions-repository'
 
 /**

@@ -1,12 +1,11 @@
+import config from './config'
+
 var Promise = require('lie');
 var TaskQueue = require('./utils/task-queue');
 var ImageCompressor = require("image-compressor.js");
 var sessionRepo = require("./repositories/sessions-repository");
 
 ImageCompressor = new ImageCompressor();
-
-// Files having greater size than this value (in bytes) will be optimized
-var FILESIZE_TRESHOLD = 300000
 
 function Optimizer(session, onProgressCb) {
     var id = session._id;
@@ -15,7 +14,7 @@ function Optimizer(session, onProgressCb) {
     function needsOptimization(attachment) {
         if (attachment.content_type.indexOf('image/') === -1) {
             return false; // This is not an image
-        } else if (attachment.length < FILESIZE_TRESHOLD) {
+        } else if (attachment.length < config.OPTIMIZE_TRESHOLD) {
             return false; // The file is already small enough
         }
         return true;
@@ -31,9 +30,9 @@ function Optimizer(session, onProgressCb) {
     function optimize(name, file) {
         return getFileBlob(name, file).then(function (blob) {
             return ImageCompressor.compress(blob, {
-              maxWidth: 600,
-              quality: 0.6,
-              convertSize: 999999999 // prevent converting to JPG
+              maxWidth: config.OPTIMIZE_MAX_WIDTH,
+              quality: config.OPTIMIZE_QUALITY,
+              convertSize: config.OPTIMIZE_CONVERT_SIZE
             });
         }).then(function(result) {
             session._attachments[name] = {

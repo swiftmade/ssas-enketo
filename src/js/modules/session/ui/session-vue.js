@@ -1,5 +1,5 @@
-var Vue = require('vue');
-var vueModal = require('./session-modal');
+var Vue = require('vue')
+var vueModal = require('./session-modal')
 
 var vue = new Vue({
     el: '#app',
