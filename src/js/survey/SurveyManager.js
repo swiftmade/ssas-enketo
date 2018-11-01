@@ -4,7 +4,6 @@ import queryParams from '../common/QueryParams'
 class SurveyManager {
 
     async loadAndAttach() {
-        alert('here')
         await this._load()
         this._preprocessFormHtml()
         this._attachSurveyFormToDom()
