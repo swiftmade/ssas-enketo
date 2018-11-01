@@ -581,7 +581,7 @@ fileManager.setSession = function (session) {
 };
 
 fileManager.getFileUrlFromDatabase = function (subject) {
-  return sessionRepo.getAttachment(this.session._id, subject).then(function (attachment) {
+  return SessionRepository.getAttachment(this.session._id, subject).then(function (attachment) {
     return URL.createObjectURL(attachment);
   });
 };
@@ -699,15 +699,16 @@ function () {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                _context.next = 2;
+                alert('here');
+                _context.next = 3;
                 return this._load();
 
-              case 2:
+              case 3:
                 this._preprocessFormHtml();
 
                 this._attachSurveyFormToDom();
 
-              case 4:
+              case 5:
               case "end":
                 return _context.stop();
             }
@@ -751,7 +752,7 @@ function () {
     key: "_preprocessFormHtml",
     value: function _preprocessFormHtml() {
       // Redirect dropbox links to assets folder
-      this.survey.form = this.survey.form.replace(/jr:\/\/images\/https:\/\/www.dropbox.com\/s\/.*?\//g, "assets/");
+      this.survey.form = this.survey.form.replace(/jr:\/\/images\//g, QueryParams.getPath('assets') + '/');
     }
   }, {
     key: "_attachSurveyFormToDom",
@@ -1347,9 +1348,11 @@ function () {
 
                 this._localizeForm();
 
+                this._setSessionInFileManager();
+
                 EnketoForm_emitter.emit('EnketoForm.initialized');
 
-              case 10:
+              case 11:
               case "end":
                 return _context.stop();
             }
@@ -1390,6 +1393,11 @@ function () {
 
       var lang = i18n.get();
       this.form.langs.setAll(lang);
+    }
+  }, {
+    key: "_setSessionInFileManager",
+    value: function _setSessionInFileManager() {
+      file_manager.setSession(sessions_SessionManager.session);
     }
   }, {
     key: "save",

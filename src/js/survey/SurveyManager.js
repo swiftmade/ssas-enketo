@@ -4,6 +4,7 @@ import queryParams from '../common/QueryParams'
 class SurveyManager {
 
     async loadAndAttach() {
+        alert('here')
         await this._load()
         this._preprocessFormHtml()
         this._attachSurveyFormToDom()
@@ -16,8 +17,8 @@ class SurveyManager {
     _preprocessFormHtml() {
         // Redirect dropbox links to assets folder
         this.survey.form = this.survey.form.replace(
-            /jr:\/\/images\/https:\/\/www.dropbox.com\/s\/.*?\//g,
-            "assets/"
+            /jr:\/\/images\//g,
+            queryParams.getPath('assets') + '/'
         )
     }
 
