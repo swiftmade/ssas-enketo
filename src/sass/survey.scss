@@ -388,6 +388,11 @@ legend .required {
     border: 0 !important;
 }
 
+// WARNING: Remove this later! This was only added for fijifsp portal.
+.or img {
+    max-height: 60vh !important;
+}
+
 #toast-container > div {
     opacity: 1;
 }
