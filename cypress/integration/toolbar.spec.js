@@ -13,17 +13,17 @@ describe('Toolbar', () => {
             .get('#surveyModal').should('not.be.visible')
     })
 
-    it('has save button', () => {
+    it('has save', () => {
         cy.get('.save-progress').click()
             .get('.toast.toast-success').should('be.visible')
     })
 
-    it('has validate button', () => {
+    it('has validate', () => {
         cy.get('.validate-form').click()
             .get('.toast.toast-error').should('be.visible')
     })
 
-    it('has jump to button', () => {
+    it('has jump to', () => {
         cy
             .get('#jump-to').click()
             .get('#jump-to-block').should('be.visible')

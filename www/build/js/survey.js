@@ -10,10 +10,10 @@
 })(window, function() {
 return (window["webpackJsonp"] = window["webpackJsonp"] || []).push([[3],{
 
-/***/ 144:
+/***/ 146:
 /***/ (function(module, exports, __webpack_require__) {
 
-var lodashSet = __webpack_require__(368);
+var lodashSet = __webpack_require__(371);
 
 module.exports = {
   get: function get(obj, path, def) {
@@ -29,23 +29,114 @@ module.exports = {
 
 /***/ }),
 
-/***/ 362:
+/***/ 22:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+// EXTERNAL MODULE: ./node_modules/pouchdb/lib/index-browser.js
+var index_browser = __webpack_require__(58);
+var index_browser_default = /*#__PURE__*/__webpack_require__.n(index_browser);
+
+// CONCATENATED MODULE: ./src/js/common/repositories/PouchDB.js
+
+window.PouchDB = index_browser_default.a;
+
+function getStorageDriver(name) {
+  var storage = new index_browser_default.a(name, {
+    adapter: 'idb',
+    // We don't really want to keep revisions at all.
+    revs_limit: 1,
+    // Get rid of redundant documents after each write
+    auto_compaction: true
+  });
+  return storage;
+}
+
+var instances = {};
+
+function Storage(dbName) {
+  var driver = getStorageDriver(dbName);
+
+  this.all = function () {
+    return driver.allDocs({
+      include_docs: true
+    }).then(function (result) {
+      return result.rows.map(function (row) {
+        return row.doc;
+      });
+    });
+  };
+
+  this.create = function (doc) {
+    return driver.post(doc).then(function (result) {
+      return driver.get(result.id);
+    });
+  };
+
+  this.update = function (doc) {
+    return driver.put(doc).then(function (result) {
+      return driver.get(result.id);
+    });
+  };
+
+  this.get = function (id) {
+    return driver.get(id);
+  };
+
+  this.remove = function (doc) {
+    return driver.remove(doc);
+  };
+
+  this.attach = function (id, attachmentId, blob) {
+    return driver.putAttachment(id, attachmentId, blob);
+  };
+
+  this.getAttachment = function (id, filename) {
+    return driver.getAttachment(id, filename);
+  };
+}
+
+var getInstance = function getInstance(name) {
+  if (!instances.hasOwnProperty(name)) {
+    instances[name] = new Storage(name);
+  }
+
+  return instances[name];
+};
+// EXTERNAL MODULE: ./src/js/common/QueryParams.js
+var QueryParams = __webpack_require__(4);
+
+// CONCATENATED MODULE: ./src/js/common/repositories/SessionRepository.js
+
+
+var databaseName = 'sessions';
+
+if (QueryParams["a" /* default */].has('db')) {
+  databaseName = QueryParams["a" /* default */].get('db');
+}
+
+/* harmony default export */ var SessionRepository = __webpack_exports__["a"] = (getInstance(databaseName));
+
+/***/ }),
+
+/***/ 365:
 /***/ (function(module, exports, __webpack_require__) {
 
 // extracted by mini-css-extract-plugin
 
 /***/ }),
 
-/***/ 364:
+/***/ 367:
 /***/ (function(module, exports, __webpack_require__) {
 
-var en = __webpack_require__(365);
+var en = __webpack_require__(368);
 
-var lo = __webpack_require__(366);
+var lo = __webpack_require__(369);
 
-var zh = __webpack_require__(367);
+var zh = __webpack_require__(370);
 
-var _ = __webpack_require__(144);
+var _ = __webpack_require__(146);
 
 var Cookies = {
   set: function set(key, value) {
@@ -122,7 +213,7 @@ module.exports = i18n;
 
 /***/ }),
 
-/***/ 365:
+/***/ 368:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -171,7 +262,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 366:
+/***/ 369:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -220,7 +311,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 367:
+/***/ 370:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -268,7 +359,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 374:
+/***/ 377:
 /***/ (function(module, exports, __webpack_require__) {
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -278,7 +369,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
  * The aim of this patch is to allow arbitrarily adding session parameters to the survey file
  * https://github.com/enketo/enketo-core/blob/master/src/js/form-model.js
  */
-var FormModel = __webpack_require__(145);
+var FormModel = __webpack_require__(147);
 
 var parser = new DOMParser();
 
@@ -315,17 +406,49 @@ module.exports = FormModel;
 
 /***/ }),
 
-/***/ 461:
+/***/ 4:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+var UrlSearchParams = __webpack_require__(149);
+
+var queryParams = new UrlSearchParams(window.location.search);
+
+queryParams.getPath = function (key) {
+  var path = '';
+
+  if (queryParams.has('base')) {
+    path = queryParams.get('base') + '/';
+  }
+
+  return path + queryParams.get(key);
+};
+
+queryParams.getUrl = function (uri) {
+  var url = '';
+
+  if (queryParams.has('base')) {
+    url = queryParams.get('base') + '/';
+  }
+
+  return url + uri;
+};
+
+/* harmony default export */ __webpack_exports__["a"] = (queryParams);
+
+/***/ }),
+
+/***/ 462:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 
 // EXTERNAL MODULE: ./src/sass/survey.scss
-var survey = __webpack_require__(362);
+var survey = __webpack_require__(365);
 
 // EXTERNAL MODULE: ./src/js/i18n/i18n.js
-var i18n_i18n = __webpack_require__(364);
+var i18n_i18n = __webpack_require__(367);
 
 // EXTERNAL MODULE: ./node_modules/jquery/dist/jquery.js
 var jquery = __webpack_require__(1);
@@ -367,26 +490,26 @@ var jquery = __webpack_require__(1);
   };
 })();
 // EXTERNAL MODULE: ./node_modules/toastr/toastr.js
-var toastr_toastr = __webpack_require__(60);
+var toastr_toastr = __webpack_require__(63);
 var toastr_default = /*#__PURE__*/__webpack_require__.n(toastr_toastr);
 
 // EXTERNAL MODULE: ./node_modules/angular/index.js
-var angular = __webpack_require__(50);
+var angular = __webpack_require__(40);
 var angular_default = /*#__PURE__*/__webpack_require__.n(angular);
 
 // EXTERNAL MODULE: ./node_modules/v-accordion/index.js
-var v_accordion = __webpack_require__(371);
+var v_accordion = __webpack_require__(374);
 
 // CONCATENATED MODULE: ./src/js/survey/ui/JumpTo.js
 
 
 
 
-var emitter = __webpack_require__(55);
+var emitter = __webpack_require__(57);
 
 var app = angular_default.a.module('jumpTo', ['vAccordion']);
 
-var _ = __webpack_require__(144);
+var _ = __webpack_require__(146);
 
 app.controller("jumpCtrl", ['$scope', function ($scope) {
   var rawPages = [];
@@ -454,114 +577,14 @@ jquery("#jump-to").click(function () {
 jquery("#jump-to-block").hide();
 angular_default.a.bootstrap(document.getElementById('jump-to-block'), ["jumpTo"]);
 // EXTERNAL MODULE: ./src/js/survey/enketo-patches/form-model.js
-var form_model = __webpack_require__(374);
+var form_model = __webpack_require__(377);
 
-// CONCATENATED MODULE: ./src/js/common/QueryParams.js
-var UrlSearchParams = __webpack_require__(382);
+// EXTERNAL MODULE: ./src/js/common/QueryParams.js
+var QueryParams = __webpack_require__(4);
 
-var queryParams = new UrlSearchParams(window.location.search);
+// EXTERNAL MODULE: ./src/js/common/repositories/SessionRepository.js + 1 modules
+var SessionRepository = __webpack_require__(22);
 
-queryParams.getPath = function (key) {
-  var path = '';
-
-  if (queryParams.has('base')) {
-    path = queryParams.get('base') + '/';
-  }
-
-  return path + queryParams.get(key);
-};
-
-queryParams.getUrl = function (uri) {
-  var url = '';
-
-  if (queryParams.has('base')) {
-    url = queryParams.get('base') + '/';
-  }
-
-  return url + uri;
-};
-
-/* harmony default export */ var QueryParams = (queryParams);
-// EXTERNAL MODULE: ./node_modules/pouchdb/lib/index-browser.js
-var index_browser = __webpack_require__(109);
-var index_browser_default = /*#__PURE__*/__webpack_require__.n(index_browser);
-
-// CONCATENATED MODULE: ./src/js/common/repositories/PouchDB.js
-
-window.PouchDB = index_browser_default.a;
-
-function getStorageDriver(name) {
-  var storage = new index_browser_default.a(name, {
-    adapter: 'idb',
-    // We don't really want to keep revisions at all.
-    revs_limit: 1,
-    // Get rid of redundant documents after each write
-    auto_compaction: true
-  });
-  return storage;
-}
-
-var instances = {};
-
-function Storage(dbName) {
-  var driver = getStorageDriver(dbName);
-
-  this.all = function () {
-    return driver.allDocs({
-      include_docs: true
-    }).then(function (result) {
-      return result.rows.map(function (row) {
-        return row.doc;
-      });
-    });
-  };
-
-  this.create = function (doc) {
-    return driver.post(doc).then(function (result) {
-      return driver.get(result.id);
-    });
-  };
-
-  this.update = function (doc) {
-    return driver.put(doc).then(function (result) {
-      return driver.get(result.id);
-    });
-  };
-
-  this.get = function (id) {
-    return driver.get(id);
-  };
-
-  this.remove = function (doc) {
-    return driver.remove(doc);
-  };
-
-  this.attach = function (id, attachmentId, blob) {
-    return driver.putAttachment(id, attachmentId, blob);
-  };
-
-  this.getAttachment = function (id, filename) {
-    return driver.getAttachment(id, filename);
-  };
-}
-
-var getInstance = function getInstance(name) {
-  if (!instances.hasOwnProperty(name)) {
-    instances[name] = new Storage(name);
-  }
-
-  return instances[name];
-};
-// CONCATENATED MODULE: ./src/js/common/repositories/SessionRepository.js
-
-
-var databaseName = 'sessions';
-
-if (QueryParams.has('db')) {
-  databaseName = QueryParams.get('db');
-}
-
-/* harmony default export */ var SessionRepository = (getInstance(databaseName));
 // CONCATENATED MODULE: ./src/js/survey/enketo-patches/file-manager.js
 /**
  * This patches the file-manager module from enketo-core
@@ -569,7 +592,7 @@ if (QueryParams.has('db')) {
  * The actual source for this module can be found here:
  * https://github.com/enketo/enketo-core/blob/master/src/js/file-manager.js
  */
-var fileManager = __webpack_require__(106);
+var fileManager = __webpack_require__(109);
 
 
  // Preserve the original getFileUrl method
@@ -581,13 +604,13 @@ fileManager.setSession = function (session) {
 };
 
 fileManager.getFileUrlFromDatabase = function (subject) {
-  return SessionRepository.getAttachment(this.session._id, subject).then(function (attachment) {
+  return SessionRepository["a" /* default */].getAttachment(this.session._id, subject).then(function (attachment) {
     return URL.createObjectURL(attachment);
   });
 };
 
 fileManager.getFileUrlOnServer = function (subject) {
-  return Promise.resolve(QueryParams.getUrl("submissions/" + this.session.instance_id + "/photo/" + subject));
+  return Promise.resolve(QueryParams["a" /* default */].getUrl("submissions/" + this.session.instance_id + "/photo/" + subject));
 };
 
 fileManager.getFileUrl = function (subject) {
@@ -606,7 +629,7 @@ fileManager.getFileUrl = function (subject) {
 
 /* harmony default export */ var file_manager = (fileManager);
 // EXTERNAL MODULE: ./node_modules/axios/index.js
-var axios = __webpack_require__(160);
+var axios = __webpack_require__(163);
 var axios_default = /*#__PURE__*/__webpack_require__.n(axios);
 
 // CONCATENATED MODULE: ./src/js/common/Server.js
@@ -730,7 +753,7 @@ function () {
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return common_Server.json(QueryParams.getPath('survey'));
+                return common_Server.json(QueryParams["a" /* default */].getPath('survey'));
 
               case 2:
                 this.survey = _context2.sent;
@@ -751,7 +774,7 @@ function () {
     key: "_preprocessFormHtml",
     value: function _preprocessFormHtml() {
       // Redirect dropbox links to assets folder
-      this.survey.form = this.survey.form.replace(/jr:\/\/images\//g, QueryParams.getPath('assets') + '/');
+      this.survey.form = this.survey.form.replace(/jr:\/\/images\//g, QueryParams["a" /* default */].getPath('assets') + '/');
     }
   }, {
     key: "_attachSurveyFormToDom",
@@ -810,11 +833,11 @@ function () {
   InMemory_createClass(InMemory, [{
     key: "start",
     value: function start() {
-      if (!QueryParams.has('edit')) {
+      if (!QueryParams["a" /* default */].has('edit')) {
         return Promise.resolve(_getEmptySession());
       }
 
-      return this._loadSessionFromUrl(QueryParams.getPath('edit'));
+      return this._loadSessionFromUrl(QueryParams["a" /* default */].getPath('edit'));
     }
   }, {
     key: "canSave",
@@ -825,7 +848,7 @@ function () {
     key: "beforeEnd",
     value: function beforeEnd(session) {
       // Before ending the session, submit it to the server.
-      return submit(QueryParams.getPath('submit'), session);
+      return submit(QueryParams["a" /* default */].getPath('submit'), session);
     }
   }, {
     key: "_loadSessionFromUrl",
@@ -880,7 +903,7 @@ function Persisted_defineProperties(target, props) { for (var i = 0; i < props.l
 
 function Persisted_createClass(Constructor, protoProps, staticProps) { if (protoProps) Persisted_defineProperties(Constructor.prototype, protoProps); if (staticProps) Persisted_defineProperties(Constructor, staticProps); return Constructor; }
 
-var Persisted_emitter = __webpack_require__(55);
+var Persisted_emitter = __webpack_require__(57);
 
 
 
@@ -932,7 +955,7 @@ function () {
     key: "save",
     value: function save(session, newSession) {
       newSession._attachments = this._normalizedAttachments(session, newSession);
-      return SessionRepository.update(newSession);
+      return SessionRepository["a" /* default */].update(newSession);
     } // Save session before ending...
 
   }, {
@@ -951,7 +974,7 @@ function () {
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return SessionRepository.all();
+                return SessionRepository["a" /* default */].all();
 
               case 2:
                 this.sessions = _context2.sent;
@@ -979,12 +1002,12 @@ function () {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                if (!QueryParams.has('session')) {
+                if (!QueryParams["a" /* default */].has('session')) {
                   _context3.next = 2;
                   break;
                 }
 
-                return _context3.abrupt("return", this._startFromName(QueryParams.get('session')));
+                return _context3.abrupt("return", this._startFromName(QueryParams["a" /* default */].get('session')));
 
               case 2:
                 return _context3.abrupt("return", this._sessionFromUi());
@@ -1029,7 +1052,7 @@ function () {
                           switch (_context4.prev = _context4.next) {
                             case 0:
                               _context4.next = 2;
-                              return SessionRepository.remove(session);
+                              return SessionRepository["a" /* default */].remove(session);
 
                             case 2:
                               _context4.next = 4;
@@ -1115,11 +1138,11 @@ function () {
               case 0:
                 payload = _args7.length > 1 && _args7[1] !== undefined ? _args7[1] : {};
 
-                if (QueryParams.has('session_extra')) {
-                  payload = JSON.parse(QueryParams.get('session_extra'));
+                if (QueryParams["a" /* default */].has('session_extra')) {
+                  payload = JSON.parse(QueryParams["a" /* default */].get('session_extra'));
                 }
 
-                return _context7.abrupt("return", SessionRepository.create({
+                return _context7.abrupt("return", SessionRepository["a" /* default */].create({
                   name: name,
                   xml: '',
                   payload: payload,
@@ -1180,7 +1203,7 @@ var AVAILABLE_DRIVERS = {
 };
 /* harmony default export */ var SessionDrivers = ({
   getDriver: function getDriver() {
-    var mode = QueryParams.get('mode');
+    var mode = QueryParams["a" /* default */].get('mode');
     var driver = AVAILABLE_DRIVERS[mode ? mode : 'offline'];
     return new driver();
   }
@@ -1306,9 +1329,9 @@ function EnketoForm_createClass(Constructor, protoProps, staticProps) { if (prot
 
 
 
-var Form = __webpack_require__(395);
+var Form = __webpack_require__(397);
 
-var EnketoForm_emitter = __webpack_require__(55);
+var EnketoForm_emitter = __webpack_require__(57);
 
 
 
@@ -1386,8 +1409,8 @@ function () {
   }, {
     key: "_localizeForm",
     value: function _localizeForm() {
-      if (QueryParams.has("lang")) {
-        i18n.set(QueryParams.get("lang"));
+      if (QueryParams["a" /* default */].has("lang")) {
+        i18n.set(QueryParams["a" /* default */].get("lang"));
       }
 
       var lang = i18n.get();
@@ -1537,7 +1560,7 @@ function () {
     key: "_validateForm",
     value: function _validateForm() {
       // You can add ?novalidate=1 to the url to disable validation for that session
-      if (QueryParams.has("novalidate")) {
+      if (QueryParams["a" /* default */].has("novalidate")) {
         return Promise.resolve(true);
       }
 
@@ -1604,7 +1627,7 @@ function Kernel_createClass(Constructor, protoProps, staticProps) { if (protoPro
 
 
 
-var Kernel_emitter = __webpack_require__(55);
+var Kernel_emitter = __webpack_require__(57);
 
 
 
@@ -1656,12 +1679,12 @@ function () {
                 return survey_EnketoForm.save();
 
               case 2:
-                if (!QueryParams.has('return')) {
+                if (!QueryParams["a" /* default */].has('return')) {
                   _context2.next = 4;
                   break;
                 }
 
-                return _context2.abrupt("return", window.location(QueryParams.getUrl('return')));
+                return _context2.abrupt("return", window.location(QueryParams["a" /* default */].getUrl('return')));
 
               case 4:
                 window.location = 'index.html';
@@ -1725,7 +1748,7 @@ jquery(document).ready(function () {
 
 
 
-var Overlays_emitter = __webpack_require__(55);
+var Overlays_emitter = __webpack_require__(57);
 
 
 
@@ -1762,11 +1785,11 @@ Overlays_emitter.on('EnketoForm.validationSucceeded', function () {
 */
 
 var Overlays_setBackgroundImage = function setBackgroundImage() {
-  if (!QueryParams.has('bg')) {
+  if (!QueryParams["a" /* default */].has('bg')) {
     return;
   }
 
-  var style = "content: ' ';" + "display: block;" + "position: absolute;" + "top: 0;" + "left: 0;" + "width: 100%;" + "height: 100%;" + "opacity: 0.2;" + "z-index: -1;" + "background-image: url('" + QueryParams.get('bg') + "');" + "background-size: cover;" + "background-position: center;" + "background-repeat: no-repeat;";
+  var style = "content: ' ';" + "display: block;" + "position: absolute;" + "top: 0;" + "left: 0;" + "width: 100%;" + "height: 100%;" + "opacity: 0.2;" + "z-index: -1;" + "background-image: url('" + QueryParams["a" /* default */].get('bg') + "');" + "background-size: cover;" + "background-position: center;" + "background-repeat: no-repeat;";
   jquery('<style>' + '#loading-block:after { ' + style + '} </style>').appendTo('head');
 };
 
@@ -1824,7 +1847,7 @@ var Overlays_validationSucceeded = function validationSucceeded() {
   jquery('.last-page').click();
 };
 // CONCATENATED MODULE: ./src/js/survey/ui/SessionModal.js
-var SessionModal_emitter = __webpack_require__(55);
+var SessionModal_emitter = __webpack_require__(57);
 
 
 var SessionModal_app = angular_default.a.module('sessionModal', []);
@@ -1921,5 +1944,5 @@ survey_Kernel.boot();
 
 /***/ })
 
-},[[461,0,1]]]);
+},[[462,1,0]]]);
 });

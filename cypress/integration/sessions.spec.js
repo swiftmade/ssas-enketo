@@ -59,6 +59,7 @@ describe('Survey session', () => {
 
     // Make sure submissions page is empty
     cy.visit('/submissions.html')
+      .get('[ng-cloak="true"]').should('not.exist')
       .get('#packet-rows').children().should('have.length', 0)
 
     // Start the survey and submit it.
