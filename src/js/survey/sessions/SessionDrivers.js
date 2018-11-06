@@ -1,11 +1,11 @@
 import queryParams from '../../common/QueryParams'
 
-import InMemory from './drivers/InMemory'
-import Persisted from './drivers/Persisted'
+import Online from './drivers/Online'
+import Offline from './drivers/Offline'
 
 const AVAILABLE_DRIVERS = {
-    'online': InMemory,
-    'offline': Persisted,
+    'online': Online,
+    'offline': Offline,
 }
 
 export default {

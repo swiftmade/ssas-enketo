@@ -2,6 +2,37 @@ import sessionRepo from '../../common/repositories/SessionRepository'
 
 const app = angular.module('app', [])
 
+app.filter('fileSize', function () {
+    return function (bytes) {
+        var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        if (bytes == 0) return '0 Byte';
+        var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+        return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+    }
+})
+
+app.filter('date', function () {
+    return function (value) {
+        var date = new Date(value);
+        return date.toLocaleString();
+    }
+})
+
+app.directive('progress', function () {
+    return {
+        scope: {
+            value: '='
+        },
+        restrict: 'E',
+        replace: true,
+        template: '<div class="progress"> ' +
+            '<div class="progress-bar progress-bar-warning progress-bar-striped" role="progressbar" aria-valuenow="{{value}}" aria-valuemin="0" aria-valuemax="100" style="width: {{value}}%"> ' +
+            '<span class="sr-only">{{value}}% Complete (success)</span> ' +
+            '</div> ' +
+            '</div>'
+    }
+})
+
 app.controller('SubmissionsCtrl', ['$scope', '$timeout', function ($scope, $timeout) {
 
     function loadPackets(showSubmitted) {

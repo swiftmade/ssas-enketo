@@ -1,7 +1,5 @@
 import EnketoForm from './EnketoForm'
 import queryParams from '../common/QueryParams'
-const emitter = require('tiny-emitter/instance')
-import SessionManager from './sessions/SessionManager'
 
 class Kernel {
 
@@ -12,6 +10,12 @@ class Kernel {
 
     async boot() {
         EnketoForm.init()
+    }
+
+    async submit() {
+        return EnketoForm
+            .finishAndSubmit()
+            .then(_ => this.exit())
     }
 
     async exit() {

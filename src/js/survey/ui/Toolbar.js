@@ -1,4 +1,5 @@
 import * as $ from 'jquery'
+import toastr from 'toastr'
 import Kernel from '../Kernel'
 import EnketoForm from '../EnketoForm'
 
@@ -13,7 +14,6 @@ $(document).ready(function() {
     })
 
     $('.validate-form').on('click', function () {
-
         EnketoForm.validate()
     });
 
@@ -27,19 +27,17 @@ $(document).ready(function() {
 
     // validate handler for validate button
     $('.submit-form').on('click', function () {
-        Survey.submit().then(function () {
-            // Successful
-            toastr.success("Your submission has been successfully saved on the device");
-            $('.submit-form').remove();
-        }).catch(function (error) {
-            if (error.message == "redirected!") {
-                return;
-            }
-            // Rejected!
-            toastr.error(error.message ? error.message : "An unknown error occured");
-        });
 
-        return false;
+        const $self = $(this)
+        $self.attr('disabled', 'disabled')
+
+        Kernel.submit().catch(e => {
+            console.error(e)
+            $self.removeAttr('disabled', 'disabled')
+            toastr.error('An error occured while finalizing your submission!')
+        })
+
+        return false
     });
     
 })

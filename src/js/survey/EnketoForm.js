@@ -9,6 +9,10 @@ import SurveyManager from './SurveyManager'
 import queryParams from '../common/QueryParams'
 import SessionManager from './sessions/SessionManager'
 
+const makeEmitter = silent => silent
+    ? e => { /*do nothing*/ }
+    : e => emitter.emit(e)
+
 class EnketoForm {
 
     async init() {
@@ -30,9 +34,7 @@ class EnketoForm {
     _newFormInstance() {
         this.form = new Form('form.or:eq(0)', {
             modelStr: SurveyManager.survey.model,
-            instanceStr: SessionManager.session.xml,
-            submitted: SessionManager.session.submitted,
-            session: SessionManager.session.payload,
+            ...SessionManager.session.toFormInstance(),
         })
     }
 
@@ -79,11 +81,11 @@ class EnketoForm {
 
     async _saveSession() {
         await SessionManager.save(
-            await this._record()
+            await this._form()
         )
     }
 
-    async _record() {
+    async _form() {
         return {
             xml: this.form.getDataStr(),
             files: await this._formFiles(),
@@ -114,22 +116,38 @@ class EnketoForm {
         return this.form.validate()
     }
 
-    async validate() {
+    async validate(silent = false) {
 
         if (this.validating) {
             return
         }
 
+        const emitEvent = makeEmitter(silent)
+
         this.validating = true
-        emitter.emit('EnketoForm.validating')
+        emitEvent('EnketoForm.validating')
         const outcome = await this._validateForm()
-        
-        emitter.emit(outcome
+
+        emitEvent(outcome
             ? 'EnketoForm.validationSucceeded'
             : 'EnketoForm.validationFailed'
         )
 
         this.validating = false
+        return outcome
+    }
+
+    async finishAndSubmit() {
+
+        const silent = true
+
+        if (!(await this.validate(silent))) {
+            throw new Error('Form cannot be submitted. Check validation errors!')
+        }
+
+        await SessionManager.finalize(
+            this._form()
+        )
     }
 }
 

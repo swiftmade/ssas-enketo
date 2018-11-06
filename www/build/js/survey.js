@@ -490,8 +490,8 @@ var jquery = __webpack_require__(1);
   };
 })();
 // EXTERNAL MODULE: ./node_modules/toastr/toastr.js
-var toastr_toastr = __webpack_require__(63);
-var toastr_default = /*#__PURE__*/__webpack_require__.n(toastr_toastr);
+var toastr = __webpack_require__(53);
+var toastr_default = /*#__PURE__*/__webpack_require__.n(toastr);
 
 // EXTERNAL MODULE: ./node_modules/angular/index.js
 var angular = __webpack_require__(40);
@@ -505,7 +505,7 @@ var v_accordion = __webpack_require__(374);
 
 
 
-var emitter = __webpack_require__(57);
+var emitter = __webpack_require__(62);
 
 var app = angular_default.a.module('jumpTo', ['vAccordion']);
 
@@ -787,54 +787,150 @@ function () {
 }();
 
 /* harmony default export */ var survey_SurveyManager = (new SurveyManager_SurveyManager());
-// CONCATENATED MODULE: ./src/js/survey/sessions/drivers/InMemory.js
+// CONCATENATED MODULE: ./src/js/survey/sessions/Session.js
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-function InMemory_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+function Session_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function InMemory_asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { InMemory_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { InMemory_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+function Session_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function InMemory_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function Session_createClass(Constructor, protoProps, staticProps) { if (protoProps) Session_defineProperties(Constructor.prototype, protoProps); if (staticProps) Session_defineProperties(Constructor, staticProps); return Constructor; }
 
-function InMemory_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function InMemory_createClass(Constructor, protoProps, staticProps) { if (protoProps) InMemory_defineProperties(Constructor.prototype, protoProps); if (staticProps) InMemory_defineProperties(Constructor, staticProps); return Constructor; }
-
-var $ = __webpack_require__(1); //var submit = require('../../submit')
-
-
-
-
-
-var _getEmptySession = function _getEmptySession() {
-  return {
-    'xml': null,
-    'draft': false,
-    'submitted': false,
-    'browser_mode': true,
-    'instance_id': null,
-    'deprecated_id': null
-  };
-};
-/**
- * In memory session is not stored anywhere.
- */
-
-
-var InMemory_InMemory =
+var Session =
 /*#__PURE__*/
 function () {
-  function InMemory() {
-    InMemory_classCallCheck(this, InMemory);
+  function Session(data) {
+    Session_classCallCheck(this, Session);
+
+    this.data = _objectSpread({
+      xml: null,
+      online: false,
+      draft: true,
+      payload: {},
+      _attachments: {},
+      submitted: false,
+      instance_id: null,
+      deprecated_id: null,
+      last_update: Date.now()
+    }, data);
   }
 
-  InMemory_createClass(InMemory, [{
+  Session_createClass(Session, [{
+    key: "setData",
+    value: function setData(data) {
+      this.data = _objectSpread({}, this.data, data, {
+        last_update: Date.now()
+      });
+      return this;
+    }
+  }, {
+    key: "writeEnketoForm",
+    value: function writeEnketoForm(form) {
+      this.setData({
+        xml: form.xml,
+        instance_id: form.instance_id,
+        deprecated_id: form.deprecated_id,
+        _attachments: this._getFiles(form.files)
+      });
+    }
+  }, {
+    key: "toFormInstance",
+    value: function toFormInstance() {
+      return {
+        instanceStr: this.data.xml,
+        session: this.data.payload,
+        submitted: this.data.submitted
+      };
+    }
+  }, {
+    key: "finalize",
+    value: function finalize() {
+      this.setData({
+        draft: false
+      });
+    }
+  }, {
+    key: "_getFiles",
+    value: function _getFiles(files) {
+      var _this = this;
+
+      if (!files || _typeof(files) !== 'object') {
+        return this.data._attachments;
+      }
+
+      var attachments = {};
+      files.forEach(function (file) {
+        // Mark already existing attachments as stub
+        if (_this._isFileStub(file)) {
+          if (_this._attachmentExists(file)) {
+            attachments[file] = _objectSpread({}, _this.data._attachments[file], {
+              stub: true
+            });
+          }
+
+          return;
+        }
+
+        attachments[file.name] = {
+          data: file,
+          content_type: file.type
+        };
+      });
+      return attachments;
+    }
+  }, {
+    key: "_isFileStub",
+    value: function _isFileStub(file) {
+      return typeof file === 'string';
+    }
+  }, {
+    key: "_attachmentExists",
+    value: function _attachmentExists(name) {
+      return this.data.hasOwnProperty('_attachments') && this.data._attachments.hasOwnProperty(name);
+    }
+  }]);
+
+  return Session;
+}();
+
+
+// CONCATENATED MODULE: ./src/js/survey/sessions/drivers/Online.js
+function Online_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function Online_asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { Online_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { Online_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function Online_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function Online_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function Online_createClass(Constructor, protoProps, staticProps) { if (protoProps) Online_defineProperties(Constructor.prototype, protoProps); if (staticProps) Online_defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+
+/**
+ * Online session
+ */
+
+var Online_Online =
+/*#__PURE__*/
+function () {
+  function Online() {
+    Online_classCallCheck(this, Online);
+  }
+
+  Online_createClass(Online, [{
     key: "start",
     value: function start() {
       if (!QueryParams["a" /* default */].has('edit')) {
-        return Promise.resolve(_getEmptySession());
+        return Promise.resolve(new Session({
+          online: true,
+          draft: false
+        }));
       }
 
       return this._loadSessionFromUrl(QueryParams["a" /* default */].getPath('edit'));
@@ -845,36 +941,29 @@ function () {
       return false;
     }
   }, {
-    key: "beforeEnd",
-    value: function beforeEnd(session) {
-      // Before ending the session, submit it to the server.
-      return submit(QueryParams["a" /* default */].getPath('submit'), session);
-    }
-  }, {
     key: "_loadSessionFromUrl",
     value: function () {
-      var _loadSessionFromUrl2 = InMemory_asyncToGenerator(
+      var _loadSessionFromUrl2 = Online_asyncToGenerator(
       /*#__PURE__*/
       regeneratorRuntime.mark(function _callee(url) {
-        var session, data;
+        var data;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                session = _getEmptySession();
-                _context.next = 3;
+                _context.next = 2;
                 return common_Server.json(url);
 
-              case 3:
+              case 2:
                 data = _context.sent;
-                return _context.abrupt("return", _objectSpread({}, session, {
+                return _context.abrupt("return", new Session({
                   submitted: true,
                   xml: data.instance,
                   instance_id: data.instance_id,
                   deprecated_id: data.deprecated_id
                 }));
 
-              case 5:
+              case 4:
               case "end":
                 return _context.stop();
             }
@@ -888,40 +977,43 @@ function () {
     }()
   }]);
 
-  return InMemory;
+  return Online;
 }();
 
 
-// CONCATENATED MODULE: ./src/js/survey/sessions/drivers/Persisted.js
-function Persisted_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+// CONCATENATED MODULE: ./src/js/survey/sessions/drivers/Offline.js
+function Offline_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
-function Persisted_asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { Persisted_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { Persisted_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+function Offline_asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { Offline_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { Offline_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-function Persisted_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function Offline_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function Persisted_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+function Offline_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function Persisted_createClass(Constructor, protoProps, staticProps) { if (protoProps) Persisted_defineProperties(Constructor.prototype, protoProps); if (staticProps) Persisted_defineProperties(Constructor, staticProps); return Constructor; }
+function Offline_createClass(Constructor, protoProps, staticProps) { if (protoProps) Offline_defineProperties(Constructor.prototype, protoProps); if (staticProps) Offline_defineProperties(Constructor, staticProps); return Constructor; }
 
-var Persisted_emitter = __webpack_require__(57);
+
+
+var Offline_emitter = __webpack_require__(62);
+
 
 
 
 /**
- * Persisted session is stored on the device using IndexedDB (pouchdb)
+ * Offline session is stored on the device using IndexedDB (pouchdb)
  */
 
-var Persisted_Persisted =
+var Offline_Offline =
 /*#__PURE__*/
 function () {
-  function Persisted() {
-    Persisted_classCallCheck(this, Persisted);
+  function Offline() {
+    Offline_classCallCheck(this, Offline);
   }
 
-  Persisted_createClass(Persisted, [{
+  Offline_createClass(Offline, [{
     key: "start",
     value: function () {
-      var _start = Persisted_asyncToGenerator(
+      var _start = Offline_asyncToGenerator(
       /*#__PURE__*/
       regeneratorRuntime.mark(function _callee() {
         return regeneratorRuntime.wrap(function _callee$(_context) {
@@ -953,39 +1045,59 @@ function () {
     }
   }, {
     key: "save",
-    value: function save(session, newSession) {
-      newSession._attachments = this._normalizedAttachments(session, newSession);
-      return SessionRepository["a" /* default */].update(newSession);
-    } // Save session before ending...
-
-  }, {
-    key: "beforeEnd",
-    value: function beforeEnd(session) {
-      this.save(session);
-    }
-  }, {
-    key: "_loadSessions",
     value: function () {
-      var _loadSessions2 = Persisted_asyncToGenerator(
+      var _save = Offline_asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee2() {
+      regeneratorRuntime.mark(function _callee2(session) {
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                _context2.next = 2;
-                return SessionRepository["a" /* default */].all();
+                _context2.t0 = Session;
+                _context2.next = 3;
+                return SessionRepository["a" /* default */].update(session.data);
 
-              case 2:
-                this.sessions = _context2.sent;
-                Persisted_emitter.emit('SessionModal.updateSessions', this.sessions);
+              case 3:
+                _context2.t1 = _context2.sent;
+                return _context2.abrupt("return", new _context2.t0(_context2.t1));
 
-              case 4:
+              case 5:
               case "end":
                 return _context2.stop();
             }
           }
         }, _callee2, this);
+      }));
+
+      return function save(_x) {
+        return _save.apply(this, arguments);
+      };
+    }()
+  }, {
+    key: "_loadSessions",
+    value: function () {
+      var _loadSessions2 = Offline_asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee3() {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _context3.next = 2;
+                return SessionRepository["a" /* default */].all();
+
+              case 2:
+                this.sessions = _context3.sent;
+                Offline_emitter.emit('SessionModal.updateSessions', this.sessions.filter(function (session) {
+                  return session.draft;
+                }));
+
+              case 4:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
       }));
 
       return function _loadSessions() {
@@ -995,29 +1107,29 @@ function () {
   }, {
     key: "_chooseSession",
     value: function () {
-      var _chooseSession2 = Persisted_asyncToGenerator(
+      var _chooseSession2 = Offline_asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee3() {
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+      regeneratorRuntime.mark(function _callee4() {
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
                 if (!QueryParams["a" /* default */].has('session')) {
-                  _context3.next = 2;
+                  _context4.next = 2;
                   break;
                 }
 
-                return _context3.abrupt("return", this._startFromName(QueryParams["a" /* default */].get('session')));
+                return _context4.abrupt("return", this._startFromName(QueryParams["a" /* default */].get('session')));
 
               case 2:
-                return _context3.abrupt("return", this._sessionFromUi());
+                return _context4.abrupt("return", this._sessionFromUi());
 
               case 3:
               case "end":
-                return _context3.stop();
+                return _context4.stop();
             }
           }
-        }, _callee3, this);
+        }, _callee4, this);
       }));
 
       return function _chooseSession() {
@@ -1027,60 +1139,60 @@ function () {
   }, {
     key: "_sessionFromUi",
     value: function () {
-      var _sessionFromUi2 = Persisted_asyncToGenerator(
+      var _sessionFromUi2 = Offline_asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee5() {
+      regeneratorRuntime.mark(function _callee6() {
         var _this = this;
 
-        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+        return regeneratorRuntime.wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
-                Persisted_emitter.emit('SessionModal.activate');
-                return _context5.abrupt("return", new Promise(function (resolve) {
-                  Persisted_emitter.once('Session.create', function (name) {
+                Offline_emitter.emit('SessionModal.activate');
+                return _context6.abrupt("return", new Promise(function (resolve) {
+                  Offline_emitter.once('Session.create', function (name) {
                     resolve(_this._startFromName(name));
                   });
-                  Persisted_emitter.on('Session.delete',
+                  Offline_emitter.on('Session.delete',
                   /*#__PURE__*/
                   function () {
-                    var _ref = Persisted_asyncToGenerator(
+                    var _ref = Offline_asyncToGenerator(
                     /*#__PURE__*/
-                    regeneratorRuntime.mark(function _callee4(session) {
-                      return regeneratorRuntime.wrap(function _callee4$(_context4) {
+                    regeneratorRuntime.mark(function _callee5(session) {
+                      return regeneratorRuntime.wrap(function _callee5$(_context5) {
                         while (1) {
-                          switch (_context4.prev = _context4.next) {
+                          switch (_context5.prev = _context5.next) {
                             case 0:
-                              _context4.next = 2;
+                              _context5.next = 2;
                               return SessionRepository["a" /* default */].remove(session);
 
                             case 2:
-                              _context4.next = 4;
+                              _context5.next = 4;
                               return _this._loadSessions();
 
                             case 4:
                             case "end":
-                              return _context4.stop();
+                              return _context5.stop();
                           }
                         }
-                      }, _callee4, this);
+                      }, _callee5, this);
                     }));
 
-                    return function (_x) {
+                    return function (_x2) {
                       return _ref.apply(this, arguments);
                     };
                   }());
-                  Persisted_emitter.on('Session.select', function (session) {
-                    resolve(session);
+                  Offline_emitter.on('Session.select', function (session) {
+                    resolve(new Session(session));
                   });
                 }));
 
               case 2:
               case "end":
-                return _context5.stop();
+                return _context6.stop();
             }
           }
-        }, _callee5, this);
+        }, _callee6, this);
       }));
 
       return function _sessionFromUi() {
@@ -1090,68 +1202,29 @@ function () {
   }, {
     key: "_startFromName",
     value: function () {
-      var _startFromName2 = Persisted_asyncToGenerator(
+      var _startFromName2 = Offline_asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee6(name) {
+      regeneratorRuntime.mark(function _callee7(name) {
         var existingSession;
-        return regeneratorRuntime.wrap(function _callee6$(_context6) {
+        return regeneratorRuntime.wrap(function _callee7$(_context7) {
           while (1) {
-            switch (_context6.prev = _context6.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
                 existingSession = this.sessions.find(function (s) {
                   return s.name == name;
                 });
 
                 if (!existingSession) {
-                  _context6.next = 3;
+                  _context7.next = 3;
                   break;
                 }
 
-                return _context6.abrupt("return", existingSession);
+                return _context7.abrupt("return", new Session(existingSession));
 
               case 3:
-                return _context6.abrupt("return", this._createFromName(name));
+                return _context7.abrupt("return", this._createFromName(name));
 
               case 4:
-              case "end":
-                return _context6.stop();
-            }
-          }
-        }, _callee6, this);
-      }));
-
-      return function _startFromName(_x2) {
-        return _startFromName2.apply(this, arguments);
-      };
-    }()
-  }, {
-    key: "_createFromName",
-    value: function () {
-      var _createFromName2 = Persisted_asyncToGenerator(
-      /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee7(name) {
-        var payload,
-            _args7 = arguments;
-        return regeneratorRuntime.wrap(function _callee7$(_context7) {
-          while (1) {
-            switch (_context7.prev = _context7.next) {
-              case 0:
-                payload = _args7.length > 1 && _args7[1] !== undefined ? _args7[1] : {};
-
-                if (QueryParams["a" /* default */].has('session_extra')) {
-                  payload = JSON.parse(QueryParams["a" /* default */].get('session_extra'));
-                }
-
-                return _context7.abrupt("return", SessionRepository["a" /* default */].create({
-                  name: name,
-                  xml: '',
-                  payload: payload,
-                  draft: true,
-                  submitted: false,
-                  last_update: Date.now()
-                }));
-
-              case 3:
               case "end":
                 return _context7.stop();
             }
@@ -1159,37 +1232,79 @@ function () {
         }, _callee7, this);
       }));
 
-      return function _createFromName(_x3) {
-        return _createFromName2.apply(this, arguments);
+      return function _startFromName(_x3) {
+        return _startFromName2.apply(this, arguments);
       };
     }()
   }, {
-    key: "_normalizedAttachments",
-    value: function _normalizedAttachments(session, newSession) {
-      var attachments = {};
+    key: "_create",
+    value: function () {
+      var _create2 = Offline_asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee8(data) {
+        var session, savedSessionData;
+        return regeneratorRuntime.wrap(function _callee8$(_context8) {
+          while (1) {
+            switch (_context8.prev = _context8.next) {
+              case 0:
+                session = new Session(data);
+                _context8.next = 3;
+                return SessionRepository["a" /* default */].create(session.data);
 
-      newSession._attachments.forEach(function (file) {
-        // Mark already existing attachments as stub
-        if (typeof file === 'string') {
-          if (session.hasOwnProperty('_attachments') && session._attachments.hasOwnProperty(file)) {
-            attachments[file] = session['_attachments'][file];
-            attachments[file].stub = true;
+              case 3:
+                savedSessionData = _context8.sent;
+                return _context8.abrupt("return", new Session(savedSessionData));
+
+              case 5:
+              case "end":
+                return _context8.stop();
+            }
           }
+        }, _callee8, this);
+      }));
 
-          return;
-        }
+      return function _create(_x4) {
+        return _create2.apply(this, arguments);
+      };
+    }()
+  }, {
+    key: "_createFromName",
+    value: function () {
+      var _createFromName2 = Offline_asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee9(name) {
+        var payload,
+            _args9 = arguments;
+        return regeneratorRuntime.wrap(function _callee9$(_context9) {
+          while (1) {
+            switch (_context9.prev = _context9.next) {
+              case 0:
+                payload = _args9.length > 1 && _args9[1] !== undefined ? _args9[1] : {};
 
-        attachments[file.name] = {
-          data: file,
-          content_type: file.type
-        };
-      });
+                if (QueryParams["a" /* default */].has('session_extra')) {
+                  payload = JSON.parse(QueryParams["a" /* default */].get('session_extra'));
+                }
 
-      return attachments;
-    }
+                return _context9.abrupt("return", this._create({
+                  name: name,
+                  payload: payload
+                }));
+
+              case 3:
+              case "end":
+                return _context9.stop();
+            }
+          }
+        }, _callee9, this);
+      }));
+
+      return function _createFromName(_x5) {
+        return _createFromName2.apply(this, arguments);
+      };
+    }()
   }]);
 
-  return Persisted;
+  return Offline;
 }();
 
 
@@ -1198,8 +1313,8 @@ function () {
 
 
 var AVAILABLE_DRIVERS = {
-  'online': InMemory_InMemory,
-  'offline': Persisted_Persisted
+  'online': Online_Online,
+  'offline': Offline_Offline
 };
 /* harmony default export */ var SessionDrivers = ({
   getDriver: function getDriver() {
@@ -1209,10 +1324,6 @@ var AVAILABLE_DRIVERS = {
   }
 });
 // CONCATENATED MODULE: ./src/js/survey/sessions/SessionManager.js
-function SessionManager_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { SessionManager_defineProperty(target, key, source[key]); }); } return target; }
-
-function SessionManager_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function SessionManager_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function SessionManager_asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { SessionManager_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { SessionManager_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -1263,30 +1374,25 @@ function () {
       };
     }()
   }, {
-    key: "save",
+    key: "finalize",
     value: function () {
-      var _save = SessionManager_asyncToGenerator(
+      var _finalize = SessionManager_asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee2(record) {
+      regeneratorRuntime.mark(function _callee2(form) {
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                if (this.driver.canSave()) {
-                  _context2.next = 2;
+                if (!this.driver.canSave()) {
+                  _context2.next = 4;
                   break;
                 }
 
-                throw new Exception('This driver does not support saving!');
-
-              case 2:
+                this.session.finalize();
                 _context2.next = 4;
-                return this.driver.save(this.session, this.sessionUpdate(record));
+                return this.save(form);
 
               case 4:
-                this.session = _context2.sent;
-
-              case 5:
               case "end":
                 return _context2.stop();
             }
@@ -1294,20 +1400,48 @@ function () {
         }, _callee2, this);
       }));
 
-      return function save(_x) {
+      return function finalize(_x) {
+        return _finalize.apply(this, arguments);
+      };
+    }() // Form 
+
+  }, {
+    key: "save",
+    value: function () {
+      var _save = SessionManager_asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee3(form) {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                if (this.driver.canSave()) {
+                  _context3.next = 2;
+                  break;
+                }
+
+                throw new Exception('This driver does not support saving!');
+
+              case 2:
+                this.session.writeEnketoForm(form);
+                _context3.next = 5;
+                return this.driver.save(this.session);
+
+              case 5:
+                this.session = _context3.sent;
+
+              case 6:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      return function save(_x2) {
         return _save.apply(this, arguments);
       };
     }()
-  }, {
-    key: "sessionUpdate",
-    value: function sessionUpdate(record) {
-      return SessionManager_objectSpread({}, this.session, {
-        xml: record.xml,
-        _attachments: record.files,
-        instance_id: record.instance_id,
-        deprecated_id: record.deprecated_id
-      });
-    }
   }]);
 
   return SessionManager;
@@ -1315,6 +1449,10 @@ function () {
 
 /* harmony default export */ var sessions_SessionManager = (new SessionManager_SessionManager());
 // CONCATENATED MODULE: ./src/js/survey/EnketoForm.js
+function EnketoForm_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { EnketoForm_defineProperty(target, key, source[key]); }); } return target; }
+
+function EnketoForm_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function EnketoForm_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function EnketoForm_asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { EnketoForm_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { EnketoForm_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -1331,11 +1469,19 @@ function EnketoForm_createClass(Constructor, protoProps, staticProps) { if (prot
 
 var Form = __webpack_require__(397);
 
-var EnketoForm_emitter = __webpack_require__(57);
+var EnketoForm_emitter = __webpack_require__(62);
 
 
 
 
+
+var makeEmitter = function makeEmitter(silent) {
+  return silent ? function (e) {
+    /*do nothing*/
+  } : function (e) {
+    return EnketoForm_emitter.emit(e);
+  };
+};
 
 var EnketoForm_EnketoForm =
 /*#__PURE__*/
@@ -1389,12 +1535,9 @@ function () {
   }, {
     key: "_newFormInstance",
     value: function _newFormInstance() {
-      this.form = new Form('form.or:eq(0)', {
-        modelStr: survey_SurveyManager.survey.model,
-        instanceStr: sessions_SessionManager.session.xml,
-        submitted: sessions_SessionManager.session.submitted,
-        session: sessions_SessionManager.session.payload
-      });
+      this.form = new Form('form.or:eq(0)', EnketoForm_objectSpread({
+        modelStr: survey_SurveyManager.survey.model
+      }, sessions_SessionManager.session.toFormInstance()));
     }
   }, {
     key: "_initFormInstance",
@@ -1484,7 +1627,7 @@ function () {
               case 0:
                 _context3.t0 = sessions_SessionManager;
                 _context3.next = 3;
-                return this._record();
+                return this._form();
 
               case 3:
                 _context3.t1 = _context3.sent;
@@ -1504,9 +1647,9 @@ function () {
       };
     }()
   }, {
-    key: "_record",
+    key: "_form",
     value: function () {
-      var _record2 = EnketoForm_asyncToGenerator(
+      var _form2 = EnketoForm_asyncToGenerator(
       /*#__PURE__*/
       regeneratorRuntime.mark(function _callee4() {
         return regeneratorRuntime.wrap(function _callee4$(_context4) {
@@ -1536,8 +1679,8 @@ function () {
         }, _callee4, this);
       }));
 
-      return function _record() {
-        return _record2.apply(this, arguments);
+      return function _form() {
+        return _form2.apply(this, arguments);
       };
     }()
   }, {
@@ -1572,30 +1715,37 @@ function () {
       var _validate = EnketoForm_asyncToGenerator(
       /*#__PURE__*/
       regeneratorRuntime.mark(function _callee5() {
-        var outcome;
+        var silent,
+            emitEvent,
+            outcome,
+            _args5 = arguments;
         return regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
+                silent = _args5.length > 0 && _args5[0] !== undefined ? _args5[0] : false;
+
                 if (!this.validating) {
-                  _context5.next = 2;
+                  _context5.next = 3;
                   break;
                 }
 
                 return _context5.abrupt("return");
 
-              case 2:
+              case 3:
+                emitEvent = makeEmitter(silent);
                 this.validating = true;
-                EnketoForm_emitter.emit('EnketoForm.validating');
-                _context5.next = 6;
+                emitEvent('EnketoForm.validating');
+                _context5.next = 8;
                 return this._validateForm();
 
-              case 6:
+              case 8:
                 outcome = _context5.sent;
-                EnketoForm_emitter.emit(outcome ? 'EnketoForm.validationSucceeded' : 'EnketoForm.validationFailed');
+                emitEvent(outcome ? 'EnketoForm.validationSucceeded' : 'EnketoForm.validationFailed');
                 this.validating = false;
+                return _context5.abrupt("return", outcome);
 
-              case 9:
+              case 12:
               case "end":
                 return _context5.stop();
             }
@@ -1605,6 +1755,45 @@ function () {
 
       return function validate() {
         return _validate.apply(this, arguments);
+      };
+    }()
+  }, {
+    key: "finishAndSubmit",
+    value: function () {
+      var _finishAndSubmit = EnketoForm_asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee6() {
+        var silent;
+        return regeneratorRuntime.wrap(function _callee6$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                silent = true;
+                _context6.next = 3;
+                return this.validate(silent);
+
+              case 3:
+                if (_context6.sent) {
+                  _context6.next = 5;
+                  break;
+                }
+
+                throw new Error('Form cannot be submitted. Check validation errors!');
+
+              case 5:
+                _context6.next = 7;
+                return sessions_SessionManager.finalize(this._form());
+
+              case 7:
+              case "end":
+                return _context6.stop();
+            }
+          }
+        }, _callee6, this);
+      }));
+
+      return function finishAndSubmit() {
+        return _finishAndSubmit.apply(this, arguments);
       };
     }()
   }]);
@@ -1624,10 +1813,6 @@ function Kernel_defineProperties(target, props) { for (var i = 0; i < props.leng
 
 function Kernel_createClass(Constructor, protoProps, staticProps) { if (protoProps) Kernel_defineProperties(Constructor.prototype, protoProps); if (staticProps) Kernel_defineProperties(Constructor, staticProps); return Constructor; }
 
-
-
-
-var Kernel_emitter = __webpack_require__(57);
 
 
 
@@ -1666,35 +1851,63 @@ function () {
       };
     }()
   }, {
-    key: "exit",
+    key: "submit",
     value: function () {
-      var _exit = Kernel_asyncToGenerator(
+      var _submit = Kernel_asyncToGenerator(
       /*#__PURE__*/
       regeneratorRuntime.mark(function _callee2() {
+        var _this = this;
+
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                _context2.next = 2;
+                return _context2.abrupt("return", survey_EnketoForm.finishAndSubmit().then(function (_) {
+                  return _this.exit();
+                }));
+
+              case 1:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      return function submit() {
+        return _submit.apply(this, arguments);
+      };
+    }()
+  }, {
+    key: "exit",
+    value: function () {
+      var _exit = Kernel_asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee3() {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _context3.next = 2;
                 return survey_EnketoForm.save();
 
               case 2:
                 if (!QueryParams["a" /* default */].has('return')) {
-                  _context2.next = 4;
+                  _context3.next = 4;
                   break;
                 }
 
-                return _context2.abrupt("return", window.location(QueryParams["a" /* default */].getUrl('return')));
+                return _context3.abrupt("return", window.location(QueryParams["a" /* default */].getUrl('return')));
 
               case 4:
                 window.location = 'index.html';
 
               case 5:
               case "end":
-                return _context2.stop();
+                return _context3.stop();
             }
           }
-        }, _callee2, this);
+        }, _callee3, this);
       }));
 
       return function exit() {
@@ -1708,6 +1921,7 @@ function () {
 
 /* harmony default export */ var survey_Kernel = (new Kernel_Kernel());
 // CONCATENATED MODULE: ./src/js/survey/ui/Toolbar.js
+
 
 
 
@@ -1729,17 +1943,12 @@ jquery(document).ready(function () {
   }); // validate handler for validate button
 
   jquery('.submit-form').on('click', function () {
-    Survey.submit().then(function () {
-      // Successful
-      toastr.success("Your submission has been successfully saved on the device");
-      jquery('.submit-form').remove();
-    }).catch(function (error) {
-      if (error.message == "redirected!") {
-        return;
-      } // Rejected!
-
-
-      toastr.error(error.message ? error.message : "An unknown error occured");
+    var $self = jquery(this);
+    $self.attr('disabled', 'disabled');
+    survey_Kernel.submit().catch(function (e) {
+      console.error(e);
+      $self.removeAttr('disabled', 'disabled');
+      toastr_default.a.error('An error occured while finalizing your submission!');
     });
     return false;
   });
@@ -1748,7 +1957,7 @@ jquery(document).ready(function () {
 
 
 
-var Overlays_emitter = __webpack_require__(57);
+var Overlays_emitter = __webpack_require__(62);
 
 
 
@@ -1847,7 +2056,7 @@ var Overlays_validationSucceeded = function validationSucceeded() {
   jquery('.last-page').click();
 };
 // CONCATENATED MODULE: ./src/js/survey/ui/SessionModal.js
-var SessionModal_emitter = __webpack_require__(57);
+var SessionModal_emitter = __webpack_require__(62);
 
 
 var SessionModal_app = angular_default.a.module('sessionModal', []);

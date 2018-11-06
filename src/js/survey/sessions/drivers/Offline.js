@@ -1,12 +1,14 @@
+import Session from '../Session'
 const emitter = require('tiny-emitter/instance')
 import queryParams from '../../../common/QueryParams'
 import sessionRepository from '../../../common/repositories/SessionRepository'
+import SessionDrivers from '../SessionDrivers';
 
 /**
- * Persisted session is stored on the device using IndexedDB (pouchdb)
+ * Offline session is stored on the device using IndexedDB (pouchdb)
  */
 
- export default class Persisted {
+ export default class Offline {
 
     async start() {
         await this._loadSessions()
@@ -17,19 +19,17 @@ import sessionRepository from '../../../common/repositories/SessionRepository'
         return true
     }
 
-    save(session, newSession) {
-        newSession._attachments = this._normalizedAttachments(session, newSession)
-        return sessionRepository.update(newSession)
-    }
-
-    // Save session before ending...
-    beforeEnd(session) {
-        this.save(session)
+    async save(session) {
+        return new Session(
+            await sessionRepository.update(session.data)
+        )
     }
 
     async _loadSessions() {
         this.sessions = await sessionRepository.all()
-        emitter.emit('SessionModal.updateSessions', this.sessions)
+        emitter.emit('SessionModal.updateSessions', this.sessions.filter(
+            session => session.draft
+        ))
     }
 
     async _chooseSession() {
@@ -54,7 +54,7 @@ import sessionRepository from '../../../common/repositories/SessionRepository'
             })
 
             emitter.on('Session.select', session => {
-                resolve(session)
+                resolve(new Session(session))
             })
         })
     }
@@ -63,46 +63,25 @@ import sessionRepository from '../../../common/repositories/SessionRepository'
         const existingSession = this.sessions.find(s => s.name == name)
 
         if(existingSession) {
-            return existingSession
+            return new Session(existingSession)
         }
         
         return this._createFromName(name)
+    }
+
+    async _create(data) {
+        const session = new Session(data)
+        const savedSessionData = await sessionRepository.create(session.data)
+        return new Session(savedSessionData)
     }
 
     async _createFromName(name, payload = {}) {
         if (queryParams.has('session_extra')) {
             payload = JSON.parse(queryParams.get('session_extra'));
         }
-        return sessionRepository.create({
+        return this._create({
             name,
-            xml: '',
-            payload,
-            draft: true,
-            submitted: false,
-            last_update: Date.now(),
+            payload
         })
     }
-
-    _normalizedAttachments(session, newSession) {
-        
-        var attachments = {}
-
-        newSession._attachments.forEach(file => {
-            // Mark already existing attachments as stub
-            if (typeof file === 'string') {
-                if (session.hasOwnProperty('_attachments') && session._attachments.hasOwnProperty(file)) {
-                    attachments[file] = session['_attachments'][file]
-                    attachments[file].stub = true
-                }
-                return
-            }
-            attachments[file.name] = {
-                data: file,
-                content_type: file.type,
-            }
-        })
-
-        return attachments
-    }
-
 }
