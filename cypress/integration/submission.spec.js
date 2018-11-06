@@ -12,7 +12,7 @@ describe('Submissions', () => {
             response: [],
         }).as('postSubmission')
 
-        cy.visit('/survey.dev.html?survey=test.json&mode=online&submit=openrosa/submissions&return=index.html')
+        cy.visit('/survey.html?survey=test.json&mode=online&submit=openrosa/submissions&return=index.html')
             .get('input[name="/data/TEST1"]').type('Hello World!')
             .get('.submit-form').click()
         
@@ -34,7 +34,7 @@ describe('Submissions', () => {
             status: 500,
         }).as('postSubmission')
 
-        cy.visit('/survey.dev.html?survey=test.json&mode=online&submit=openrosa/submissions')
+        cy.visit('/survey.html?survey=test.json&mode=online&submit=openrosa/submissions')
             .get('input[name="/data/TEST1"]').type('Hello World!')
             .get('.submit-form').click()
 
@@ -51,13 +51,13 @@ describe('Submissions', () => {
             status: 200,
         }).as('postSubmission')
 
-        cy.visit('/survey.dev.html?survey=test.json&mode=offline&session=test&submit=openrosa/submissions')
+        cy.visit('/survey.html?survey=test.json&mode=offline&session=test&submit=openrosa/submissions')
             .get('input[name="/data/TEST1"]').type('Hello World!')
             .get('.submit-form').click()
 
         cy.location('pathname').should('eq', '/index.html')
 
-        cy.visit('/submissions.dev.html?submit=openrosa/submissions')
+        cy.visit('/submissions.html?submit=openrosa/submissions')
             .get('#packet-rows').children().should('have.length', 1)
             .get('.upload-packet').click()
 
