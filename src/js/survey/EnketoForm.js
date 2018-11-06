@@ -146,7 +146,7 @@ class EnketoForm {
         }
 
         await SessionManager.finalize(
-            this._form()
+            await this._form()
         )
     }
 }

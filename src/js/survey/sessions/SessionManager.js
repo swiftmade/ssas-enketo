@@ -11,24 +11,19 @@ class SessionManager
     }
 
     async finalize(form) {
-        // First, save the current form.
         if (this.driver.canSave()) {
-            this.session.finalize()
             await this.save(form)
+        } else {
+            this.session.writeEnketoForm(form)
         }
-        /*
-        // Then optimize its attachments
-        await Optimizer.optimize(
-            this.driver,
-            this.session
-        )
-        */
+        // TODO: Optimize...
+        await this.driver.finalize(this.session)
     }
 
     // Form 
     async save(form) {
         if (!this.driver.canSave()) {
-            throw new Exception('This driver does not support saving!')
+            return Promise.resolve(true)
         }
         this.session.writeEnketoForm(form)
         this.session = await this.driver.save(this.session)

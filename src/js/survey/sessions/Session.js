@@ -41,12 +41,6 @@ export default class Session {
         }
     }
 
-    finalize() {
-        this.setData({
-            draft: false,
-        })
-    }
-
     _getFiles(files) {
         if (!files || typeof files !== 'object') {
             return this.data._attachments

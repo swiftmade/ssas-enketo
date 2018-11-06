@@ -21,6 +21,10 @@ export default class Online {
         return false
     }
 
+    async finalize(session) {
+        await Server.submit(session)
+    }
+
     async _loadSessionFromUrl(url) {
         const data = await Server.json(url)
 
