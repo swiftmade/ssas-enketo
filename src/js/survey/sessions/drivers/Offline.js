@@ -1,8 +1,7 @@
-import Session from '../Session'
+import Session from '../../../common/Session'
 const emitter = require('tiny-emitter/instance')
 import queryParams from '../../../common/QueryParams'
 import sessionRepository from '../../../common/repositories/SessionRepository'
-import SessionDrivers from '../SessionDrivers';
 
 /**
  * Offline session is stored on the device using IndexedDB (pouchdb)
@@ -23,6 +22,12 @@ import SessionDrivers from '../SessionDrivers';
         return new Session(
             await sessionRepository.update(session.data)
         )
+    }
+
+    async finalize(session) {
+        return await this.save(session.setData({
+            draft: false
+        }))
     }
 
     async _loadSessions() {

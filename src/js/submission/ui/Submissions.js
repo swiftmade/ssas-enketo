@@ -1,3 +1,6 @@
+import toastr from 'toastr'
+import Server from '../../common/Server'
+import Session from '../../common/Session'
 import sessionRepo from '../../common/repositories/SessionRepository'
 
 const app = angular.module('app', [])
@@ -111,7 +114,8 @@ app.controller('SubmissionsCtrl', ['$scope', '$timeout', function ($scope, $time
                 });
             };
 
-            submit(queryParams.getPath("server"), packet, onUploadProgress)
+            // TODO: Handle progress
+            Server.submit(new Session(packet))
                 .then(function (result) {
                     return sessionRepo.get(packet._id);
                 })
@@ -130,7 +134,7 @@ app.controller('SubmissionsCtrl', ['$scope', '$timeout', function ($scope, $time
                     packet.uploaded = false;
                     $scope.$apply();
                     toastr.error(i18n._("submissions.error", {
-                        packet: next.packet.name
+                        packet: packet.name
                     }));
                 });
         });

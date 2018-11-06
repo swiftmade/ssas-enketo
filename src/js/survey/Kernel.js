@@ -18,12 +18,20 @@ class Kernel {
             .then(_ => this.exit())
     }
 
-    async exit() {
+    async _save() {
         await EnketoForm.save()
+    }    
+
+    async exit() {
         if (queryParams.has('return')) {
-            return window.location(queryParams.getUrl('return'))
+            return window.location = queryParams.getPath('return')
         }
         window.location = 'index.html'
+    }
+
+    async saveAndexit() {
+        await this._save()
+        await this.exit()
     }
 }
 

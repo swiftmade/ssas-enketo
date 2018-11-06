@@ -1,5 +1,5 @@
-import Session from '../Session'
 import Server from '../../../common/Server'
+import Session from '../../../common/Session'
 import queryParams from '../../../common/QueryParams'
 
 /**

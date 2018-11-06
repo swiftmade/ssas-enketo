@@ -10,7 +10,7 @@ $(document).ready(function() {
     })
 
     $('#close-button').click(function () {
-        Kernel.exit()
+        Kernel.saveAndExit()
     })
 
     $('.validate-form').on('click', function () {
