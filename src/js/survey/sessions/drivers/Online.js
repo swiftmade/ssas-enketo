@@ -25,6 +25,14 @@ export default class Online {
         await Server.submit(session)
     }
 
+    async attachmentUrl(session, fileName) {
+        return queryParams.getUrl(
+            "submissions/" +
+            session.data.instance_id +
+            "/photo/" + fileName
+        )
+    }
+
     async _loadSessionFromUrl(url) {
         const data = await Server.json(url)
 

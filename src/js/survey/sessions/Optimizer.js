@@ -21,7 +21,7 @@ function Optimizer(session, onProgressCb) {
     }
 
     function getFileBlob(name, file) {
-        if (session.hasOwnProperty('browser_mode')) {
+        if (session.isOnline()) {
             return Promise.resolve(file.data);
         }
         return sessionRepo.getAttachment(id, name);
@@ -67,7 +67,7 @@ function Optimizer(session, onProgressCb) {
         }
 
         return queue.run().then(function () {
-            if (!session.browser_mode) {
+            if (!session.isOnline()) {
                 return sessionRepo.update(session);
             }
             return session;

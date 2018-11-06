@@ -41,6 +41,10 @@ export default class Session {
         }
     }
 
+    isOnline() {
+        return this.data.online
+    }
+
     _getFiles(files) {
         if (!files || typeof files !== 'object') {
             return this.data._attachments

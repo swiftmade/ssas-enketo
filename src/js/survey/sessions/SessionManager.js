@@ -10,6 +10,13 @@ class SessionManager
         this.session = await this.driver.start()
     }
 
+    async attachmentUrl(fileName) {
+        return await this.driver.attachmentUrl(
+            this.session,
+            fileName
+        )
+    }
+
     async finalize(form) {
         if (this.driver.canSave()) {
             await this.save(form)

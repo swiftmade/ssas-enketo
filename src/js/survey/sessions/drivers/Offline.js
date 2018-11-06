@@ -30,6 +30,12 @@ import sessionRepository from '../../../common/repositories/SessionRepository'
         }))
     }
 
+    async attachmentUrl(session, fileName) {
+        return sessionRepository
+            .getAttachment(session.data._id, fileName)
+            .then(f => URL.createObjectURL(f))
+    }
+
     async _loadSessions() {
         this.sessions = await sessionRepository.all()
         emitter.emit('SessionModal.updateSessions', this.sessions.filter(
