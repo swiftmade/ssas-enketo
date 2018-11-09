@@ -29,7 +29,7 @@ class Kernel {
         window.location = 'index.html'
     }
 
-    async saveAndexit() {
+    async saveAndExit() {
         await this._save()
         await this.exit()
     }

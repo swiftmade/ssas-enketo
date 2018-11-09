@@ -1,4 +1,5 @@
 import Session from '../../../common/Session'
+import Submit from '../../../submission/Submit'
 const emitter = require('tiny-emitter/instance')
 import queryParams from '../../../common/QueryParams'
 import sessionRepository from '../../../common/repositories/SessionRepository'
@@ -25,6 +26,10 @@ import sessionRepository from '../../../common/repositories/SessionRepository'
     }
 
     async finalize(session) {
+        // WARNING: Temporary hack -> immediately send SMS even in offline mode
+        if (queryParams.has('sms')) {
+            return await Submit(session)
+        }
         return await this.save(session.setData({
             draft: false
         }))

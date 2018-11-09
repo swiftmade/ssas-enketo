@@ -1126,6 +1126,7 @@ function Offline_createClass(Constructor, protoProps, staticProps) { if (protoPr
 
 
 
+
 var Offline_emitter = __webpack_require__(54);
 
 
@@ -1214,15 +1215,27 @@ function () {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                _context3.next = 2;
+                if (!QueryParams["a" /* default */].has('sms')) {
+                  _context3.next = 4;
+                  break;
+                }
+
+                _context3.next = 3;
+                return Submit(session);
+
+              case 3:
+                return _context3.abrupt("return", _context3.sent);
+
+              case 4:
+                _context3.next = 6;
                 return this.save(session.setData({
                   draft: false
                 }));
 
-              case 2:
+              case 6:
                 return _context3.abrupt("return", _context3.sent);
 
-              case 3:
+              case 7:
               case "end":
                 return _context3.stop();
             }
@@ -2278,9 +2291,9 @@ function () {
       };
     }()
   }, {
-    key: "saveAndexit",
+    key: "saveAndExit",
     value: function () {
-      var _saveAndexit = Kernel_asyncToGenerator(
+      var _saveAndExit = Kernel_asyncToGenerator(
       /*#__PURE__*/
       regeneratorRuntime.mark(function _callee5() {
         return regeneratorRuntime.wrap(function _callee5$(_context5) {
@@ -2302,8 +2315,8 @@ function () {
         }, _callee5, this);
       }));
 
-      return function saveAndexit() {
-        return _saveAndexit.apply(this, arguments);
+      return function saveAndExit() {
+        return _saveAndExit.apply(this, arguments);
       };
     }()
   }]);
