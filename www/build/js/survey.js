@@ -615,7 +615,7 @@ var v_accordion = __webpack_require__(376);
 
 
 
-var emitter = __webpack_require__(60);
+var emitter = __webpack_require__(54);
 
 var app = angular_default.a.module('jumpTo', ['vAccordion']);
 
@@ -693,7 +693,7 @@ var form_model = __webpack_require__(379);
 var QueryParams = __webpack_require__(2);
 
 // EXTERNAL MODULE: ./src/js/common/Server.js
-var Server = __webpack_require__(55);
+var Server = __webpack_require__(56);
 
 // EXTERNAL MODULE: ./src/js/common/Session.js
 var Session = __webpack_require__(22);
@@ -717,6 +717,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
+
+var Sms_emitter = __webpack_require__(54);
 
 var Sms_Sms =
 /*#__PURE__*/
@@ -745,7 +747,7 @@ function () {
       var _submit = _asyncToGenerator(
       /*#__PURE__*/
       regeneratorRuntime.mark(function _callee() {
-        var number, output, sms;
+        var number, output, sms, href;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -753,10 +755,20 @@ function () {
                 number = QueryParams["a" /* default */].get('sms');
                 output = _objectSpread({}, _typeof(this.session.data.payload) === 'object' ? this.session.data.payload : {}, this.transcode(this.session.data.xml));
                 sms = this.objectToText(output);
-                window.location.href = 'sms:' + encodeURIComponent(number) + '&body=' + encodeURIComponent(sms);
-                throw new Error('Redirected to sms app');
+                href = 'sms:' + encodeURIComponent(number) + '&body=' + encodeURIComponent(sms);
 
-              case 5:
+                window.clickSendSms = function () {
+                  Sms_emitter.emit('SMS.click');
+                };
+
+                Sms_emitter.emit('EnketoForm.submit.status', '<a href="' + href + '" class="btn btn-primary" target="_blank" onclick="clickSendSms()">Click here to send SMS</a>');
+                return _context.abrupt("return", new Promise(function (resolve) {
+                  Sms_emitter.once('SMS.click', function () {
+                    setTimeout(resolve, 200);
+                  });
+                }));
+
+              case 7:
               case "end":
                 return _context.stop();
             }
@@ -901,7 +913,7 @@ function Submit_defineProperties(target, props) { for (var i = 0; i < props.leng
 
 function Submit_createClass(Constructor, protoProps, staticProps) { if (protoProps) Submit_defineProperties(Constructor.prototype, protoProps); if (staticProps) Submit_defineProperties(Constructor, staticProps); return Constructor; }
 
-var Submit_emitter = __webpack_require__(60);
+var Submit_emitter = __webpack_require__(54);
 
 
 
@@ -1114,7 +1126,7 @@ function Offline_createClass(Constructor, protoProps, staticProps) { if (protoPr
 
 
 
-var Offline_emitter = __webpack_require__(60);
+var Offline_emitter = __webpack_require__(54);
 
 
 
@@ -1800,7 +1812,7 @@ function EnketoForm_createClass(Constructor, protoProps, staticProps) { if (prot
 
 var Form = __webpack_require__(417);
 
-var EnketoForm_emitter = __webpack_require__(60);
+var EnketoForm_emitter = __webpack_require__(54);
 
 
 
@@ -2337,7 +2349,7 @@ jquery(document).ready(function () {
 
 
 
-var Overlays_emitter = __webpack_require__(60);
+var Overlays_emitter = __webpack_require__(54);
 
 
 
@@ -2458,7 +2470,7 @@ var Overlays_submitStatus = function submitStatus(_submitStatus) {
   jquery('#submit-progress-text').html(_submitStatus);
 };
 // CONCATENATED MODULE: ./src/js/survey/ui/SessionModal.js
-var SessionModal_emitter = __webpack_require__(60);
+var SessionModal_emitter = __webpack_require__(54);
 
 
 var SessionModal_app = angular_default.a.module('sessionModal', []);
@@ -2555,7 +2567,7 @@ survey_Kernel.boot();
 
 /***/ }),
 
-/***/ 55:
+/***/ 56:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

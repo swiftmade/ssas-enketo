@@ -1,5 +1,6 @@
 import $ from 'jquery'
 import queryParams from '../../common/QueryParams'
+const emitter = require('tiny-emitter/instance')
 
 export default class Sms {
     
@@ -24,11 +25,24 @@ export default class Sms {
             ...(typeof this.session.data.payload === 'object' ? this.session.data.payload : {}),
             ...this.transcode(this.session.data.xml)
         }
-
         const sms = this.objectToText(output)
-        window.location.href = 'sms:' + encodeURIComponent(number) +
+        const href = 'sms:' + encodeURIComponent(number) +
             '&body=' + encodeURIComponent(sms)
-        throw new Error('Redirected to sms app')
+
+        window.clickSendSms = () => {
+            emitter.emit('SMS.click')
+        }
+        
+        emitter.emit(
+            'EnketoForm.submit.status',
+            '<a href="' + href + '" class="btn btn-primary" target="_blank" onclick="clickSendSms()">Click here to send SMS</a>'
+        )
+
+        return new Promise(resolve => {
+            emitter.once('SMS.click', () => {
+                setTimeout(resolve, 200)
+            })
+        })
     }
 }
 
