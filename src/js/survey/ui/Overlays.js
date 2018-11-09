@@ -18,6 +18,11 @@ emitter.on('EnketoForm.validating', () => validating())
 emitter.on('EnketoForm.validationFailed', () => validationFailed())
 emitter.on('EnketoForm.validationSucceeded', () => validationSucceeded())
 
+emitter.on('EnketoForm.submitting', () => submitting())
+emitter.on('EnketoForm.submitFailed', () => submitFailed())
+emitter.on('EnketoForm.submitSucceeded', () => submitSucceeded())
+emitter.on('EnketoForm.submit.status', (status) => submitStatus(status))
+
 /**
  * Callbacks
 */
@@ -102,3 +107,16 @@ const validationSucceeded = () => {
     _finishValidating('success', 'The data looks valid!')
     $('.last-page').click()
 }
+
+const submitting = () => {
+    $('#submit-progress').overlay('show')
+}
+
+const submitFailed = () => {
+
+}
+
+const submitStatus = (submitStatus) => {
+    $('#submit-progress-text').html(submitStatus)
+}
+

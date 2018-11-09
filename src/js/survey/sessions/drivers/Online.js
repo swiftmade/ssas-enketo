@@ -1,5 +1,6 @@
 import Server from '../../../common/Server'
 import Session from '../../../common/Session'
+import Submit from '../../../submission/Submit'
 import queryParams from '../../../common/QueryParams'
 
 /**
@@ -22,7 +23,7 @@ export default class Online {
     }
 
     async finalize(session) {
-        await Server.submit(session)
+        await Submit(session)
     }
 
     async attachmentUrl(session, fileName) {

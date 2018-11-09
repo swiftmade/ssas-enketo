@@ -1,3 +1,5 @@
+import queryParams from './QueryParams'
+
 export default class Session {
 
     constructor(data) {
@@ -13,6 +15,10 @@ export default class Session {
             last_update: Date.now(),
             ...data,
         }
+
+        if (!data.hasOwnProperty('payload')) {
+            this._setPayloadFromUrl()
+        }
     }
 
     setData(data) {
@@ -22,6 +28,18 @@ export default class Session {
             last_update: Date.now(),
         }
         return this
+    }
+
+    _setPayloadFromUrl() {
+        try {
+            const sessionExtra = queryParams.get('session_extra')
+            this.setData({
+                payload: JSON.parse(sessionExtra)
+            })
+        } catch(e) {
+            console.error(e)
+        }
+        
     }
 
     writeEnketoForm(form) {
@@ -36,7 +54,6 @@ export default class Session {
     toFormInstance() {
         return {
             instanceStr: this.data.xml,
-            session: this.data.payload,
             submitted: this.data.submitted,
         }
     }
