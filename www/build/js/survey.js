@@ -19,7 +19,7 @@ var lo = __webpack_require__(112);
 
 var zh = __webpack_require__(113);
 
-var _ = __webpack_require__(82);
+var _ = __webpack_require__(81);
 
 var Cookies = {
   set: function set(key, value) {
@@ -242,11 +242,38 @@ module.exports = {
 
 /***/ }),
 
+/***/ 2:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+var UrlSearchParams = __webpack_require__(157);
+
+var queryParams = new UrlSearchParams(window.location.search);
+
+queryParams.getPath = function (key) {
+  return queryParams.getUrl(queryParams.get(key));
+};
+
+queryParams.getUrl = function (uri) {
+  var url = '';
+
+  if (queryParams.has('base')) {
+    url = queryParams.get('base') + '/';
+  }
+
+  return url + uri;
+};
+
+/* harmony default export */ __webpack_exports__["a"] = (queryParams);
+
+/***/ }),
+
 /***/ 22:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Session; });
+/* harmony import */ var _QueryParams__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
@@ -258,6 +285,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
 
 var Session =
 /*#__PURE__*/
@@ -276,6 +305,10 @@ function () {
       deprecated_id: null,
       last_update: Date.now()
     }, data);
+
+    if (!data.hasOwnProperty('payload')) {
+      this._setPayloadFromUrl();
+    }
   }
 
   _createClass(Session, [{
@@ -285,6 +318,18 @@ function () {
         last_update: Date.now()
       });
       return this;
+    }
+  }, {
+    key: "_setPayloadFromUrl",
+    value: function _setPayloadFromUrl() {
+      try {
+        var sessionExtra = _QueryParams__WEBPACK_IMPORTED_MODULE_0__[/* default */ "a"].get('session_extra');
+        this.setData({
+          payload: JSON.parse(sessionExtra)
+        });
+      } catch (e) {
+        console.error(e);
+      }
     }
   }, {
     key: "writeEnketoForm",
@@ -301,9 +346,13 @@ function () {
     value: function toFormInstance() {
       return {
         instanceStr: this.data.xml,
-        session: this.data.payload,
         submitted: this.data.submitted
       };
+    }
+  }, {
+    key: "isOnline",
+    value: function isOnline() {
+      return this.data.online;
     }
   }, {
     key: "_getFiles",
@@ -353,13 +402,13 @@ function () {
 
 /***/ }),
 
-/***/ 23:
+/***/ 27:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 
 // EXTERNAL MODULE: ./node_modules/pouchdb/lib/index-browser.js
-var index_browser = __webpack_require__(60);
+var index_browser = __webpack_require__(61);
 var index_browser_default = /*#__PURE__*/__webpack_require__.n(index_browser);
 
 // CONCATENATED MODULE: ./src/js/common/repositories/PouchDB.js
@@ -429,7 +478,7 @@ var getInstance = function getInstance(name) {
   return instances[name];
 };
 // EXTERNAL MODULE: ./src/js/common/QueryParams.js
-var QueryParams = __webpack_require__(3);
+var QueryParams = __webpack_require__(2);
 
 // CONCATENATED MODULE: ./src/js/common/repositories/SessionRepository.js
 
@@ -441,32 +490,6 @@ if (QueryParams["a" /* default */].has('db')) {
 }
 
 /* harmony default export */ var SessionRepository = __webpack_exports__["a"] = (getInstance(databaseName));
-
-/***/ }),
-
-/***/ 3:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-var UrlSearchParams = __webpack_require__(157);
-
-var queryParams = new UrlSearchParams(window.location.search);
-
-queryParams.getPath = function (key) {
-  return queryParams.getUrl(queryParams.get(key));
-};
-
-queryParams.getUrl = function (uri) {
-  var url = '';
-
-  if (queryParams.has('base')) {
-    url = queryParams.get('base') + '/';
-  }
-
-  return url + uri;
-};
-
-/* harmony default export */ __webpack_exports__["a"] = (queryParams);
 
 /***/ }),
 
@@ -524,107 +547,6 @@ module.exports = FormModel;
 
 /***/ }),
 
-/***/ 43:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(61);
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _QueryParams__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-
-
-
-var Server =
-/*#__PURE__*/
-function () {
-  function Server() {
-    _classCallCheck(this, Server);
-  }
-
-  _createClass(Server, [{
-    key: "json",
-    value: function () {
-      var _json = _asyncToGenerator(
-      /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee(url) {
-        var _ref, data;
-
-        return regeneratorRuntime.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                _context.next = 2;
-                return axios__WEBPACK_IMPORTED_MODULE_0___default.a.get(url);
-
-              case 2:
-                _ref = _context.sent;
-                data = _ref.data;
-                return _context.abrupt("return", data);
-
-              case 5:
-              case "end":
-                return _context.stop();
-            }
-          }
-        }, _callee, this);
-      }));
-
-      return function json(_x) {
-        return _json.apply(this, arguments);
-      };
-    }()
-  }, {
-    key: "submit",
-    value: function () {
-      var _submit = _asyncToGenerator(
-      /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee2(session) {
-        var submitUrl;
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                submitUrl = _QueryParams__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"].get('submit');
-                _context2.next = 3;
-                return axios__WEBPACK_IMPORTED_MODULE_0___default.a.post(submitUrl, session.data, {
-                  headers: {
-                    'X-OpenRosa-Version': '1.0',
-                    'X-OpenRosa-Instance-Id': session.data.instance_id,
-                    'X-OpenRosa-Deprecated-Id': session.data.deprecated_id
-                  }
-                });
-
-              case 3:
-              case "end":
-                return _context2.stop();
-            }
-          }
-        }, _callee2, this);
-      }));
-
-      return function submit(_x2) {
-        return _submit.apply(this, arguments);
-      };
-    }()
-  }]);
-
-  return Server;
-}();
-
-/* harmony default export */ __webpack_exports__["a"] = (new Server());
-
-/***/ }),
-
 /***/ 464:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -639,6 +561,7 @@ var i18n_i18n = __webpack_require__(110);
 
 // EXTERNAL MODULE: ./node_modules/jquery/dist/jquery.js
 var jquery = __webpack_require__(1);
+var jquery_default = /*#__PURE__*/__webpack_require__.n(jquery);
 
 // CONCATENATED MODULE: ./src/js/plugins/overlay.js
 
@@ -692,11 +615,11 @@ var v_accordion = __webpack_require__(376);
 
 
 
-var emitter = __webpack_require__(65);
+var emitter = __webpack_require__(60);
 
 var app = angular_default.a.module('jumpTo', ['vAccordion']);
 
-var _ = __webpack_require__(82);
+var _ = __webpack_require__(81);
 
 app.controller("jumpCtrl", ['$scope', function ($scope) {
   var rawPages = [];
@@ -767,58 +690,21 @@ angular_default.a.bootstrap(document.getElementById('jump-to-block'), ["jumpTo"]
 var form_model = __webpack_require__(379);
 
 // EXTERNAL MODULE: ./src/js/common/QueryParams.js
-var QueryParams = __webpack_require__(3);
+var QueryParams = __webpack_require__(2);
 
-// EXTERNAL MODULE: ./src/js/common/repositories/SessionRepository.js + 1 modules
-var SessionRepository = __webpack_require__(23);
-
-// CONCATENATED MODULE: ./src/js/survey/enketo-patches/file-manager.js
-/**
- * This patches the file-manager module from enketo-core
- * The aim of this patch is to be able to retrieve attachments stored inside PouchDB
- * The actual source for this module can be found here:
- * https://github.com/enketo/enketo-core/blob/master/src/js/file-manager.js
- */
-var fileManager = __webpack_require__(117);
-
-
- // Preserve the original getFileUrl method
-
-var originalGetFileUrl = fileManager.getFileUrl;
-
-fileManager.setSession = function (session) {
-  this.session = session;
-};
-
-fileManager.getFileUrlFromDatabase = function (subject) {
-  return SessionRepository["a" /* default */].getAttachment(this.session._id, subject).then(function (attachment) {
-    return URL.createObjectURL(attachment);
-  });
-};
-
-fileManager.getFileUrlOnServer = function (subject) {
-  return Promise.resolve(QueryParams["a" /* default */].getUrl("submissions/" + this.session.instance_id + "/photo/" + subject));
-};
-
-fileManager.getFileUrl = function (subject) {
-  if (subject && typeof subject === 'string') {
-    if (this.session.browser_mode) {
-      // In browser mode, load the attachments directly from the server
-      return this.getFileUrlOnServer(subject);
-    } // When running against PouchDB load it from there
-
-
-    return this.getFileUrlFromDatabase(subject);
-  }
-
-  return originalGetFileUrl(subject);
-};
-
-/* harmony default export */ var file_manager = (fileManager);
 // EXTERNAL MODULE: ./src/js/common/Server.js
-var Server = __webpack_require__(43);
+var Server = __webpack_require__(55);
 
-// CONCATENATED MODULE: ./src/js/survey/SurveyManager.js
+// EXTERNAL MODULE: ./src/js/common/Session.js
+var Session = __webpack_require__(22);
+
+// CONCATENATED MODULE: ./src/js/submission/drivers/Sms.js
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -832,32 +718,45 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
-var SurveyManager_SurveyManager =
+var Sms_Sms =
 /*#__PURE__*/
 function () {
-  function SurveyManager() {
-    _classCallCheck(this, SurveyManager);
+  function Sms(session) {
+    _classCallCheck(this, Sms);
+
+    this.session = session;
   }
 
-  _createClass(SurveyManager, [{
-    key: "loadAndAttach",
+  _createClass(Sms, [{
+    key: "transcode",
+    value: function transcode(xml) {
+      return new Sms_EnketoXmlParser(xml).parse();
+    }
+  }, {
+    key: "objectToText",
+    value: function objectToText(object) {
+      return Object.keys(object).map(function (key) {
+        return "".concat(key, ":").concat(object[key]);
+      }).join(';');
+    }
+  }, {
+    key: "submit",
     value: function () {
-      var _loadAndAttach = _asyncToGenerator(
+      var _submit = _asyncToGenerator(
       /*#__PURE__*/
       regeneratorRuntime.mark(function _callee() {
+        var number, output, sms;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                _context.next = 2;
-                return this._load();
+                number = QueryParams["a" /* default */].get('sms');
+                output = _objectSpread({}, _typeof(this.session.data.payload) === 'object' ? this.session.data.payload : {}, this.transcode(this.session.data.xml));
+                sms = this.objectToText(output);
+                window.location.href = 'sms:' + encodeURIComponent(number) + '&body=' + encodeURIComponent(sms);
+                throw new Error('Redirected to sms app');
 
-              case 2:
-                this._preprocessFormHtml();
-
-                this._attachSurveyFormToDom();
-
-              case 4:
+              case 5:
               case "end":
                 return _context.stop();
             }
@@ -865,58 +764,207 @@ function () {
         }, _callee, this);
       }));
 
-      return function loadAndAttach() {
-        return _loadAndAttach.apply(this, arguments);
+      return function submit() {
+        return _submit.apply(this, arguments);
       };
     }()
-  }, {
-    key: "_load",
-    value: function () {
-      var _load2 = _asyncToGenerator(
-      /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee2() {
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                _context2.next = 2;
-                return Server["a" /* default */].json(QueryParams["a" /* default */].getPath('survey'));
+  }]);
 
-              case 2:
-                this.survey = _context2.sent;
+  return Sms;
+}();
 
-              case 3:
-              case "end":
-                return _context2.stop();
-            }
-          }
-        }, _callee2, this);
-      }));
 
-      return function _load() {
-        return _load2.apply(this, arguments);
-      };
-    }()
-  }, {
-    key: "_preprocessFormHtml",
-    value: function _preprocessFormHtml() {
-      // Redirect dropbox links to assets folder
-      this.survey.form = this.survey.form.replace(/jr:\/\/images\//g, QueryParams["a" /* default */].getPath('assets') + '/');
+var IGNORED_TAGS = ['meta', 'start', 'end', 'today', 'username', 'simserial', 'subscriberid', 'deviceid', 'phonenumber'];
+
+var Sms_EnketoXmlParser =
+/*#__PURE__*/
+function () {
+  function EnketoXmlParser(xml) {
+    _classCallCheck(this, EnketoXmlParser);
+
+    this.$xml = jquery_default()(jquery_default.a.parseXML(xml));
+    this.output = {};
+  }
+
+  _createClass(EnketoXmlParser, [{
+    key: "parse",
+    value: function parse() {
+      this._appendMeta();
+
+      this._appendFromNodes(this.$xml.find('data').children());
+
+      return this.output;
     }
   }, {
-    key: "_attachSurveyFormToDom",
-    value: function _attachSurveyFormToDom() {
-      document.querySelector('.form-header').insertAdjacentHTML('afterend', this.survey.form);
+    key: "_appendMeta",
+    value: function _appendMeta() {
+      var meta = this.$xml.find('meta');
+
+      this._appendFromNodes(meta.children());
+    }
+  }, {
+    key: "_appendFromNodes",
+    value: function _appendFromNodes($children) {
+      var _this = this;
+
+      $children.each(function () {
+        if (jquery_default()(this).children().length) {
+          return _this._appendFromNodes(jquery_default()(this).children());
+        }
+
+        var node = jquery_default()(this)[0];
+
+        if (IGNORED_TAGS.includes(node.nodeName)) {
+          return;
+        } else if (node.getAttribute('type') === 'file') {
+          return;
+        } else if (!node.textContent) {
+          return;
+        } else {
+          _this.output[node.nodeName] = node.textContent;
+        }
+      });
     }
   }]);
 
-  return SurveyManager;
+  return EnketoXmlParser;
+}();
+// CONCATENATED MODULE: ./src/js/submission/drivers/Http.js
+function Http_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function Http_asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { Http_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { Http_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function Http_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function Http_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function Http_createClass(Constructor, protoProps, staticProps) { if (protoProps) Http_defineProperties(Constructor.prototype, protoProps); if (staticProps) Http_defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+var Http_Http =
+/*#__PURE__*/
+function () {
+  function Http(session) {
+    Http_classCallCheck(this, Http);
+
+    this.session = session;
+  }
+
+  Http_createClass(Http, [{
+    key: "submit",
+    value: function () {
+      var _submit = Http_asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee() {
+        var submitUrl;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                submitUrl = QueryParams["a" /* default */].get('submit');
+                _context.next = 3;
+                return axios.post(submitUrl, this.session.data, {
+                  headers: {
+                    'X-OpenRosa-Version': '1.0',
+                    'X-OpenRosa-Instance-Id': this.session.data.instance_id,
+                    'X-OpenRosa-Deprecated-Id': this.session.data.deprecated_id
+                  }
+                });
+
+              case 3:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      return function submit() {
+        return _submit.apply(this, arguments);
+      };
+    }()
+  }]);
+
+  return Http;
 }();
 
-/* harmony default export */ var survey_SurveyManager = (new SurveyManager_SurveyManager());
-// EXTERNAL MODULE: ./src/js/common/Session.js
-var Session = __webpack_require__(22);
 
+// CONCATENATED MODULE: ./src/js/submission/Submit.js
+function Submit_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function Submit_asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { Submit_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { Submit_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function Submit_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function Submit_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function Submit_createClass(Constructor, protoProps, staticProps) { if (protoProps) Submit_defineProperties(Constructor.prototype, protoProps); if (staticProps) Submit_defineProperties(Constructor, staticProps); return Constructor; }
+
+var Submit_emitter = __webpack_require__(60);
+
+
+
+
+
+var Submit_Submission =
+/*#__PURE__*/
+function () {
+  function Submission(session) {
+    Submit_classCallCheck(this, Submission);
+
+    this.session = session;
+  }
+
+  Submit_createClass(Submission, [{
+    key: "getDriver",
+    value: function getDriver() {
+      if (QueryParams["a" /* default */].has('sms')) {
+        return new Sms_Sms(this.session);
+      }
+
+      return new Http_Http(this.session);
+    }
+  }, {
+    key: "send",
+    value: function () {
+      var _send = Submit_asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee() {
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                Submit_emitter.emit('EnketoForm.submitting');
+                _context.next = 3;
+                return this.getDriver().submit();
+
+              case 3:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      return function send() {
+        return _send.apply(this, arguments);
+      };
+    }()
+  }, {
+    key: "_updateStatus",
+    value: function _updateStatus(text) {
+      Submit_emitter.emit('EnketoForm.submit.status', text);
+    }
+  }]);
+
+  return Submission;
+}();
+
+/* harmony default export */ var Submit = (function (session) {
+  var submission = new Submit_Submission(session);
+  return submission.send();
+});
 // CONCATENATED MODULE: ./src/js/survey/sessions/drivers/Online.js
 function Online_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
@@ -927,6 +975,7 @@ function Online_classCallCheck(instance, Constructor) { if (!(instance instanceo
 function Online_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function Online_createClass(Constructor, protoProps, staticProps) { if (protoProps) Online_defineProperties(Constructor.prototype, protoProps); if (staticProps) Online_defineProperties(Constructor, staticProps); return Constructor; }
+
 
 
 
@@ -970,7 +1019,7 @@ function () {
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return Server["a" /* default */].submit(session);
+                return Submit(session);
 
               case 2:
               case "end":
@@ -985,22 +1034,46 @@ function () {
       };
     }()
   }, {
-    key: "_loadSessionFromUrl",
+    key: "attachmentUrl",
     value: function () {
-      var _loadSessionFromUrl2 = Online_asyncToGenerator(
+      var _attachmentUrl = Online_asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee2(url) {
-        var data;
+      regeneratorRuntime.mark(function _callee2(session, fileName) {
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                _context2.next = 2;
+                return _context2.abrupt("return", QueryParams["a" /* default */].getUrl("submissions/" + session.data.instance_id + "/photo/" + fileName));
+
+              case 1:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      return function attachmentUrl(_x2, _x3) {
+        return _attachmentUrl.apply(this, arguments);
+      };
+    }()
+  }, {
+    key: "_loadSessionFromUrl",
+    value: function () {
+      var _loadSessionFromUrl2 = Online_asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee3(url) {
+        var data;
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _context3.next = 2;
                 return Server["a" /* default */].json(url);
 
               case 2:
-                data = _context2.sent;
-                return _context2.abrupt("return", new Session["a" /* default */]({
+                data = _context3.sent;
+                return _context3.abrupt("return", new Session["a" /* default */]({
                   submitted: true,
                   xml: data.instance,
                   instance_id: data.instance_id,
@@ -1009,13 +1082,13 @@ function () {
 
               case 4:
               case "end":
-                return _context2.stop();
+                return _context3.stop();
             }
           }
-        }, _callee2, this);
+        }, _callee3, this);
       }));
 
-      return function _loadSessionFromUrl(_x2) {
+      return function _loadSessionFromUrl(_x4) {
         return _loadSessionFromUrl2.apply(this, arguments);
       };
     }()
@@ -1024,6 +1097,9 @@ function () {
   return Online;
 }();
 
+
+// EXTERNAL MODULE: ./src/js/common/repositories/SessionRepository.js + 1 modules
+var SessionRepository = __webpack_require__(27);
 
 // CONCATENATED MODULE: ./src/js/survey/sessions/drivers/Offline.js
 function Offline_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -1038,7 +1114,7 @@ function Offline_createClass(Constructor, protoProps, staticProps) { if (protoPr
 
 
 
-var Offline_emitter = __webpack_require__(65);
+var Offline_emitter = __webpack_require__(60);
 
 
 
@@ -1147,30 +1223,56 @@ function () {
       };
     }()
   }, {
-    key: "_loadSessions",
+    key: "attachmentUrl",
     value: function () {
-      var _loadSessions2 = Offline_asyncToGenerator(
+      var _attachmentUrl = Offline_asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee4() {
+      regeneratorRuntime.mark(function _callee4(session, fileName) {
         return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                _context4.next = 2;
+                return _context4.abrupt("return", SessionRepository["a" /* default */].getAttachment(session.data._id, fileName).then(function (f) {
+                  return URL.createObjectURL(f);
+                }));
+
+              case 1:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
+      }));
+
+      return function attachmentUrl(_x3, _x4) {
+        return _attachmentUrl.apply(this, arguments);
+      };
+    }()
+  }, {
+    key: "_loadSessions",
+    value: function () {
+      var _loadSessions2 = Offline_asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee5() {
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                _context5.next = 2;
                 return SessionRepository["a" /* default */].all();
 
               case 2:
-                this.sessions = _context4.sent;
+                this.sessions = _context5.sent;
                 Offline_emitter.emit('SessionModal.updateSessions', this.sessions.filter(function (session) {
                   return session.draft;
                 }));
 
               case 4:
               case "end":
-                return _context4.stop();
+                return _context5.stop();
             }
           }
-        }, _callee4, this);
+        }, _callee5, this);
       }));
 
       return function _loadSessions() {
@@ -1182,27 +1284,27 @@ function () {
     value: function () {
       var _chooseSession2 = Offline_asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee5() {
-        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+      regeneratorRuntime.mark(function _callee6() {
+        return regeneratorRuntime.wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
                 if (!QueryParams["a" /* default */].has('session')) {
-                  _context5.next = 2;
+                  _context6.next = 2;
                   break;
                 }
 
-                return _context5.abrupt("return", this._startFromName(QueryParams["a" /* default */].get('session')));
+                return _context6.abrupt("return", this._startFromName(QueryParams["a" /* default */].get('session')));
 
               case 2:
-                return _context5.abrupt("return", this._sessionFromUi());
+                return _context6.abrupt("return", this._sessionFromUi());
 
               case 3:
               case "end":
-                return _context5.stop();
+                return _context6.stop();
             }
           }
-        }, _callee5, this);
+        }, _callee6, this);
       }));
 
       return function _chooseSession() {
@@ -1214,15 +1316,15 @@ function () {
     value: function () {
       var _sessionFromUi2 = Offline_asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee7() {
+      regeneratorRuntime.mark(function _callee8() {
         var _this = this;
 
-        return regeneratorRuntime.wrap(function _callee7$(_context7) {
+        return regeneratorRuntime.wrap(function _callee8$(_context8) {
           while (1) {
-            switch (_context7.prev = _context7.next) {
+            switch (_context8.prev = _context8.next) {
               case 0:
                 Offline_emitter.emit('SessionModal.activate');
-                return _context7.abrupt("return", new Promise(function (resolve) {
+                return _context8.abrupt("return", new Promise(function (resolve) {
                   Offline_emitter.once('Session.create', function (name) {
                     resolve(_this._startFromName(name));
                   });
@@ -1231,27 +1333,27 @@ function () {
                   function () {
                     var _ref = Offline_asyncToGenerator(
                     /*#__PURE__*/
-                    regeneratorRuntime.mark(function _callee6(session) {
-                      return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                    regeneratorRuntime.mark(function _callee7(session) {
+                      return regeneratorRuntime.wrap(function _callee7$(_context7) {
                         while (1) {
-                          switch (_context6.prev = _context6.next) {
+                          switch (_context7.prev = _context7.next) {
                             case 0:
-                              _context6.next = 2;
+                              _context7.next = 2;
                               return SessionRepository["a" /* default */].remove(session);
 
                             case 2:
-                              _context6.next = 4;
+                              _context7.next = 4;
                               return _this._loadSessions();
 
                             case 4:
                             case "end":
-                              return _context6.stop();
+                              return _context7.stop();
                           }
                         }
-                      }, _callee6, this);
+                      }, _callee7, this);
                     }));
 
-                    return function (_x3) {
+                    return function (_x5) {
                       return _ref.apply(this, arguments);
                     };
                   }());
@@ -1262,10 +1364,10 @@ function () {
 
               case 2:
               case "end":
-                return _context7.stop();
+                return _context8.stop();
             }
           }
-        }, _callee7, this);
+        }, _callee8, this);
       }));
 
       return function _sessionFromUi() {
@@ -1277,35 +1379,35 @@ function () {
     value: function () {
       var _startFromName2 = Offline_asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee8(name) {
+      regeneratorRuntime.mark(function _callee9(name) {
         var existingSession;
-        return regeneratorRuntime.wrap(function _callee8$(_context8) {
+        return regeneratorRuntime.wrap(function _callee9$(_context9) {
           while (1) {
-            switch (_context8.prev = _context8.next) {
+            switch (_context9.prev = _context9.next) {
               case 0:
                 existingSession = this.sessions.find(function (s) {
                   return s.name == name;
                 });
 
                 if (!existingSession) {
-                  _context8.next = 3;
+                  _context9.next = 3;
                   break;
                 }
 
-                return _context8.abrupt("return", new Session["a" /* default */](existingSession));
+                return _context9.abrupt("return", new Session["a" /* default */](existingSession));
 
               case 3:
-                return _context8.abrupt("return", this._createFromName(name));
+                return _context9.abrupt("return", this._createFromName(name));
 
               case 4:
               case "end":
-                return _context8.stop();
+                return _context9.stop();
             }
           }
-        }, _callee8, this);
+        }, _callee9, this);
       }));
 
-      return function _startFromName(_x4) {
+      return function _startFromName(_x6) {
         return _startFromName2.apply(this, arguments);
       };
     }()
@@ -1314,29 +1416,29 @@ function () {
     value: function () {
       var _create2 = Offline_asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee9(data) {
+      regeneratorRuntime.mark(function _callee10(data) {
         var session, savedSessionData;
-        return regeneratorRuntime.wrap(function _callee9$(_context9) {
+        return regeneratorRuntime.wrap(function _callee10$(_context10) {
           while (1) {
-            switch (_context9.prev = _context9.next) {
+            switch (_context10.prev = _context10.next) {
               case 0:
                 session = new Session["a" /* default */](data);
-                _context9.next = 3;
+                _context10.next = 3;
                 return SessionRepository["a" /* default */].create(session.data);
 
               case 3:
-                savedSessionData = _context9.sent;
-                return _context9.abrupt("return", new Session["a" /* default */](savedSessionData));
+                savedSessionData = _context10.sent;
+                return _context10.abrupt("return", new Session["a" /* default */](savedSessionData));
 
               case 5:
               case "end":
-                return _context9.stop();
+                return _context10.stop();
             }
           }
-        }, _callee9, this);
+        }, _callee10, this);
       }));
 
-      return function _create(_x5) {
+      return function _create(_x7) {
         return _create2.apply(this, arguments);
       };
     }()
@@ -1345,33 +1447,33 @@ function () {
     value: function () {
       var _createFromName2 = Offline_asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee10(name) {
+      regeneratorRuntime.mark(function _callee11(name) {
         var payload,
-            _args10 = arguments;
-        return regeneratorRuntime.wrap(function _callee10$(_context10) {
+            _args11 = arguments;
+        return regeneratorRuntime.wrap(function _callee11$(_context11) {
           while (1) {
-            switch (_context10.prev = _context10.next) {
+            switch (_context11.prev = _context11.next) {
               case 0:
-                payload = _args10.length > 1 && _args10[1] !== undefined ? _args10[1] : {};
+                payload = _args11.length > 1 && _args11[1] !== undefined ? _args11[1] : {};
 
                 if (QueryParams["a" /* default */].has('session_extra')) {
                   payload = JSON.parse(QueryParams["a" /* default */].get('session_extra'));
                 }
 
-                return _context10.abrupt("return", this._create({
+                return _context11.abrupt("return", this._create({
                   name: name,
                   payload: payload
                 }));
 
               case 3:
               case "end":
-                return _context10.stop();
+                return _context11.stop();
             }
           }
-        }, _callee10, this);
+        }, _callee11, this);
       }));
 
-      return function _createFromName(_x6) {
+      return function _createFromName(_x8) {
         return _createFromName2.apply(this, arguments);
       };
     }()
@@ -1447,35 +1549,22 @@ function () {
       };
     }()
   }, {
-    key: "finalize",
+    key: "attachmentUrl",
     value: function () {
-      var _finalize = SessionManager_asyncToGenerator(
+      var _attachmentUrl = SessionManager_asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee2(form) {
+      regeneratorRuntime.mark(function _callee2(fileName) {
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                if (!this.driver.canSave()) {
-                  _context2.next = 5;
-                  break;
-                }
+                _context2.next = 2;
+                return this.driver.attachmentUrl(this.session, fileName);
 
-                _context2.next = 3;
-                return this.save(form);
+              case 2:
+                return _context2.abrupt("return", _context2.sent);
 
               case 3:
-                _context2.next = 6;
-                break;
-
-              case 5:
-                this.session.writeEnketoForm(form);
-
-              case 6:
-                _context2.next = 8;
-                return this.driver.finalize(this.session);
-
-              case 8:
               case "end":
                 return _context2.stop();
             }
@@ -1483,7 +1572,48 @@ function () {
         }, _callee2, this);
       }));
 
-      return function finalize(_x) {
+      return function attachmentUrl(_x) {
+        return _attachmentUrl.apply(this, arguments);
+      };
+    }()
+  }, {
+    key: "finalize",
+    value: function () {
+      var _finalize = SessionManager_asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee3(form) {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                if (!this.driver.canSave()) {
+                  _context3.next = 5;
+                  break;
+                }
+
+                _context3.next = 3;
+                return this.save(form);
+
+              case 3:
+                _context3.next = 6;
+                break;
+
+              case 5:
+                this.session.writeEnketoForm(form);
+
+              case 6:
+                _context3.next = 8;
+                return this.driver.finalize(this.session);
+
+              case 8:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      return function finalize(_x2) {
         return _finalize.apply(this, arguments);
       };
     }() // Form 
@@ -1493,35 +1623,35 @@ function () {
     value: function () {
       var _save = SessionManager_asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee3(form) {
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+      regeneratorRuntime.mark(function _callee4(form) {
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
                 if (this.driver.canSave()) {
-                  _context3.next = 2;
+                  _context4.next = 2;
                   break;
                 }
 
-                return _context3.abrupt("return", Promise.resolve(true));
+                return _context4.abrupt("return", Promise.resolve(true));
 
               case 2:
                 this.session.writeEnketoForm(form);
-                _context3.next = 5;
+                _context4.next = 5;
                 return this.driver.save(this.session);
 
               case 5:
-                this.session = _context3.sent;
+                this.session = _context4.sent;
 
               case 6:
               case "end":
-                return _context3.stop();
+                return _context4.stop();
             }
           }
-        }, _callee3, this);
+        }, _callee4, this);
       }));
 
-      return function save(_x2) {
+      return function save(_x3) {
         return _save.apply(this, arguments);
       };
     }()
@@ -1531,10 +1661,128 @@ function () {
 }();
 
 /* harmony default export */ var sessions_SessionManager = (new SessionManager_SessionManager());
-// CONCATENATED MODULE: ./src/js/survey/EnketoForm.js
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+// CONCATENATED MODULE: ./src/js/survey/enketo-patches/file-manager.js
+/**
+ * This patches the file-manager module from enketo-core
+ * The aim of this patch is to be able to retrieve attachments stored inside PouchDB
+ * The actual source for this module can be found here:
+ * https://github.com/enketo/enketo-core/blob/master/src/js/file-manager.js
+ */
+var fileManager = __webpack_require__(117);
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+ // Preserve the original getFileUrl method
+
+var originalGetFileUrl = fileManager.getFileUrl;
+
+fileManager.getFileUrl = function (subject) {
+  if (subject && typeof subject === 'string') {
+    return sessions_SessionManager.attachmentUrl(subject);
+  }
+
+  return originalGetFileUrl(subject);
+};
+
+/* harmony default export */ var file_manager = (fileManager);
+// CONCATENATED MODULE: ./src/js/survey/SurveyManager.js
+function SurveyManager_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function SurveyManager_asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { SurveyManager_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { SurveyManager_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function SurveyManager_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function SurveyManager_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function SurveyManager_createClass(Constructor, protoProps, staticProps) { if (protoProps) SurveyManager_defineProperties(Constructor.prototype, protoProps); if (staticProps) SurveyManager_defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+
+var SurveyManager_SurveyManager =
+/*#__PURE__*/
+function () {
+  function SurveyManager() {
+    SurveyManager_classCallCheck(this, SurveyManager);
+  }
+
+  SurveyManager_createClass(SurveyManager, [{
+    key: "loadAndAttach",
+    value: function () {
+      var _loadAndAttach = SurveyManager_asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee() {
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return this._load();
+
+              case 2:
+                this._preprocessFormHtml();
+
+                this._attachSurveyFormToDom();
+
+              case 4:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      return function loadAndAttach() {
+        return _loadAndAttach.apply(this, arguments);
+      };
+    }()
+  }, {
+    key: "_load",
+    value: function () {
+      var _load2 = SurveyManager_asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee2() {
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.next = 2;
+                return Server["a" /* default */].json(QueryParams["a" /* default */].getPath('survey'));
+
+              case 2:
+                this.survey = _context2.sent;
+
+              case 3:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      return function _load() {
+        return _load2.apply(this, arguments);
+      };
+    }()
+  }, {
+    key: "_preprocessFormHtml",
+    value: function _preprocessFormHtml() {
+      // Redirect dropbox links to assets folder
+      this.survey.form = this.survey.form.replace(/jr:\/\/images\//g, QueryParams["a" /* default */].getPath('assets') + '/');
+    }
+  }, {
+    key: "_attachSurveyFormToDom",
+    value: function _attachSurveyFormToDom() {
+      document.querySelector('.form-header').insertAdjacentHTML('afterend', this.survey.form);
+    }
+  }]);
+
+  return SurveyManager;
+}();
+
+/* harmony default export */ var survey_SurveyManager = (new SurveyManager_SurveyManager());
+// CONCATENATED MODULE: ./src/js/survey/EnketoForm.js
+function EnketoForm_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { EnketoForm_defineProperty(target, key, source[key]); }); } return target; }
+
+function EnketoForm_defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function EnketoForm_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
@@ -1550,9 +1798,9 @@ function EnketoForm_createClass(Constructor, protoProps, staticProps) { if (prot
 
 
 
-var Form = __webpack_require__(399);
+var Form = __webpack_require__(417);
 
-var EnketoForm_emitter = __webpack_require__(65);
+var EnketoForm_emitter = __webpack_require__(60);
 
 
 
@@ -1599,11 +1847,9 @@ function () {
 
                 this._localizeForm();
 
-                this._setSessionInFileManager();
-
                 EnketoForm_emitter.emit('EnketoForm.initialized');
 
-              case 11:
+              case 10:
               case "end":
                 return _context.stop();
             }
@@ -1618,7 +1864,7 @@ function () {
   }, {
     key: "_newFormInstance",
     value: function _newFormInstance() {
-      this.form = new Form('form.or:eq(0)', _objectSpread({
+      this.form = new Form('form.or:eq(0)', EnketoForm_objectSpread({
         modelStr: survey_SurveyManager.survey.model
       }, sessions_SessionManager.session.toFormInstance()));
     }
@@ -1641,11 +1887,6 @@ function () {
 
       var lang = i18n.get();
       this.form.langs.setAll(lang);
-    }
-  }, {
-    key: "_setSessionInFileManager",
-    value: function _setSessionInFileManager() {
-      file_manager.setSession(sessions_SessionManager.session);
     }
   }, {
     key: "save",
@@ -2096,7 +2337,7 @@ jquery(document).ready(function () {
 
 
 
-var Overlays_emitter = __webpack_require__(65);
+var Overlays_emitter = __webpack_require__(60);
 
 
 
@@ -2127,6 +2368,18 @@ Overlays_emitter.on('EnketoForm.validationFailed', function () {
 });
 Overlays_emitter.on('EnketoForm.validationSucceeded', function () {
   return Overlays_validationSucceeded();
+});
+Overlays_emitter.on('EnketoForm.submitting', function () {
+  return Overlays_submitting();
+});
+Overlays_emitter.on('EnketoForm.submitFailed', function () {
+  return submitFailed();
+});
+Overlays_emitter.on('EnketoForm.submitSucceeded', function () {
+  return submitSucceeded();
+});
+Overlays_emitter.on('EnketoForm.submit.status', function (status) {
+  return Overlays_submitStatus(status);
 });
 /**
  * Callbacks
@@ -2194,8 +2447,18 @@ var Overlays_validationSucceeded = function validationSucceeded() {
 
   jquery('.last-page').click();
 };
+
+var Overlays_submitting = function submitting() {
+  jquery('#submit-progress').overlay('show');
+};
+
+var submitFailed = function submitFailed() {};
+
+var Overlays_submitStatus = function submitStatus(_submitStatus) {
+  jquery('#submit-progress-text').html(_submitStatus);
+};
 // CONCATENATED MODULE: ./src/js/survey/ui/SessionModal.js
-var SessionModal_emitter = __webpack_require__(65);
+var SessionModal_emitter = __webpack_require__(60);
 
 
 var SessionModal_app = angular_default.a.module('sessionModal', []);
@@ -2292,7 +2555,73 @@ survey_Kernel.boot();
 
 /***/ }),
 
-/***/ 82:
+/***/ 55:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(83);
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+var Server =
+/*#__PURE__*/
+function () {
+  function Server() {
+    _classCallCheck(this, Server);
+  }
+
+  _createClass(Server, [{
+    key: "json",
+    value: function () {
+      var _json = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee(url) {
+        var _ref, data;
+
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return axios__WEBPACK_IMPORTED_MODULE_0___default.a.get(url);
+
+              case 2:
+                _ref = _context.sent;
+                data = _ref.data;
+                return _context.abrupt("return", data);
+
+              case 5:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      return function json(_x) {
+        return _json.apply(this, arguments);
+      };
+    }()
+  }]);
+
+  return Server;
+}();
+
+/* harmony default export */ __webpack_exports__["a"] = (new Server());
+
+/***/ }),
+
+/***/ 81:
 /***/ (function(module, exports, __webpack_require__) {
 
 var lodashSet = __webpack_require__(154);

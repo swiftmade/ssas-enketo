@@ -24,13 +24,11 @@ export default class Sms {
             ...(typeof this.session.data.payload === 'object' ? this.session.data.payload : {}),
             ...this.transcode(this.session.data.xml)
         }
-        
-        // TODO: Send this sms to the number
-        /*
-        console.log('SEND TO: ' + number)
-        console.log(this.session.data.xml)
-        console.log(this.objectToText(output))
-        */
+
+        const sms = this.objectToText(output)
+        window.location.href = 'sms:' + encodeURIComponent(number) +
+            '&body=' + encodeURIComponent(sms)
+        throw new Error('Redirected to sms app')
     }
 }
 

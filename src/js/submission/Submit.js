@@ -20,7 +20,6 @@ class Submission {
     async send() {
         emitter.emit('EnketoForm.submitting')
         await this.getDriver().submit()
-        return new Promise(resolve => {})
     }
 
     _updateStatus(text) {

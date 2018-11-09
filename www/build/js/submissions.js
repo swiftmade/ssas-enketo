@@ -19,7 +19,7 @@ var lo = __webpack_require__(112);
 
 var zh = __webpack_require__(113);
 
-var _ = __webpack_require__(82);
+var _ = __webpack_require__(81);
 
 var Cookies = {
   set: function set(key, value) {
@@ -242,11 +242,38 @@ module.exports = {
 
 /***/ }),
 
+/***/ 2:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+var UrlSearchParams = __webpack_require__(157);
+
+var queryParams = new UrlSearchParams(window.location.search);
+
+queryParams.getPath = function (key) {
+  return queryParams.getUrl(queryParams.get(key));
+};
+
+queryParams.getUrl = function (uri) {
+  var url = '';
+
+  if (queryParams.has('base')) {
+    url = queryParams.get('base') + '/';
+  }
+
+  return url + uri;
+};
+
+/* harmony default export */ __webpack_exports__["a"] = (queryParams);
+
+/***/ }),
+
 /***/ 22:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Session; });
+/* harmony import */ var _QueryParams__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
@@ -258,6 +285,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
 
 var Session =
 /*#__PURE__*/
@@ -276,6 +305,10 @@ function () {
       deprecated_id: null,
       last_update: Date.now()
     }, data);
+
+    if (!data.hasOwnProperty('payload')) {
+      this._setPayloadFromUrl();
+    }
   }
 
   _createClass(Session, [{
@@ -285,6 +318,18 @@ function () {
         last_update: Date.now()
       });
       return this;
+    }
+  }, {
+    key: "_setPayloadFromUrl",
+    value: function _setPayloadFromUrl() {
+      try {
+        var sessionExtra = _QueryParams__WEBPACK_IMPORTED_MODULE_0__[/* default */ "a"].get('session_extra');
+        this.setData({
+          payload: JSON.parse(sessionExtra)
+        });
+      } catch (e) {
+        console.error(e);
+      }
     }
   }, {
     key: "writeEnketoForm",
@@ -301,9 +346,13 @@ function () {
     value: function toFormInstance() {
       return {
         instanceStr: this.data.xml,
-        session: this.data.payload,
         submitted: this.data.submitted
       };
+    }
+  }, {
+    key: "isOnline",
+    value: function isOnline() {
+      return this.data.online;
     }
   }, {
     key: "_getFiles",
@@ -353,13 +402,13 @@ function () {
 
 /***/ }),
 
-/***/ 23:
+/***/ 27:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 
 // EXTERNAL MODULE: ./node_modules/pouchdb/lib/index-browser.js
-var index_browser = __webpack_require__(60);
+var index_browser = __webpack_require__(61);
 var index_browser_default = /*#__PURE__*/__webpack_require__.n(index_browser);
 
 // CONCATENATED MODULE: ./src/js/common/repositories/PouchDB.js
@@ -429,7 +478,7 @@ var getInstance = function getInstance(name) {
   return instances[name];
 };
 // EXTERNAL MODULE: ./src/js/common/QueryParams.js
-var QueryParams = __webpack_require__(3);
+var QueryParams = __webpack_require__(2);
 
 // CONCATENATED MODULE: ./src/js/common/repositories/SessionRepository.js
 
@@ -441,133 +490,6 @@ if (QueryParams["a" /* default */].has('db')) {
 }
 
 /* harmony default export */ var SessionRepository = __webpack_exports__["a"] = (getInstance(databaseName));
-
-/***/ }),
-
-/***/ 3:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-var UrlSearchParams = __webpack_require__(157);
-
-var queryParams = new UrlSearchParams(window.location.search);
-
-queryParams.getPath = function (key) {
-  return queryParams.getUrl(queryParams.get(key));
-};
-
-queryParams.getUrl = function (uri) {
-  var url = '';
-
-  if (queryParams.has('base')) {
-    url = queryParams.get('base') + '/';
-  }
-
-  return url + uri;
-};
-
-/* harmony default export */ __webpack_exports__["a"] = (queryParams);
-
-/***/ }),
-
-/***/ 43:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(61);
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _QueryParams__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-
-
-
-var Server =
-/*#__PURE__*/
-function () {
-  function Server() {
-    _classCallCheck(this, Server);
-  }
-
-  _createClass(Server, [{
-    key: "json",
-    value: function () {
-      var _json = _asyncToGenerator(
-      /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee(url) {
-        var _ref, data;
-
-        return regeneratorRuntime.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                _context.next = 2;
-                return axios__WEBPACK_IMPORTED_MODULE_0___default.a.get(url);
-
-              case 2:
-                _ref = _context.sent;
-                data = _ref.data;
-                return _context.abrupt("return", data);
-
-              case 5:
-              case "end":
-                return _context.stop();
-            }
-          }
-        }, _callee, this);
-      }));
-
-      return function json(_x) {
-        return _json.apply(this, arguments);
-      };
-    }()
-  }, {
-    key: "submit",
-    value: function () {
-      var _submit = _asyncToGenerator(
-      /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee2(session) {
-        var submitUrl;
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                submitUrl = _QueryParams__WEBPACK_IMPORTED_MODULE_1__[/* default */ "a"].get('submit');
-                _context2.next = 3;
-                return axios__WEBPACK_IMPORTED_MODULE_0___default.a.post(submitUrl, session.data, {
-                  headers: {
-                    'X-OpenRosa-Version': '1.0',
-                    'X-OpenRosa-Instance-Id': session.data.instance_id,
-                    'X-OpenRosa-Deprecated-Id': session.data.deprecated_id
-                  }
-                });
-
-              case 3:
-              case "end":
-                return _context2.stop();
-            }
-          }
-        }, _callee2, this);
-      }));
-
-      return function submit(_x2) {
-        return _submit.apply(this, arguments);
-      };
-    }()
-  }]);
-
-  return Server;
-}();
-
-/* harmony default export */ __webpack_exports__["a"] = (new Server());
 
 /***/ }),
 
@@ -598,13 +520,13 @@ var toastr = __webpack_require__(34);
 var toastr_default = /*#__PURE__*/__webpack_require__.n(toastr);
 
 // EXTERNAL MODULE: ./src/js/common/Server.js
-var Server = __webpack_require__(43);
+var Server = __webpack_require__(55);
 
 // EXTERNAL MODULE: ./src/js/common/Session.js
 var Session = __webpack_require__(22);
 
 // EXTERNAL MODULE: ./src/js/common/repositories/SessionRepository.js + 1 modules
-var SessionRepository = __webpack_require__(23);
+var SessionRepository = __webpack_require__(27);
 
 // CONCATENATED MODULE: ./src/js/submission/ui/Submissions.js
 
@@ -757,7 +679,73 @@ app.controller('SubmissionsCtrl', ['$scope', '$timeout', function ($scope, $time
 
 /***/ }),
 
-/***/ 82:
+/***/ 55:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(83);
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+var Server =
+/*#__PURE__*/
+function () {
+  function Server() {
+    _classCallCheck(this, Server);
+  }
+
+  _createClass(Server, [{
+    key: "json",
+    value: function () {
+      var _json = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee(url) {
+        var _ref, data;
+
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return axios__WEBPACK_IMPORTED_MODULE_0___default.a.get(url);
+
+              case 2:
+                _ref = _context.sent;
+                data = _ref.data;
+                return _context.abrupt("return", data);
+
+              case 5:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      return function json(_x) {
+        return _json.apply(this, arguments);
+      };
+    }()
+  }]);
+
+  return Server;
+}();
+
+/* harmony default export */ __webpack_exports__["a"] = (new Server());
+
+/***/ }),
+
+/***/ 81:
 /***/ (function(module, exports, __webpack_require__) {
 
 var lodashSet = __webpack_require__(154);
