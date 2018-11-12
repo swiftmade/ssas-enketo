@@ -19,7 +19,7 @@ var lo = __webpack_require__(112);
 
 var zh = __webpack_require__(113);
 
-var _ = __webpack_require__(81);
+var _ = __webpack_require__(82);
 
 var Cookies = {
   set: function set(key, value) {
@@ -402,13 +402,13 @@ function () {
 
 /***/ }),
 
-/***/ 27:
+/***/ 28:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 
 // EXTERNAL MODULE: ./node_modules/pouchdb/lib/index-browser.js
-var index_browser = __webpack_require__(61);
+var index_browser = __webpack_require__(62);
 var index_browser_default = /*#__PURE__*/__webpack_require__.n(index_browser);
 
 // CONCATENATED MODULE: ./src/js/common/repositories/PouchDB.js
@@ -600,11 +600,11 @@ var jquery_default = /*#__PURE__*/__webpack_require__.n(jquery);
   };
 })();
 // EXTERNAL MODULE: ./node_modules/toastr/toastr.js
-var toastr = __webpack_require__(34);
+var toastr = __webpack_require__(27);
 var toastr_default = /*#__PURE__*/__webpack_require__.n(toastr);
 
 // EXTERNAL MODULE: ./node_modules/angular/index.js
-var angular = __webpack_require__(42);
+var angular = __webpack_require__(43);
 var angular_default = /*#__PURE__*/__webpack_require__.n(angular);
 
 // EXTERNAL MODULE: ./node_modules/v-accordion/index.js
@@ -615,11 +615,11 @@ var v_accordion = __webpack_require__(376);
 
 
 
-var emitter = __webpack_require__(54);
+var emitter = __webpack_require__(41);
 
 var app = angular_default.a.module('jumpTo', ['vAccordion']);
 
-var _ = __webpack_require__(81);
+var _ = __webpack_require__(82);
 
 app.controller("jumpCtrl", ['$scope', function ($scope) {
   var rawPages = [];
@@ -718,7 +718,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
-var Sms_emitter = __webpack_require__(54);
+var Sms_emitter = __webpack_require__(41);
 
 var Sms_Sms =
 /*#__PURE__*/
@@ -784,17 +784,17 @@ function () {
     value: function _smsLink(number, body) {
       var sms = 'sms:' + encodeURIComponent(number);
 
-      if (this._isPlatformIOS()) {
+      if (this._isPlatformApple()) {
         return sms + '&body=' + encodeURIComponent(body);
       }
 
       return sms + '?body=' + encodeURIComponent(body);
     }
   }, {
-    key: "_isPlatformIOS",
-    value: function _isPlatformIOS() {
+    key: "_isPlatformApple",
+    value: function _isPlatformApple() {
       var userAgent = window.navigator.userAgent.toLowerCase();
-      return /iphone|ipod|ipad/.test(userAgent);
+      return /iphone|ipod|ipad|os\sx/.test(userAgent);
     }
   }]);
 
@@ -857,6 +857,10 @@ function () {
 
   return EnketoXmlParser;
 }();
+// EXTERNAL MODULE: ./node_modules/axios/index.js
+var axios = __webpack_require__(61);
+var axios_default = /*#__PURE__*/__webpack_require__.n(axios);
+
 // CONCATENATED MODULE: ./src/js/submission/drivers/Http.js
 function Http_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
@@ -867,6 +871,7 @@ function Http_classCallCheck(instance, Constructor) { if (!(instance instanceof 
 function Http_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function Http_createClass(Constructor, protoProps, staticProps) { if (protoProps) Http_defineProperties(Constructor.prototype, protoProps); if (staticProps) Http_defineProperties(Constructor, staticProps); return Constructor; }
+
 
 
 
@@ -885,22 +890,34 @@ function () {
       var _submit = Http_asyncToGenerator(
       /*#__PURE__*/
       regeneratorRuntime.mark(function _callee() {
-        var submitUrl;
+        var submitUrl, form, headers;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 submitUrl = QueryParams["a" /* default */].get('submit');
-                _context.next = 3;
-                return axios.post(submitUrl, this.session.data, {
-                  headers: {
-                    'X-OpenRosa-Version': '1.0',
-                    'X-OpenRosa-Instance-Id': this.session.data.instance_id,
-                    'X-OpenRosa-Deprecated-Id': this.session.data.deprecated_id
-                  }
+                form = new FormData();
+                form.append('Date', new Date().toUTCString());
+                form.append('xml_submission_file', new Blob([this.session.data.xml]));
+                headers = {
+                  'Content-Type': 'multipart/form-data',
+                  // Open-rosa Headers
+                  'X-OpenRosa-Version': '1.0',
+                  'X-OpenRosa-Instance-Id': this.session.data.instance_id,
+                  'X-OpenRosa-Deprecated-Id': this.session.data.deprecated_id // TODO: Document auth parameter
+
+                };
+
+                if (QueryParams["a" /* default */].get('auth')) {
+                  headers['Authorization'] = 'Bearer ' + QueryParams["a" /* default */].get('auth');
+                }
+
+                _context.next = 8;
+                return axios_default.a.post(submitUrl, form, {
+                  headers: headers
                 });
 
-              case 3:
+              case 8:
               case "end":
                 return _context.stop();
             }
@@ -929,7 +946,7 @@ function Submit_defineProperties(target, props) { for (var i = 0; i < props.leng
 
 function Submit_createClass(Constructor, protoProps, staticProps) { if (protoProps) Submit_defineProperties(Constructor.prototype, protoProps); if (staticProps) Submit_defineProperties(Constructor, staticProps); return Constructor; }
 
-var Submit_emitter = __webpack_require__(54);
+var Submit_emitter = __webpack_require__(41);
 
 
 
@@ -954,18 +971,33 @@ function () {
       return new Http_Http(this.session);
     }
   }, {
-    key: "send",
+    key: "chooseDriver",
     value: function () {
-      var _send = Submit_asyncToGenerator(
+      var _chooseDriver = Submit_asyncToGenerator(
       /*#__PURE__*/
       regeneratorRuntime.mark(function _callee() {
+        var _this = this;
+
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                Submit_emitter.emit('EnketoForm.submitting');
-                _context.next = 3;
-                return this.getDriver().submit();
+                window.chooseMethod = function (method) {
+                  Submit_emitter.emit('Submit.method.choose', method);
+                };
+
+                Submit_emitter.emit('EnketoForm.submit.status', '<div style="text-align:center">Please choose submission method <br>' + '<a href="#" role="button" style="margin:16px" onclick="chooseMethod(\'sms\')" class="btn btn-primary">SMS</a>' + '<a href="#" role="button" style="margin:16px" onclick="chooseMethod(\'http\')" class="btn btn-primary">Internet</a>' + '</div>');
+                return _context.abrupt("return", new Promise(function (resolve) {
+                  Submit_emitter.once('Submit.method.choose', function (method) {
+                    Submit_emitter.emit('EnketoForm.submit.status', 'Please wait...');
+
+                    if (method === 'sms') {
+                      return resolve(new Sms_Sms(_this.session));
+                    }
+
+                    return resolve(new Http_Http(_this.session));
+                  });
+                }));
 
               case 3:
               case "end":
@@ -973,6 +1005,51 @@ function () {
             }
           }
         }, _callee, this);
+      }));
+
+      return function chooseDriver() {
+        return _chooseDriver.apply(this, arguments);
+      };
+    }()
+  }, {
+    key: "send",
+    value: function () {
+      var _send = Submit_asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee2() {
+        var driver;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                Submit_emitter.emit('EnketoForm.submitting');
+
+                if (!QueryParams["a" /* default */].get('instant_submit')) {
+                  _context2.next = 7;
+                  break;
+                }
+
+                _context2.next = 4;
+                return this.chooseDriver();
+
+              case 4:
+                driver = _context2.sent;
+                _context2.next = 8;
+                break;
+
+              case 7:
+                driver = this.getDriver();
+
+              case 8:
+                _context2.next = 10;
+                return driver.submit();
+
+              case 10:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
       }));
 
       return function send() {
@@ -1127,7 +1204,7 @@ function () {
 
 
 // EXTERNAL MODULE: ./src/js/common/repositories/SessionRepository.js + 1 modules
-var SessionRepository = __webpack_require__(27);
+var SessionRepository = __webpack_require__(28);
 
 // CONCATENATED MODULE: ./src/js/survey/sessions/drivers/Offline.js
 function Offline_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -1143,7 +1220,7 @@ function Offline_createClass(Constructor, protoProps, staticProps) { if (protoPr
 
 
 
-var Offline_emitter = __webpack_require__(54);
+var Offline_emitter = __webpack_require__(41);
 
 
 
@@ -1231,7 +1308,7 @@ function () {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                if (!QueryParams["a" /* default */].has('sms')) {
+                if (!QueryParams["a" /* default */].has('instant_submit')) {
                   _context3.next = 4;
                   break;
                 }
@@ -1841,7 +1918,7 @@ function EnketoForm_createClass(Constructor, protoProps, staticProps) { if (prot
 
 var Form = __webpack_require__(417);
 
-var EnketoForm_emitter = __webpack_require__(54);
+var EnketoForm_emitter = __webpack_require__(41);
 
 
 
@@ -2146,21 +2223,32 @@ function () {
                 throw new Error('Form cannot be submitted. Check validation errors!');
 
               case 5:
+                _context6.prev = 5;
                 _context6.t0 = sessions_SessionManager;
-                _context6.next = 8;
+                _context6.next = 9;
                 return this._form();
 
-              case 8:
+              case 9:
                 _context6.t1 = _context6.sent;
-                _context6.next = 11;
+                _context6.next = 12;
                 return _context6.t0.finalize.call(_context6.t0, _context6.t1);
 
-              case 11:
+              case 12:
+                _context6.next = 18;
+                break;
+
+              case 14:
+                _context6.prev = 14;
+                _context6.t2 = _context6["catch"](5);
+                EnketoForm_emitter.emit('EnketoForm.submitFailed', _context6.t2);
+                throw _context6.t2;
+
+              case 18:
               case "end":
                 return _context6.stop();
             }
           }
-        }, _callee6, this);
+        }, _callee6, this, [[5, 14]]);
       }));
 
       return function finishAndSubmit() {
@@ -2186,6 +2274,8 @@ function Kernel_createClass(Constructor, protoProps, staticProps) { if (protoPro
 
 
 
+
+var Kernel_emitter = __webpack_require__(41);
 
 var Kernel_Kernel =
 /*#__PURE__*/
@@ -2368,7 +2458,7 @@ jquery(document).ready(function () {
     $self.attr('disabled', 'disabled');
     survey_Kernel.submit().catch(function (e) {
       console.error(e);
-      $self.removeAttr('disabled', 'disabled');
+      $self.removeAttr('disabled');
       toastr_default.a.error('An error occured while finalizing your submission!');
     });
     return false;
@@ -2378,7 +2468,7 @@ jquery(document).ready(function () {
 
 
 
-var Overlays_emitter = __webpack_require__(54);
+var Overlays_emitter = __webpack_require__(41);
 
 
 
@@ -2414,7 +2504,7 @@ Overlays_emitter.on('EnketoForm.submitting', function () {
   return Overlays_submitting();
 });
 Overlays_emitter.on('EnketoForm.submitFailed', function () {
-  return submitFailed();
+  return Overlays_submitFailed();
 });
 Overlays_emitter.on('EnketoForm.submitSucceeded', function () {
   return submitSucceeded();
@@ -2493,13 +2583,16 @@ var Overlays_submitting = function submitting() {
   jquery('#submit-progress').overlay('show');
 };
 
-var submitFailed = function submitFailed() {};
+var Overlays_submitFailed = function submitFailed() {
+  jquery('#submit-progress').overlay('hide');
+  toastr_default.a.error('Submission failed', 'Submission could not be completed');
+};
 
 var Overlays_submitStatus = function submitStatus(_submitStatus) {
   jquery('#submit-progress-text').html(_submitStatus);
 };
 // CONCATENATED MODULE: ./src/js/survey/ui/SessionModal.js
-var SessionModal_emitter = __webpack_require__(54);
+var SessionModal_emitter = __webpack_require__(41);
 
 
 var SessionModal_app = angular_default.a.module('sessionModal', []);
@@ -2600,7 +2693,7 @@ survey_Kernel.boot();
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(83);
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(61);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
@@ -2662,7 +2755,7 @@ function () {
 
 /***/ }),
 
-/***/ 81:
+/***/ 82:
 /***/ (function(module, exports, __webpack_require__) {
 
 var lodashSet = __webpack_require__(154);

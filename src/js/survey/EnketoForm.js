@@ -140,9 +140,14 @@ class EnketoForm {
             throw new Error('Form cannot be submitted. Check validation errors!')
         }
 
-        await SessionManager.finalize(
-            await this._form()
-        )
+        try {
+            await SessionManager.finalize(
+                await this._form()
+            )
+        } catch(e) {
+            emitter.emit('EnketoForm.submitFailed', e)
+            throw e
+        }
     }
 }
 

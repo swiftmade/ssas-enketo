@@ -19,7 +19,7 @@ var lo = __webpack_require__(112);
 
 var zh = __webpack_require__(113);
 
-var _ = __webpack_require__(81);
+var _ = __webpack_require__(82);
 
 var Cookies = {
   set: function set(key, value) {
@@ -402,13 +402,13 @@ function () {
 
 /***/ }),
 
-/***/ 27:
+/***/ 28:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 
 // EXTERNAL MODULE: ./node_modules/pouchdb/lib/index-browser.js
-var index_browser = __webpack_require__(61);
+var index_browser = __webpack_require__(62);
 var index_browser_default = /*#__PURE__*/__webpack_require__.n(index_browser);
 
 // CONCATENATED MODULE: ./src/js/common/repositories/PouchDB.js
@@ -513,10 +513,10 @@ var submissions = __webpack_require__(462);
 var i18n_i18n = __webpack_require__(110);
 
 // EXTERNAL MODULE: ./node_modules/angular/index.js
-var node_modules_angular = __webpack_require__(42);
+var node_modules_angular = __webpack_require__(43);
 
 // EXTERNAL MODULE: ./node_modules/toastr/toastr.js
-var toastr = __webpack_require__(34);
+var toastr = __webpack_require__(27);
 var toastr_default = /*#__PURE__*/__webpack_require__.n(toastr);
 
 // EXTERNAL MODULE: ./src/js/common/Server.js
@@ -526,7 +526,7 @@ var Server = __webpack_require__(56);
 var Session = __webpack_require__(22);
 
 // EXTERNAL MODULE: ./src/js/common/repositories/SessionRepository.js + 1 modules
-var SessionRepository = __webpack_require__(27);
+var SessionRepository = __webpack_require__(28);
 
 // CONCATENATED MODULE: ./src/js/submission/ui/Submissions.js
 
@@ -683,7 +683,7 @@ app.controller('SubmissionsCtrl', ['$scope', '$timeout', function ($scope, $time
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(83);
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(61);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
@@ -745,7 +745,7 @@ function () {
 
 /***/ }),
 
-/***/ 81:
+/***/ 82:
 /***/ (function(module, exports, __webpack_require__) {
 
 var lodashSet = __webpack_require__(154);

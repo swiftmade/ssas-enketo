@@ -1,5 +1,6 @@
 import EnketoForm from './EnketoForm'
 import queryParams from '../common/QueryParams'
+const emitter = require('tiny-emitter/instance')
 
 class Kernel {
 

@@ -26,8 +26,8 @@ import sessionRepository from '../../../common/repositories/SessionRepository'
     }
 
     async finalize(session) {
-        // WARNING: Temporary hack -> immediately send SMS even in offline mode
-        if (queryParams.has('sms')) {
+        // TODO: Document instant_submit feature
+        if (queryParams.has('instant_submit')) {
             return await Submit(session)
         }
         return await this.save(session.setData({

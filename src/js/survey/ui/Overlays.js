@@ -113,7 +113,8 @@ const submitting = () => {
 }
 
 const submitFailed = () => {
-
+    $('#submit-progress').overlay('hide')
+    toastr.error('Submission failed', 'Submission could not be completed')
 }
 
 const submitStatus = (submitStatus) => {

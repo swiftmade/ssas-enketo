@@ -33,7 +33,7 @@ $(document).ready(function() {
 
         Kernel.submit().catch(e => {
             console.error(e)
-            $self.removeAttr('disabled', 'disabled')
+            $self.removeAttr('disabled')
             toastr.error('An error occured while finalizing your submission!')
         })
 

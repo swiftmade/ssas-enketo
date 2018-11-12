@@ -49,15 +49,15 @@ export default class Sms {
 
     _smsLink(number, body)  {
         const sms = 'sms:' + encodeURIComponent(number)
-        if (this._isPlatformIOS()) {
+        if (this._isPlatformApple()) {
             return sms + '&body=' + encodeURIComponent(body)
         }
         return sms + '?body=' + encodeURIComponent(body)
     }
 
-    _isPlatformIOS() {
+    _isPlatformApple() {
         const userAgent = window.navigator.userAgent.toLowerCase()
-        return /iphone|ipod|ipad/.test(userAgent)
+        return /iphone|ipod|ipad|os\sx/.test(userAgent)
     }
 }
 
