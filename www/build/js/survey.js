@@ -897,7 +897,7 @@ function () {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                submitUrl = QueryParams["a" /* default */].get('submit');
+                submitUrl = QueryParams["a" /* default */].getPath('submit');
                 form = new FormData();
                 form.append('Date', new Date().toUTCString());
                 form.append('xml_submission_file', new Blob([this.session.data.xml]));

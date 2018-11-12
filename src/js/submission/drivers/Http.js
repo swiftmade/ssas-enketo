@@ -8,7 +8,7 @@ export default class Http {
     }
 
     async submit() {
-        const submitUrl = queryParams.get('submit')
+        const submitUrl = queryParams.getPath('submit')
 
         const form = new FormData()
         form.append('Date', new Date().toUTCString())
