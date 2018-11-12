@@ -27,6 +27,13 @@ export default class Http {
             headers['Authorization'] = 'Bearer ' + queryParams.get('auth')
         }
 
+        if (typeof this.session.data.payload === 'object') {
+            form.append(
+                'Payload',
+                JSON.serialize(this.session.data.payload)
+            )
+        }
+
         await axios.post(
             submitUrl,
             form,

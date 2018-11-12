@@ -862,6 +862,8 @@ var axios = __webpack_require__(61);
 var axios_default = /*#__PURE__*/__webpack_require__.n(axios);
 
 // CONCATENATED MODULE: ./src/js/submission/drivers/Http.js
+function Http_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { Http_typeof = function _typeof(obj) { return typeof obj; }; } else { Http_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return Http_typeof(obj); }
+
 function Http_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function Http_asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { Http_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { Http_asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -912,12 +914,16 @@ function () {
                   headers['Authorization'] = 'Bearer ' + QueryParams["a" /* default */].get('auth');
                 }
 
-                _context.next = 8;
+                if (Http_typeof(this.session.data.payload) === 'object') {
+                  form.append('Payload', JSON.serialize(this.session.data.payload));
+                }
+
+                _context.next = 9;
                 return axios_default.a.post(submitUrl, form, {
                   headers: headers
                 });
 
-              case 8:
+              case 9:
               case "end":
                 return _context.stop();
             }
