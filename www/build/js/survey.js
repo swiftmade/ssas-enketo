@@ -747,28 +747,27 @@ function () {
       var _submit = _asyncToGenerator(
       /*#__PURE__*/
       regeneratorRuntime.mark(function _callee() {
-        var number, output, sms, href;
+        var number, output, smsLink;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 number = QueryParams["a" /* default */].get('sms');
                 output = _objectSpread({}, _typeof(this.session.data.payload) === 'object' ? this.session.data.payload : {}, this.transcode(this.session.data.xml));
-                sms = this.objectToText(output);
-                href = 'sms:' + encodeURIComponent(number) + '&body=' + encodeURIComponent(sms);
+                smsLink = this._smsLink(number, this.objectToText(output));
 
                 window.clickSendSms = function () {
                   Sms_emitter.emit('SMS.click');
                 };
 
-                Sms_emitter.emit('EnketoForm.submit.status', '<a href="' + href + '" class="btn btn-primary" target="_blank" onclick="clickSendSms()">Click here to send SMS</a>');
+                Sms_emitter.emit('EnketoForm.submit.status', '<a href="' + smsLink + '" class="btn btn-primary" target="_blank" onclick="clickSendSms()">Click here to send SMS</a>');
                 return _context.abrupt("return", new Promise(function (resolve) {
                   Sms_emitter.once('SMS.click', function () {
                     setTimeout(resolve, 200);
                   });
                 }));
 
-              case 7:
+              case 6:
               case "end":
                 return _context.stop();
             }
@@ -780,6 +779,23 @@ function () {
         return _submit.apply(this, arguments);
       };
     }()
+  }, {
+    key: "_smsLink",
+    value: function _smsLink(number, body) {
+      var sms = 'sms:' + encodeURIComponent(number);
+
+      if (this._isPlatformIOS()) {
+        return sms + '&body=' + encodeURIComponent(body);
+      }
+
+      return sms + '?body=' + encodeURIComponent(body);
+    }
+  }, {
+    key: "_isPlatformIOS",
+    value: function _isPlatformIOS() {
+      var userAgent = window.navigator.userAgent.toLowerCase();
+      return /iphone|ipod|ipad/.test(userAgent);
+    }
   }]);
 
   return Sms;

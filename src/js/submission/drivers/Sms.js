@@ -25,17 +25,19 @@ export default class Sms {
             ...(typeof this.session.data.payload === 'object' ? this.session.data.payload : {}),
             ...this.transcode(this.session.data.xml)
         }
-        const sms = this.objectToText(output)
-        const href = 'sms:' + encodeURIComponent(number) +
-            '&body=' + encodeURIComponent(sms)
+    
+        const smsLink = this._smsLink(
+            number,
+            this.objectToText(output)
+        )
 
         window.clickSendSms = () => {
             emitter.emit('SMS.click')
         }
-        
+
         emitter.emit(
             'EnketoForm.submit.status',
-            '<a href="' + href + '" class="btn btn-primary" target="_blank" onclick="clickSendSms()">Click here to send SMS</a>'
+            '<a href="' + smsLink + '" class="btn btn-primary" target="_blank" onclick="clickSendSms()">Click here to send SMS</a>'
         )
 
         return new Promise(resolve => {
@@ -43,6 +45,19 @@ export default class Sms {
                 setTimeout(resolve, 200)
             })
         })
+    }
+
+    _smsLink(number, body)  {
+        const sms = 'sms:' + encodeURIComponent(number)
+        if (this._isPlatformIOS()) {
+            return sms + '&body=' + encodeURIComponent(body)
+        }
+        return sms + '?body=' + encodeURIComponent(body)
+    }
+
+    _isPlatformIOS() {
+        const userAgent = window.navigator.userAgent.toLowerCase()
+        return /iphone|ipod|ipad/.test(userAgent)
     }
 }
 
