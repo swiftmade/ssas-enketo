@@ -402,7 +402,7 @@ function () {
 
 /***/ }),
 
-/***/ 28:
+/***/ 27:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -600,7 +600,7 @@ var jquery_default = /*#__PURE__*/__webpack_require__.n(jquery);
   };
 })();
 // EXTERNAL MODULE: ./node_modules/toastr/toastr.js
-var toastr = __webpack_require__(27);
+var toastr = __webpack_require__(34);
 var toastr_default = /*#__PURE__*/__webpack_require__.n(toastr);
 
 // EXTERNAL MODULE: ./node_modules/angular/index.js
@@ -915,7 +915,7 @@ function () {
                 }
 
                 if (Http_typeof(this.session.data.payload) === 'object') {
-                  form.append('Payload', JSON.serialize(this.session.data.payload));
+                  form.append('Payload', JSON.stringify(this.session.data.payload));
                 }
 
                 _context.next = 9;
@@ -1210,7 +1210,7 @@ function () {
 
 
 // EXTERNAL MODULE: ./src/js/common/repositories/SessionRepository.js + 1 modules
-var SessionRepository = __webpack_require__(28);
+var SessionRepository = __webpack_require__(27);
 
 // CONCATENATED MODULE: ./src/js/survey/sessions/drivers/Offline.js
 function Offline_asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -2465,7 +2465,6 @@ jquery(document).ready(function () {
     survey_Kernel.submit().catch(function (e) {
       console.error(e);
       $self.removeAttr('disabled');
-      toastr_default.a.error('An error occured while finalizing your submission!');
     });
     return false;
   });
@@ -2509,8 +2508,8 @@ Overlays_emitter.on('EnketoForm.validationSucceeded', function () {
 Overlays_emitter.on('EnketoForm.submitting', function () {
   return Overlays_submitting();
 });
-Overlays_emitter.on('EnketoForm.submitFailed', function () {
-  return Overlays_submitFailed();
+Overlays_emitter.on('EnketoForm.submitFailed', function (e) {
+  return Overlays_submitFailed(e);
 });
 Overlays_emitter.on('EnketoForm.submitSucceeded', function () {
   return submitSucceeded();
@@ -2589,9 +2588,9 @@ var Overlays_submitting = function submitting() {
   jquery('#submit-progress').overlay('show');
 };
 
-var Overlays_submitFailed = function submitFailed() {
+var Overlays_submitFailed = function submitFailed(e) {
   jquery('#submit-progress').overlay('hide');
-  toastr_default.a.error('Submission failed', 'Submission could not be completed');
+  toastr_default.a.error('Submission failed', typeof e === 'string' ? e : e.toString());
 };
 
 var Overlays_submitStatus = function submitStatus(_submitStatus) {

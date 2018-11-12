@@ -30,7 +30,7 @@ export default class Http {
         if (typeof this.session.data.payload === 'object') {
             form.append(
                 'Payload',
-                JSON.serialize(this.session.data.payload)
+                JSON.stringify(this.session.data.payload)
             )
         }
 

@@ -19,7 +19,7 @@ emitter.on('EnketoForm.validationFailed', () => validationFailed())
 emitter.on('EnketoForm.validationSucceeded', () => validationSucceeded())
 
 emitter.on('EnketoForm.submitting', () => submitting())
-emitter.on('EnketoForm.submitFailed', () => submitFailed())
+emitter.on('EnketoForm.submitFailed', (e) => submitFailed(e))
 emitter.on('EnketoForm.submitSucceeded', () => submitSucceeded())
 emitter.on('EnketoForm.submit.status', (status) => submitStatus(status))
 
@@ -112,9 +112,9 @@ const submitting = () => {
     $('#submit-progress').overlay('show')
 }
 
-const submitFailed = () => {
+const submitFailed = (e) => {
     $('#submit-progress').overlay('hide')
-    toastr.error('Submission failed', 'Submission could not be completed')
+    toastr.error('Submission failed', typeof e === 'string' ? e : e.toString())
 }
 
 const submitStatus = (submitStatus) => {
