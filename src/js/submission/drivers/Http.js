@@ -1,4 +1,4 @@
-import axios from 'axios'
+import Server from '../../common/Server'
 import queryParams from '../../common/QueryParams'
 
 export default class Http {
@@ -22,11 +22,6 @@ export default class Http {
             'X-OpenRosa-Deprecated-Id': this.session.data.deprecated_id,            
         }
 
-        // TODO: Document auth parameter
-        if (queryParams.get('auth')) {
-            headers['Authorization'] = 'Bearer ' + queryParams.get('auth')
-        }
-
         if (typeof this.session.data.payload === 'object') {
             form.append(
                 'Payload',
@@ -34,10 +29,10 @@ export default class Http {
             )
         }
 
-        await axios.post(
+        await Server.postForm(
             submitUrl,
             form,
-            {headers}
+            headers
         )
     }
 }

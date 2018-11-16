@@ -547,6 +547,161 @@ module.exports = FormModel;
 
 /***/ }),
 
+/***/ 38:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+// EXTERNAL MODULE: ./node_modules/axios/index.js
+var axios = __webpack_require__(45);
+var axios_default = /*#__PURE__*/__webpack_require__.n(axios);
+
+// CONCATENATED MODULE: ./src/js/common/Cookies.js
+/* harmony default export */ var Cookies = (function (cname) {
+  var name = cname + "=";
+  var decodedCookie = decodeURIComponent(document.cookie);
+  var ca = decodedCookie.split(";");
+
+  for (var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+
+    while (c.charAt(0) == " ") {
+      c = c.substring(1);
+    }
+
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+
+  return "";
+});
+// EXTERNAL MODULE: ./src/js/common/QueryParams.js
+var QueryParams = __webpack_require__(2);
+
+// CONCATENATED MODULE: ./src/js/common/Server.js
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+
+
+var Server_Server =
+/*#__PURE__*/
+function () {
+  function Server() {
+    _classCallCheck(this, Server);
+
+    this._configureAxios();
+  }
+
+  _createClass(Server, [{
+    key: "_configureAxios",
+    value: function _configureAxios() {
+      var token = this._detectAuthToken();
+
+      if (token !== null) {
+        axios_default.a.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+      }
+    }
+  }, {
+    key: "_detectAuthToken",
+    value: function _detectAuthToken() {
+      if (QueryParams["a" /* default */].has('auth')) {
+        return QueryParams["a" /* default */].get('auth');
+      } else if (Cookies('enketo_token')) {
+        return Cookies('enketo_token');
+      }
+
+      return null;
+    }
+  }, {
+    key: "json",
+    value: function () {
+      var _json = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee(url) {
+        var _ref, data;
+
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return axios_default.a.get(url);
+
+              case 2:
+                _ref = _context.sent;
+                data = _ref.data;
+                return _context.abrupt("return", data);
+
+              case 5:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      return function json(_x) {
+        return _json.apply(this, arguments);
+      };
+    }()
+  }, {
+    key: "postForm",
+    value: function () {
+      var _postForm = _asyncToGenerator(
+      /*#__PURE__*/
+      regeneratorRuntime.mark(function _callee2(url, form) {
+        var headers,
+            _ref2,
+            data,
+            _args2 = arguments;
+
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                headers = _args2.length > 2 && _args2[2] !== undefined ? _args2[2] : {};
+                _context2.next = 3;
+                return axios_default.a.post(url, form, {
+                  headers: headers
+                });
+
+              case 3:
+                _ref2 = _context2.sent;
+                data = _ref2.data;
+                return _context2.abrupt("return", data);
+
+              case 6:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      return function postForm(_x2, _x3) {
+        return _postForm.apply(this, arguments);
+      };
+    }()
+  }]);
+
+  return Server;
+}();
+
+/* harmony default export */ var common_Server = __webpack_exports__["a"] = (new Server_Server());
+
+/***/ }),
+
 /***/ 464:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -604,7 +759,7 @@ var toastr = __webpack_require__(34);
 var toastr_default = /*#__PURE__*/__webpack_require__.n(toastr);
 
 // EXTERNAL MODULE: ./node_modules/angular/index.js
-var angular = __webpack_require__(43);
+var angular = __webpack_require__(44);
 var angular_default = /*#__PURE__*/__webpack_require__.n(angular);
 
 // EXTERNAL MODULE: ./node_modules/v-accordion/index.js
@@ -615,7 +770,7 @@ var v_accordion = __webpack_require__(376);
 
 
 
-var emitter = __webpack_require__(41);
+var emitter = __webpack_require__(42);
 
 var app = angular_default.a.module('jumpTo', ['vAccordion']);
 
@@ -692,8 +847,8 @@ var form_model = __webpack_require__(379);
 // EXTERNAL MODULE: ./src/js/common/QueryParams.js
 var QueryParams = __webpack_require__(2);
 
-// EXTERNAL MODULE: ./src/js/common/Server.js
-var Server = __webpack_require__(56);
+// EXTERNAL MODULE: ./src/js/common/Server.js + 1 modules
+var Server = __webpack_require__(38);
 
 // EXTERNAL MODULE: ./src/js/common/Session.js
 var Session = __webpack_require__(22);
@@ -718,7 +873,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
-var Sms_emitter = __webpack_require__(41);
+var Sms_emitter = __webpack_require__(42);
 
 var Sms_Sms =
 /*#__PURE__*/
@@ -857,10 +1012,6 @@ function () {
 
   return EnketoXmlParser;
 }();
-// EXTERNAL MODULE: ./node_modules/axios/index.js
-var axios = __webpack_require__(61);
-var axios_default = /*#__PURE__*/__webpack_require__.n(axios);
-
 // CONCATENATED MODULE: ./src/js/submission/drivers/Http.js
 function Http_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { Http_typeof = function _typeof(obj) { return typeof obj; }; } else { Http_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return Http_typeof(obj); }
 
@@ -906,24 +1057,17 @@ function () {
                   // Open-rosa Headers
                   'X-OpenRosa-Version': '1.0',
                   'X-OpenRosa-Instance-Id': this.session.data.instance_id,
-                  'X-OpenRosa-Deprecated-Id': this.session.data.deprecated_id // TODO: Document auth parameter
-
+                  'X-OpenRosa-Deprecated-Id': this.session.data.deprecated_id
                 };
-
-                if (QueryParams["a" /* default */].get('auth')) {
-                  headers['Authorization'] = 'Bearer ' + QueryParams["a" /* default */].get('auth');
-                }
 
                 if (Http_typeof(this.session.data.payload) === 'object') {
                   form.append('Payload', JSON.stringify(this.session.data.payload));
                 }
 
-                _context.next = 9;
-                return axios_default.a.post(submitUrl, form, {
-                  headers: headers
-                });
+                _context.next = 8;
+                return Server["a" /* default */].postForm(submitUrl, form, headers);
 
-              case 9:
+              case 8:
               case "end":
                 return _context.stop();
             }
@@ -952,7 +1096,7 @@ function Submit_defineProperties(target, props) { for (var i = 0; i < props.leng
 
 function Submit_createClass(Constructor, protoProps, staticProps) { if (protoProps) Submit_defineProperties(Constructor.prototype, protoProps); if (staticProps) Submit_defineProperties(Constructor, staticProps); return Constructor; }
 
-var Submit_emitter = __webpack_require__(41);
+var Submit_emitter = __webpack_require__(42);
 
 
 
@@ -1226,7 +1370,7 @@ function Offline_createClass(Constructor, protoProps, staticProps) { if (protoPr
 
 
 
-var Offline_emitter = __webpack_require__(41);
+var Offline_emitter = __webpack_require__(42);
 
 
 
@@ -1924,7 +2068,7 @@ function EnketoForm_createClass(Constructor, protoProps, staticProps) { if (prot
 
 var Form = __webpack_require__(417);
 
-var EnketoForm_emitter = __webpack_require__(41);
+var EnketoForm_emitter = __webpack_require__(42);
 
 
 
@@ -2281,7 +2425,7 @@ function Kernel_createClass(Constructor, protoProps, staticProps) { if (protoPro
 
 
 
-var Kernel_emitter = __webpack_require__(41);
+var Kernel_emitter = __webpack_require__(42);
 
 var Kernel_Kernel =
 /*#__PURE__*/
@@ -2473,7 +2617,7 @@ jquery(document).ready(function () {
 
 
 
-var Overlays_emitter = __webpack_require__(41);
+var Overlays_emitter = __webpack_require__(42);
 
 
 
@@ -2597,7 +2741,7 @@ var Overlays_submitStatus = function submitStatus(_submitStatus) {
   jquery('#submit-progress-text').html(_submitStatus);
 };
 // CONCATENATED MODULE: ./src/js/survey/ui/SessionModal.js
-var SessionModal_emitter = __webpack_require__(41);
+var SessionModal_emitter = __webpack_require__(42);
 
 
 var SessionModal_app = angular_default.a.module('sessionModal', []);
@@ -2691,72 +2835,6 @@ toastr_default.a.options = {
 
 
 survey_Kernel.boot();
-
-/***/ }),
-
-/***/ 56:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(61);
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-
-
-var Server =
-/*#__PURE__*/
-function () {
-  function Server() {
-    _classCallCheck(this, Server);
-  }
-
-  _createClass(Server, [{
-    key: "json",
-    value: function () {
-      var _json = _asyncToGenerator(
-      /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee(url) {
-        var _ref, data;
-
-        return regeneratorRuntime.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                _context.next = 2;
-                return axios__WEBPACK_IMPORTED_MODULE_0___default.a.get(url);
-
-              case 2:
-                _ref = _context.sent;
-                data = _ref.data;
-                return _context.abrupt("return", data);
-
-              case 5:
-              case "end":
-                return _context.stop();
-            }
-          }
-        }, _callee, this);
-      }));
-
-      return function json(_x) {
-        return _json.apply(this, arguments);
-      };
-    }()
-  }]);
-
-  return Server;
-}();
-
-/* harmony default export */ __webpack_exports__["a"] = (new Server());
 
 /***/ }),
 
