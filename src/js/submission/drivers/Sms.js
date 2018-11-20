@@ -1,4 +1,4 @@
-import $ from 'jquery'
+
 import queryParams from '../../common/QueryParams'
 const emitter = require('tiny-emitter/instance')
 

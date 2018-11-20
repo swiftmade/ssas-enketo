@@ -1,4 +1,4 @@
-<data xmlns:jr="http://openrosa.org/javarosa" xmlns:orx="http://openrosa.org/xforms" id="snapshot_xml">
+module.exports = `<data xmlns:jr="http://openrosa.org/javarosa" xmlns:orx="http://openrosa.org/xforms" id="snapshot_xml">
     <start>2018-11-09T18:58:26.024+02:00</start>
     <end>2018-11-09T18:58:26.027+02:00</end>
     <today>2018-11-09</today>
@@ -56,4 +56,4 @@
     <meta>
     <instanceID>uuid:e2c7f8a1-3cbd-451a-9fab-0cade1efbe30</instanceID>
     </meta>
-</data>
+</data>`

@@ -1,4 +1,3 @@
-import * as $ from 'jquery'
 import angular from 'angular'
 import vAccordion from 'v-accordion'
 const emitter = require('tiny-emitter/instance')

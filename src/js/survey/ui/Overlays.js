@@ -1,4 +1,3 @@
-import * as $ from 'jquery'
 import toastr from 'toastr'
 const emitter = require('tiny-emitter/instance')
 import queryParams from '../../common/QueryParams'

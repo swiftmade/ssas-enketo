@@ -35,7 +35,7 @@ export default class Online {
     }
 
     async _loadSessionFromUrl(url) {
-        const data = await Server.json(url)
+        const data = await Server.create().json(url)
 
         return new Session({
             submitted: true,

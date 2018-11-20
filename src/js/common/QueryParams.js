@@ -1,16 +1,30 @@
 var UrlSearchParams = require('url-search-params')
-var queryParams = new UrlSearchParams(window.location.search)
 
-queryParams.getPath = function (key) {
-    return queryParams.getUrl(queryParams.get(key))
-}
-
-queryParams.getUrl = function (uri) {
-    var url = '';
-    if (queryParams.has('base')) {
-        url = queryParams.get('base') + '/';
+class QueryParams {
+    urlParams() {
+        if (!this._urlParams) {
+            this._urlParams = new UrlSearchParams(
+                window.location.search
+            )
+        }
+        return this._urlParams
     }
-    return url + uri;
+    has(key) {
+        return this.urlParams().has(key)
+    }
+    get(key) {
+        return this.urlParams().get(key)
+    }
+    getUrl(uri) {
+        var url = '';
+        if (this.has('base')) {
+            url = this.get('base') + '/';
+        }
+        return url + uri;
+    }
+    getPath(key) {
+        return this.getUrl(this.get(key))
+    }
 }
 
-export default queryParams;
+export default new QueryParams()

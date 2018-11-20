@@ -29,7 +29,7 @@ export default class Http {
             )
         }
 
-        await Server.postForm(
+        await Server.create().postForm(
             submitUrl,
             form,
             headers

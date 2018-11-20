@@ -1,13 +1,26 @@
 import axios from 'axios'
-import cookies from './Cookies'
+import Cookies from './Cookies'
 import queryParams from './QueryParams'
 
-class Server {
+let serverInstance = null
+
+export default class Server {
 
     constructor() {
         this._configureAxios()
     }
 
+    static create() {
+        if (!serverInstance) {
+            serverInstance = Server.newInstance()
+        }
+        return serverInstance
+    }
+
+    static newInstance() {
+        return new Server()
+    }
+    
     _configureAxios() {
         const token = this._detectAuthToken()
         if (token !== null) {
@@ -18,8 +31,8 @@ class Server {
     _detectAuthToken() {
         if (queryParams.has('auth')) {
             return queryParams.get('auth')
-        } else if(cookies('enketo_token')) {
-            return cookies('enketo_token')
+        } else if(Cookies.get('enketo_token')) {
+            return Cookies.get('enketo_token')
         }
         return null
     }
@@ -37,6 +50,3 @@ class Server {
     }
 
 }
-
-
-export default new Server()

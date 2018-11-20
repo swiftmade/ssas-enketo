@@ -1,4 +1,3 @@
-import * as $ from 'jquery'
 import './enketo-patches/form-model'
 import fileManager from './enketo-patches/file-manager'
 

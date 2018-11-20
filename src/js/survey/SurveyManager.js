@@ -10,7 +10,7 @@ class SurveyManager {
     }
 
     async _load() {
-        this.survey = await Server.json(queryParams.getPath('survey'))
+        this.survey = await Server.create().json(queryParams.getPath('survey'))
     }
 
     _preprocessFormHtml() {

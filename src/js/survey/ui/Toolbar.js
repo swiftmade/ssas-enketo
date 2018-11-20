@@ -1,5 +1,3 @@
-import * as $ from 'jquery'
-import toastr from 'toastr'
 import Kernel from '../Kernel'
 import EnketoForm from '../EnketoForm'
 

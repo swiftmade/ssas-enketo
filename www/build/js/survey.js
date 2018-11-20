@@ -10,14 +10,84 @@
 })(window, function() {
 return (window["webpackJsonp"] = window["webpackJsonp"] || []).push([[3],{
 
+/***/ 1:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var UrlSearchParams = __webpack_require__(158);
+
+var QueryParams =
+/*#__PURE__*/
+function () {
+  function QueryParams() {
+    _classCallCheck(this, QueryParams);
+  }
+
+  _createClass(QueryParams, [{
+    key: "urlParams",
+    value: function urlParams() {
+      if (!this._urlParams) {
+        this._urlParams = new UrlSearchParams(window.location.search);
+      }
+
+      return this._urlParams;
+    }
+  }, {
+    key: "has",
+    value: function has(key) {
+      return this.urlParams().has(key);
+    }
+  }, {
+    key: "get",
+    value: function get(key) {
+      return this.urlParams().get(key);
+    }
+  }, {
+    key: "getUrl",
+    value: function getUrl(uri) {
+      var url = '';
+
+      if (this.has('base')) {
+        url = this.get('base') + '/';
+      }
+
+      return url + uri;
+    }
+  }, {
+    key: "getPath",
+    value: function getPath(key) {
+      return this.getUrl(this.get(key));
+    }
+  }]);
+
+  return QueryParams;
+}();
+
+/* harmony default export */ __webpack_exports__["a"] = (new QueryParams());
+
+/***/ }),
+
 /***/ 110:
 /***/ (function(module, exports, __webpack_require__) {
 
-var en = __webpack_require__(111);
+window.$ = window.jQuery = __webpack_require__(2);
 
-var lo = __webpack_require__(112);
+/***/ }),
 
-var zh = __webpack_require__(113);
+/***/ 111:
+/***/ (function(module, exports, __webpack_require__) {
+
+var en = __webpack_require__(112);
+
+var lo = __webpack_require__(113);
+
+var zh = __webpack_require__(114);
 
 var _ = __webpack_require__(82);
 
@@ -96,7 +166,7 @@ module.exports = i18n;
 
 /***/ }),
 
-/***/ 111:
+/***/ 112:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -145,7 +215,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 112:
+/***/ 113:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -194,7 +264,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 113:
+/***/ 114:
 /***/ (function(module, exports) {
 
 module.exports = {
@@ -242,38 +312,12 @@ module.exports = {
 
 /***/ }),
 
-/***/ 2:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-var UrlSearchParams = __webpack_require__(157);
-
-var queryParams = new UrlSearchParams(window.location.search);
-
-queryParams.getPath = function (key) {
-  return queryParams.getUrl(queryParams.get(key));
-};
-
-queryParams.getUrl = function (uri) {
-  var url = '';
-
-  if (queryParams.has('base')) {
-    url = queryParams.get('base') + '/';
-  }
-
-  return url + uri;
-};
-
-/* harmony default export */ __webpack_exports__["a"] = (queryParams);
-
-/***/ }),
-
 /***/ 22:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Session; });
-/* harmony import */ var _QueryParams__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
+/* harmony import */ var _QueryParams__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
@@ -478,7 +522,7 @@ var getInstance = function getInstance(name) {
   return instances[name];
 };
 // EXTERNAL MODULE: ./src/js/common/QueryParams.js
-var QueryParams = __webpack_require__(2);
+var QueryParams = __webpack_require__(1);
 
 // CONCATENATED MODULE: ./src/js/common/repositories/SessionRepository.js
 
@@ -493,61 +537,7 @@ if (QueryParams["a" /* default */].has('db')) {
 
 /***/ }),
 
-/***/ 372:
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-
-/***/ 379:
-/***/ (function(module, exports, __webpack_require__) {
-
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-/**
- * This patches the Form-model module from enketo-core
- * The aim of this patch is to allow arbitrarily adding session parameters to the survey file
- * https://github.com/enketo/enketo-core/blob/master/src/js/form-model.js
- */
-var FormModel = __webpack_require__(155);
-
-var parser = new DOMParser();
-
-FormModel.prototype.createSession = function (id, sessObj) {
-  var instance;
-  var session;
-  var model = this.xml.querySelector('model');
-
-  if (!model) {
-    return;
-  }
-
-  sessObj = _typeof(sessObj) === 'object' ? sessObj : {};
-  instance = model.querySelector('instance[id="' + id + '"]');
-
-  if (!instance) {
-    instance = parser.parseFromString('<instance id="' + id + '"/>', 'text/xml').documentElement;
-    this.xml.adoptNode(instance);
-    model.appendChild(instance);
-  } // fixed: /sesssion/context properties
-
-
-  Object.keys(sessObj).forEach(function (prop) {
-    sessObj[prop] = sessObj[prop] || utils.readCookie('__enketo_meta_' + prop) || prop + ' not found';
-  });
-  session = parser.parseFromString('<session><context>' + Object.keys(sessObj).map(function (prop) {
-    return '<' + prop + '>' + sessObj[prop] + '</' + prop + '>';
-  }).join('') + '</context></session>', 'text/xml').documentElement;
-  this.xml.adoptNode(session);
-  instance.appendChild(session);
-};
-
-module.exports = FormModel;
-
-/***/ }),
-
-/***/ 38:
+/***/ 37:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -557,53 +547,76 @@ var axios = __webpack_require__(45);
 var axios_default = /*#__PURE__*/__webpack_require__.n(axios);
 
 // CONCATENATED MODULE: ./src/js/common/Cookies.js
-/* harmony default export */ var Cookies = (function (cname) {
-  var name = cname + "=";
-  var decodedCookie = decodeURIComponent(document.cookie);
-  var ca = decodedCookie.split(";");
-
-  for (var i = 0; i < ca.length; i++) {
-    var c = ca[i];
-
-    while (c.charAt(0) == " ") {
-      c = c.substring(1);
-    }
-
-    if (c.indexOf(name) == 0) {
-      return c.substring(name.length, c.length);
-    }
-  }
-
-  return "";
-});
-// EXTERNAL MODULE: ./src/js/common/QueryParams.js
-var QueryParams = __webpack_require__(2);
-
-// CONCATENATED MODULE: ./src/js/common/Server.js
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+var Cookies =
+/*#__PURE__*/
+function () {
+  function Cookies() {
+    _classCallCheck(this, Cookies);
+  }
+
+  _createClass(Cookies, [{
+    key: "get",
+    value: function get(cname) {
+      var name = cname + "=";
+      var decodedCookie = decodeURIComponent(document.cookie);
+      var ca = decodedCookie.split(";");
+
+      for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+
+        while (c.charAt(0) == " ") {
+          c = c.substring(1);
+        }
+
+        if (c.indexOf(name) == 0) {
+          return c.substring(name.length, c.length);
+        }
+      }
+
+      return "";
+    }
+  }]);
+
+  return Cookies;
+}();
+
+/* harmony default export */ var common_Cookies = (new Cookies());
+// EXTERNAL MODULE: ./src/js/common/QueryParams.js
+var QueryParams = __webpack_require__(1);
+
+// CONCATENATED MODULE: ./src/js/common/Server.js
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Server_Server; });
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function Server_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function Server_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function Server_createClass(Constructor, protoProps, staticProps) { if (protoProps) Server_defineProperties(Constructor.prototype, protoProps); if (staticProps) Server_defineProperties(Constructor, staticProps); return Constructor; }
 
 
 
+
+var serverInstance = null;
 
 var Server_Server =
 /*#__PURE__*/
 function () {
   function Server() {
-    _classCallCheck(this, Server);
+    Server_classCallCheck(this, Server);
 
     this._configureAxios();
   }
 
-  _createClass(Server, [{
+  Server_createClass(Server, [{
     key: "_configureAxios",
     value: function _configureAxios() {
       var token = this._detectAuthToken();
@@ -617,8 +630,8 @@ function () {
     value: function _detectAuthToken() {
       if (QueryParams["a" /* default */].has('auth')) {
         return QueryParams["a" /* default */].get('auth');
-      } else if (Cookies('enketo_token')) {
-        return Cookies('enketo_token');
+      } else if (common_Cookies.get('enketo_token')) {
+        return common_Cookies.get('enketo_token');
       }
 
       return null;
@@ -693,39 +706,44 @@ function () {
         return _postForm.apply(this, arguments);
       };
     }()
+  }], [{
+    key: "create",
+    value: function create() {
+      if (!serverInstance) {
+        serverInstance = Server.newInstance();
+      }
+
+      return serverInstance;
+    }
+  }, {
+    key: "newInstance",
+    value: function newInstance() {
+      return new Server();
+    }
   }]);
 
   return Server;
 }();
 
-/* harmony default export */ var common_Server = __webpack_exports__["a"] = (new Server_Server());
+
 
 /***/ }),
 
-/***/ 464:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ 373:
+/***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
+// extracted by mini-css-extract-plugin
 
-// EXTERNAL MODULE: ./src/sass/survey.scss
-var survey = __webpack_require__(372);
+/***/ }),
 
-// EXTERNAL MODULE: ./src/js/i18n/i18n.js
-var i18n_i18n = __webpack_require__(110);
-
-// EXTERNAL MODULE: ./node_modules/jquery/dist/jquery.js
-var jquery = __webpack_require__(1);
-var jquery_default = /*#__PURE__*/__webpack_require__.n(jquery);
-
-// CONCATENATED MODULE: ./src/js/plugins/overlay.js
-
+/***/ 375:
+/***/ (function(module, exports) {
 
 (function () {
-  var $body = jquery('body');
+  var $body = $('body');
 
   function showOverlay($el) {
-    jquery(window).scrollTop(0);
+    $(window).scrollTop(0);
     setTimeout(function () {
       $body.addClass("noScroll");
       $el.show();
@@ -737,7 +755,7 @@ var jquery_default = /*#__PURE__*/__webpack_require__.n(jquery);
     $el.hide();
   }
 
-  jquery["fn"].overlay = jquery["fn"].overlay = function (action) {
+  $.fn.overlay = $.fn.overlay = function (action) {
     switch (action) {
       case "show":
         showOverlay(this);
@@ -754,8 +772,76 @@ var jquery_default = /*#__PURE__*/__webpack_require__.n(jquery);
     return this;
   };
 })();
+
+/***/ }),
+
+/***/ 381:
+/***/ (function(module, exports, __webpack_require__) {
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+/**
+ * This patches the Form-model module from enketo-core
+ * The aim of this patch is to allow arbitrarily adding session parameters to the survey file
+ * https://github.com/enketo/enketo-core/blob/master/src/js/form-model.js
+ */
+var FormModel = __webpack_require__(156);
+
+var parser = new DOMParser();
+
+FormModel.prototype.createSession = function (id, sessObj) {
+  var instance;
+  var session;
+  var model = this.xml.querySelector('model');
+
+  if (!model) {
+    return;
+  }
+
+  sessObj = _typeof(sessObj) === 'object' ? sessObj : {};
+  instance = model.querySelector('instance[id="' + id + '"]');
+
+  if (!instance) {
+    instance = parser.parseFromString('<instance id="' + id + '"/>', 'text/xml').documentElement;
+    this.xml.adoptNode(instance);
+    model.appendChild(instance);
+  } // fixed: /sesssion/context properties
+
+
+  Object.keys(sessObj).forEach(function (prop) {
+    sessObj[prop] = sessObj[prop] || utils.readCookie('__enketo_meta_' + prop) || prop + ' not found';
+  });
+  session = parser.parseFromString('<session><context>' + Object.keys(sessObj).map(function (prop) {
+    return '<' + prop + '>' + sessObj[prop] + '</' + prop + '>';
+  }).join('') + '</context></session>', 'text/xml').documentElement;
+  this.xml.adoptNode(session);
+  instance.appendChild(session);
+};
+
+module.exports = FormModel;
+
+/***/ }),
+
+/***/ 466:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+// EXTERNAL MODULE: ./src/js/common/bootstrap.js
+var bootstrap = __webpack_require__(110);
+
+// EXTERNAL MODULE: ./src/sass/survey.scss
+var survey = __webpack_require__(373);
+
+// EXTERNAL MODULE: ./src/js/i18n/i18n.js
+var i18n_i18n = __webpack_require__(111);
+
+// EXTERNAL MODULE: ./src/js/plugins/overlay.js
+var overlay = __webpack_require__(375);
+
 // EXTERNAL MODULE: ./node_modules/toastr/toastr.js
-var toastr = __webpack_require__(34);
+var toastr = __webpack_require__(38);
 var toastr_default = /*#__PURE__*/__webpack_require__.n(toastr);
 
 // EXTERNAL MODULE: ./node_modules/angular/index.js
@@ -763,10 +849,9 @@ var angular = __webpack_require__(44);
 var angular_default = /*#__PURE__*/__webpack_require__.n(angular);
 
 // EXTERNAL MODULE: ./node_modules/v-accordion/index.js
-var v_accordion = __webpack_require__(376);
+var v_accordion = __webpack_require__(378);
 
 // CONCATENATED MODULE: ./src/js/survey/ui/JumpTo.js
-
 
 
 
@@ -784,11 +869,11 @@ app.controller("jumpCtrl", ['$scope', function ($scope) {
   };
   emitter.on('EnketoForm.initialized', function () {
     return $scope.$apply(function () {
-      jquery('[role="page"]').each(function () {
-        var page = jquery(this);
-        var labels = jquery(".question-label.active", page);
+      $('[role="page"]').each(function () {
+        var page = $(this);
+        var labels = $(".question-label.active", page);
         labels.each(function () {
-          var label = jquery(this).text();
+          var label = $(this).text();
 
           if (label.length < 2 || label[1] != ".") {
             return;
@@ -827,28 +912,28 @@ app.controller("jumpCtrl", ['$scope', function ($scope) {
     $scope.accordion.collapseAll();
     form.pages.flipToPageContaining(page.el);
     setTimeout(function () {
-      jquery("#jump-to-block").overlay("hide");
+      $("#jump-to-block").overlay("hide");
     });
   };
 
-  jquery("#jump-to-close").click(function () {
+  $("#jump-to-close").click(function () {
     $scope.accordion.collapseAll();
-    jquery("#jump-to-block").overlay("hide");
+    $("#jump-to-block").overlay("hide");
   });
 }]);
-jquery("#jump-to").click(function () {
-  jquery("#jump-to-block").overlay("show");
+$("#jump-to").click(function () {
+  $("#jump-to-block").overlay("show");
 });
-jquery("#jump-to-block").hide();
+$("#jump-to-block").hide();
 angular_default.a.bootstrap(document.getElementById('jump-to-block'), ["jumpTo"]);
 // EXTERNAL MODULE: ./src/js/survey/enketo-patches/form-model.js
-var form_model = __webpack_require__(379);
+var form_model = __webpack_require__(381);
 
 // EXTERNAL MODULE: ./src/js/common/QueryParams.js
-var QueryParams = __webpack_require__(2);
+var QueryParams = __webpack_require__(1);
 
 // EXTERNAL MODULE: ./src/js/common/Server.js + 1 modules
-var Server = __webpack_require__(38);
+var Server = __webpack_require__(37);
 
 // EXTERNAL MODULE: ./src/js/common/Session.js
 var Session = __webpack_require__(22);
@@ -872,7 +957,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 
 
-
 var Sms_emitter = __webpack_require__(42);
 
 var Sms_Sms =
@@ -887,7 +971,7 @@ function () {
   _createClass(Sms, [{
     key: "transcode",
     value: function transcode(xml) {
-      return new Sms_EnketoXmlParser(xml).parse();
+      return new EnketoXmlParser(xml).parse();
     }
   }, {
     key: "objectToText",
@@ -959,13 +1043,13 @@ function () {
 
 var IGNORED_TAGS = ['meta', 'start', 'end', 'today', 'username', 'simserial', 'subscriberid', 'deviceid', 'phonenumber'];
 
-var Sms_EnketoXmlParser =
+var EnketoXmlParser =
 /*#__PURE__*/
 function () {
   function EnketoXmlParser(xml) {
     _classCallCheck(this, EnketoXmlParser);
 
-    this.$xml = jquery_default()(jquery_default.a.parseXML(xml));
+    this.$xml = $($.parseXML(xml));
     this.output = {};
   }
 
@@ -991,11 +1075,11 @@ function () {
       var _this = this;
 
       $children.each(function () {
-        if (jquery_default()(this).children().length) {
-          return _this._appendFromNodes(jquery_default()(this).children());
+        if ($(this).children().length) {
+          return _this._appendFromNodes($(this).children());
         }
 
-        var node = jquery_default()(this)[0];
+        var node = $(this)[0];
 
         if (IGNORED_TAGS.includes(node.nodeName)) {
           return;
@@ -1065,7 +1149,7 @@ function () {
                 }
 
                 _context.next = 8;
-                return Server["a" /* default */].postForm(submitUrl, form, headers);
+                return Server["a" /* default */].create().postForm(submitUrl, form, headers);
 
               case 8:
               case "end":
@@ -1324,7 +1408,7 @@ function () {
             switch (_context3.prev = _context3.next) {
               case 0:
                 _context3.next = 2;
-                return Server["a" /* default */].json(url);
+                return Server["a" /* default */].create().json(url);
 
               case 2:
                 data = _context3.sent;
@@ -1936,7 +2020,7 @@ function () {
  * The actual source for this module can be found here:
  * https://github.com/enketo/enketo-core/blob/master/src/js/file-manager.js
  */
-var fileManager = __webpack_require__(117);
+var fileManager = __webpack_require__(118);
 
  // Preserve the original getFileUrl method
 
@@ -2013,7 +2097,7 @@ function () {
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.next = 2;
-                return Server["a" /* default */].json(QueryParams["a" /* default */].getPath('survey'));
+                return Server["a" /* default */].create().json(QueryParams["a" /* default */].getPath('survey'));
 
               case 2:
                 this.survey = _context2.sent;
@@ -2065,8 +2149,7 @@ function EnketoForm_createClass(Constructor, protoProps, staticProps) { if (prot
 
 
 
-
-var Form = __webpack_require__(417);
+var Form = __webpack_require__(419);
 
 var EnketoForm_emitter = __webpack_require__(42);
 
@@ -2286,8 +2369,8 @@ function () {
        * Also append previously uploaded files, but as strings.
        */
 
-      jquery('form.or input[type="file"][data-loaded-file-name]').each(function () {
-        files.push(jquery(this).data('loaded-file-name'));
+      $('form.or input[type="file"][data-loaded-file-name]').each(function () {
+        files.push($(this).data('loaded-file-name'));
       });
       return files;
     }
@@ -2584,27 +2667,25 @@ function () {
 // CONCATENATED MODULE: ./src/js/survey/ui/Toolbar.js
 
 
-
-
-jquery(document).ready(function () {
-  jquery('.save-progress').click(function () {
+$(document).ready(function () {
+  $('.save-progress').click(function () {
     survey_EnketoForm.save();
   });
-  jquery('#close-button').click(function () {
+  $('#close-button').click(function () {
     survey_Kernel.saveAndExit();
   });
-  jquery('.validate-form').on('click', function () {
+  $('.validate-form').on('click', function () {
     survey_EnketoForm.validate();
   });
-  jquery('.first-page-alias').click(function () {
-    jquery('.first-page').click();
+  $('.first-page-alias').click(function () {
+    $('.first-page').click();
   });
-  jquery('.last-page-alias').click(function () {
-    jquery('.last-page').click();
+  $('.last-page-alias').click(function () {
+    $('.last-page').click();
   }); // validate handler for validate button
 
-  jquery('.submit-form').on('click', function () {
-    var $self = jquery(this);
+  $('.submit-form').on('click', function () {
+    var $self = $(this);
     $self.attr('disabled', 'disabled');
     survey_Kernel.submit().catch(function (e) {
       console.error(e);
@@ -2616,7 +2697,6 @@ jquery(document).ready(function () {
 // CONCATENATED MODULE: ./src/js/survey/ui/Overlays.js
 
 
-
 var Overlays_emitter = __webpack_require__(42);
 
 
@@ -2625,14 +2705,14 @@ var Overlays_emitter = __webpack_require__(42);
  * Set event listeners
  */
 
-jquery(document).ready(function () {
+$(document).ready(function () {
   return Overlays_setBackgroundImage();
 });
 Overlays_emitter.once('EnketoForm.initialized', function () {
   return Overlays_showSurvey();
 });
 Overlays_emitter.on('EnketoForm.saving', function () {
-  return Overlays_saving();
+  return saving();
 });
 Overlays_emitter.on('EnketoForm.saveFailed', function () {
   return saveFailed();
@@ -2641,16 +2721,16 @@ Overlays_emitter.on('EnketoForm.saveSucceded', function () {
   return saveSucceded();
 });
 Overlays_emitter.on('EnketoForm.validating', function () {
-  return Overlays_validating();
+  return validating();
 });
 Overlays_emitter.on('EnketoForm.validationFailed', function () {
   return validationFailed();
 });
 Overlays_emitter.on('EnketoForm.validationSucceeded', function () {
-  return Overlays_validationSucceeded();
+  return validationSucceeded();
 });
 Overlays_emitter.on('EnketoForm.submitting', function () {
-  return Overlays_submitting();
+  return submitting();
 });
 Overlays_emitter.on('EnketoForm.submitFailed', function (e) {
   return Overlays_submitFailed(e);
@@ -2659,7 +2739,7 @@ Overlays_emitter.on('EnketoForm.submitSucceeded', function () {
   return submitSucceeded();
 });
 Overlays_emitter.on('EnketoForm.submit.status', function (status) {
-  return Overlays_submitStatus(status);
+  return submitStatus(status);
 });
 /**
  * Callbacks
@@ -2671,7 +2751,7 @@ var Overlays_setBackgroundImage = function setBackgroundImage() {
   }
 
   var style = "content: ' ';" + "display: block;" + "position: absolute;" + "top: 0;" + "left: 0;" + "width: 100%;" + "height: 100%;" + "opacity: 0.2;" + "z-index: -1;" + "background-image: url('" + QueryParams["a" /* default */].get('bg') + "');" + "background-size: cover;" + "background-position: center;" + "background-repeat: no-repeat;";
-  jquery('<style>' + '#loading-block:after { ' + style + '} </style>').appendTo('head');
+  $('<style>' + '#loading-block:after { ' + style + '} </style>').appendTo('head');
 };
 
 var Overlays_showSurvey = function showSurvey() {
@@ -2685,14 +2765,14 @@ var Overlays_showSurvey = function showSurvey() {
   window.scrollTo(0, 0);
 };
 
-var Overlays_saving = function saving() {
-  var $saveProgress = jquery(".save-progress");
+var saving = function saving() {
+  var $saveProgress = $(".save-progress");
   $saveProgress.html('<i class="fa fa-spinner fa-spin"></i>');
   $saveProgress.attr("disabled", "disabled");
 };
 
 var Overlays_finishSaving = function _finishSaving(outcome, message) {
-  var $saveProgress = jquery(".save-progress");
+  var $saveProgress = $(".save-progress");
   $saveProgress.html('<i class="fa fa-save"></i>');
   $saveProgress.removeAttr("disabled", "disabled");
 
@@ -2709,12 +2789,12 @@ var saveSucceded = function saveSucceded() {
   Overlays_finishSaving("success", i18n._("survey.saved"));
 };
 
-var Overlays_validating = function validating() {
-  jquery(".submit-form").data('original-content', jquery('.submit-form').text()).attr("disabled", "disabled").text("Validating...");
+var validating = function validating() {
+  $(".submit-form").data('original-content', $('.submit-form').text()).attr("disabled", "disabled").text("Validating...");
 };
 
 var Overlays_finishValidating = function _finishValidating(outcome, message) {
-  jquery(".submit-form").removeAttr('disabled').text(jquery('.submit-form').data('original-content'));
+  $(".submit-form").removeAttr('disabled').text($('.submit-form').data('original-content'));
   toastr_default.a[outcome](message);
 };
 
@@ -2722,23 +2802,23 @@ var validationFailed = function validationFailed() {
   Overlays_finishValidating('error', 'The form contains validation errors.');
 };
 
-var Overlays_validationSucceeded = function validationSucceeded() {
+var validationSucceeded = function validationSucceeded() {
   Overlays_finishValidating('success', 'The data looks valid!');
 
-  jquery('.last-page').click();
+  $('.last-page').click();
 };
 
-var Overlays_submitting = function submitting() {
-  jquery('#submit-progress').overlay('show');
+var submitting = function submitting() {
+  $('#submit-progress').overlay('show');
 };
 
 var Overlays_submitFailed = function submitFailed(e) {
-  jquery('#submit-progress').overlay('hide');
+  $('#submit-progress').overlay('hide');
   toastr_default.a.error('Submission failed', typeof e === 'string' ? e : e.toString());
 };
 
-var Overlays_submitStatus = function submitStatus(_submitStatus) {
-  jquery('#submit-progress-text').html(_submitStatus);
+var submitStatus = function submitStatus(_submitStatus) {
+  $('#submit-progress-text').html(_submitStatus);
 };
 // CONCATENATED MODULE: ./src/js/survey/ui/SessionModal.js
 var SessionModal_emitter = __webpack_require__(42);
@@ -2802,9 +2882,11 @@ SessionModal_app.controller('Controller', function ($scope) {
 });
 angular_default.a.bootstrap(document.getElementById('sessionModal'), ['sessionModal']);
 // CONCATENATED MODULE: ./src/js/survey.js
+
 /**
  * Stylesheets
  */
+
 
 /**
  * Localization Module
@@ -2841,7 +2923,7 @@ survey_Kernel.boot();
 /***/ 82:
 /***/ (function(module, exports, __webpack_require__) {
 
-var lodashSet = __webpack_require__(154);
+var lodashSet = __webpack_require__(155);
 
 module.exports = {
   get: function get(obj, path, def) {
@@ -2857,5 +2939,5 @@ module.exports = {
 
 /***/ })
 
-},[[464,1,0]]]);
+},[[466,1,0]]]);
 });

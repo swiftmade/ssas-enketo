@@ -115,7 +115,7 @@ app.controller('SubmissionsCtrl', ['$scope', '$timeout', function ($scope, $time
             };
 
             // TODO: Handle progress
-            Server.submit(new Session(packet))
+            Server.create().submit(new Session(packet))
                 .then(function (result) {
                     return sessionRepo.get(packet._id);
                 })
