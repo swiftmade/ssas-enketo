@@ -12,6 +12,11 @@ This module is built around [enketo-core](https://github.com/enketo/enketo-core)
 + Jump to screen to navigate around the survey.
 + Image optimization for large photos.
 
+# Development
+
+Clone this repository and install dependencies (yarn is recommended). There are two types of tests in this project: integration tests (cypress) and unit tests (mocha).
+Make sure both tests are passing before releasing a new version. You have to download and install cypress on your machine and open the project folder in the app to run the tests.
+Plus, make sure you are running a http-server which serves the contents of `www` folder at `http://127.0.0.1:8080/`
 
 # How to Use
 
