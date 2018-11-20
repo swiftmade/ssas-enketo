@@ -41,7 +41,7 @@ Based on your mode, further parameters may apply.
 | Name       | Required | Description                                                                                             |
 |------------|----------|---------------------------------------------------------------------------------------------------------|
 | submit     | Yes      | Required with online mode. Should be the url to receiving OpenRosa server's submission endpoint.        |
-| token      | No       | Sets the authorization token for the current session. Only applicable in online mode.                   |
+| auth      | No       | Sets the authorization token for the current session. Only applicable in online mode.                   |
 | edit       | No       | Use with online mode only. You need to pass the path to the json file for the submission.               |
 
 ### 1) B. Extra parameters for "offline" mode
@@ -62,7 +62,7 @@ This page will display all the submissions stored offline and let the user uploa
 | submit     | Yes      | The path for the OpenRosa server's submission endpoint                                                |
 | base       | No       | This will be prepended to all of the parameters taking paths (server).                                  |
 | db         | No       | Sets the name of the database used to store sessions. Defaults to "sessions" when not set.              |
-| token      | No       | Sets the authorization token for the current session. Always pass this if the server requires authentication.  |	
+| auth      | No       | Sets the authorization token for the current session. Always pass this if the server requires authentication.  |	
 | bg         | No       | Sets the photo to be shown in the background while this screen is being displayed                       |
 
 
@@ -81,3 +81,11 @@ When displaying the questionnaire, you can choose from three survey modes
 * Sessions are stored on the device.
 * Sessions will not be submitted to the server at the end of the survey.
 * Sessions must be sent to the server separately (via `submissions.html`)
+
+# Authorization
+
+Some portal instances may have 'require authentication' turned on. In this case, it is not possible to download the survey or make a submission without a valid authorization token. There are two ways of passing in the authorization token into enketo.
+
+1) Pass via query parameter `?auth=...token...`
+2) Pass via cookie `enketo_token`
+
