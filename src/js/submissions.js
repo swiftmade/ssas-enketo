@@ -1,3 +1,5 @@
+import './common/bootstrap'
+
 /**
  * Entrypoint for submissions.html
  */
