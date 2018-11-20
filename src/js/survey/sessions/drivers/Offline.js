@@ -26,7 +26,6 @@ import sessionRepository from '../../../common/repositories/SessionRepository'
     }
 
     async finalize(session) {
-        // TODO: Document instant_submit feature
         if (queryParams.has('instant_submit')) {
             return await Submit(session)
         }
