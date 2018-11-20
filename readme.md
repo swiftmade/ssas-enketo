@@ -33,6 +33,7 @@ This is where the survey is displayed. It will start with a loading screen until
 | bg         | No       | Sets the background photo to be shown while the survey is being loaded.                                 |
 | novalidate | No       | When this parameter is found, validation will be turned off for that session.                           |
 | assets     | No       | Assets (images) will be loaded relative to this path.                                                   |
+| sms        | No       | If exists, submissions can be sent via SMS to the number passed in.                                     |
 
 Based on your mode, further parameters may apply.
 
