@@ -20,7 +20,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-var UrlSearchParams = __webpack_require__(158);
+var UrlSearchParams = __webpack_require__(156);
 
 var QueryParams =
 /*#__PURE__*/
@@ -785,7 +785,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
  * The aim of this patch is to allow arbitrarily adding session parameters to the survey file
  * https://github.com/enketo/enketo-core/blob/master/src/js/form-model.js
  */
-var FormModel = __webpack_require__(156);
+var FormModel = __webpack_require__(157);
 
 var parser = new DOMParser();
 
@@ -851,86 +851,98 @@ var angular_default = /*#__PURE__*/__webpack_require__.n(angular);
 // EXTERNAL MODULE: ./node_modules/v-accordion/index.js
 var v_accordion = __webpack_require__(378);
 
+// EXTERNAL MODULE: ./src/js/common/QueryParams.js
+var QueryParams = __webpack_require__(1);
+
 // CONCATENATED MODULE: ./src/js/survey/ui/JumpTo.js
 
 
 
 var emitter = __webpack_require__(42);
 
-var app = angular_default.a.module('jumpTo', ['vAccordion']);
 
-var _ = __webpack_require__(82);
 
-app.controller("jumpCtrl", ['$scope', function ($scope) {
-  var rawPages = [];
-  $scope.pages = {};
-  $scope.search = {
-    label: ""
-  };
-  emitter.on('EnketoForm.initialized', function () {
-    return $scope.$apply(function () {
-      $('[role="page"]').each(function () {
-        var page = $(this);
-        var labels = $(".question-label.active", page);
-        labels.each(function () {
-          var label = $(this).text();
+var JumpTo_setupJumpTo = function setupJumpTo() {
+  $("#jump-to-block").hide(); // Jump To module can be disabled
 
-          if (label.length < 2 || label[1] != ".") {
-            return;
-          }
+  if (QueryParams["a" /* default */].get('jumpto') === 'off') {
+    $("#jump-to").remove();
+    return;
+  }
 
-          var firstSpace = label.indexOf(" ");
-          var notations = label.substr(0, firstSpace).split(".").filter(function (str) {
-            return str != '';
-          });
-          rawPages.push({
-            el: page.children().first(),
-            notations: notations,
-            label: label
+  var app = angular_default.a.module('jumpTo', ['vAccordion']);
+
+  var _ = __webpack_require__(82);
+
+  app.controller("jumpCtrl", ['$scope', function ($scope) {
+    var rawPages = [];
+    $scope.pages = {};
+    $scope.search = {
+      label: ""
+    };
+    emitter.on('EnketoForm.initialized', function () {
+      return $scope.$apply(function () {
+        $('[role="page"]').each(function () {
+          var page = $(this);
+          var labels = $(".question-label.active", page);
+          labels.each(function () {
+            var label = $(this).text();
+
+            if (label.length < 2 || label[1] != ".") {
+              return;
+            }
+
+            var firstSpace = label.indexOf(" ");
+            var notations = label.substr(0, firstSpace).split(".").filter(function (str) {
+              return str != '';
+            });
+            rawPages.push({
+              el: page.children().first(),
+              notations: notations,
+              label: label
+            });
           });
         });
-      });
-      rawPages.forEach(function (page) {
-        _.set($scope.pages, page.notations.join(".items."), page);
+        rawPages.forEach(function (page) {
+          _.set($scope.pages, page.notations.join(".items."), page);
 
-        if (page.notations.length > 1) {
-          // lose something in the beginning
-          page.notations.pop();
-          var parentPage = page.notations.join(".items.");
+          if (page.notations.length > 1) {
+            // lose something in the beginning
+            page.notations.pop();
+            var parentPage = page.notations.join(".items.");
 
-          if (_.get($scope.pages, parentPage + ".label", null) == null) {
-            _.set($scope.pages, parentPage + ".label", page.label);
+            if (_.get($scope.pages, parentPage + ".label", null) == null) {
+              _.set($scope.pages, parentPage + ".label", page.label);
 
-            _.set($scope.pages, parentPage + ".el", page.el);
+              _.set($scope.pages, parentPage + ".el", page.el);
+            }
           }
-        }
+        });
       });
     });
-  });
 
-  $scope.jump = function (page) {
-    $scope.accordion.collapseAll();
-    form.pages.flipToPageContaining(page.el);
-    setTimeout(function () {
+    $scope.jump = function (page) {
+      $scope.accordion.collapseAll();
+      form.pages.flipToPageContaining(page.el);
+      setTimeout(function () {
+        $("#jump-to-block").overlay("hide");
+      });
+    };
+
+    $("#jump-to-close").click(function () {
+      $scope.accordion.collapseAll();
       $("#jump-to-block").overlay("hide");
     });
-  };
-
-  $("#jump-to-close").click(function () {
-    $scope.accordion.collapseAll();
-    $("#jump-to-block").overlay("hide");
+  }]);
+  $("#jump-to").click(function () {
+    $("#jump-to-block").overlay("show");
   });
-}]);
-$("#jump-to").click(function () {
-  $("#jump-to-block").overlay("show");
-});
-$("#jump-to-block").hide();
-angular_default.a.bootstrap(document.getElementById('jump-to-block'), ["jumpTo"]);
+  angular_default.a.bootstrap(document.getElementById('jump-to-block'), ["jumpTo"]);
+};
+
+JumpTo_setupJumpTo();
 // EXTERNAL MODULE: ./src/js/survey/enketo-patches/form-model.js
 var form_model = __webpack_require__(381);
-
-// EXTERNAL MODULE: ./src/js/common/QueryParams.js
-var QueryParams = __webpack_require__(1);
 
 // EXTERNAL MODULE: ./src/js/common/Server.js + 1 modules
 var Server = __webpack_require__(37);
