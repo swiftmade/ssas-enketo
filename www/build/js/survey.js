@@ -1164,6 +1164,9 @@ function () {
                 return Server["a" /* default */].create().postForm(submitUrl, form, headers);
 
               case 8:
+                return _context.abrupt("return", _context.sent);
+
+              case 9:
               case "end":
                 return _context.stop();
             }
