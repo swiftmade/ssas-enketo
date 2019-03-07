@@ -24,6 +24,14 @@ class SurveyManager {
     _attachSurveyFormToDom() {
         document.querySelector('.form-header')
             .insertAdjacentHTML('afterend', this.survey.form)
+
+        this._hideSurveyTitle()
+    }
+
+    _hideSurveyTitle() {
+        if (queryParams.get('title') === 'off') {
+            document.getElementById('form-title').remove()
+        }
     }
 
 }

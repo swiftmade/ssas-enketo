@@ -2139,6 +2139,15 @@ function () {
     key: "_attachSurveyFormToDom",
     value: function _attachSurveyFormToDom() {
       document.querySelector('.form-header').insertAdjacentHTML('afterend', this.survey.form);
+
+      this._hideSurveyTitle();
+    }
+  }, {
+    key: "_hideSurveyTitle",
+    value: function _hideSurveyTitle() {
+      if (QueryParams["a" /* default */].get('title') === 'off') {
+        document.getElementById('form-title').remove();
+      }
     }
   }]);
 

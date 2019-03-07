@@ -40,6 +40,7 @@ This is where the survey is displayed. It will start with a loading screen until
 | assets     | No       | Assets (images) will be loaded relative to this path.                                                   |
 | sms        | No       | If exists, submissions can be sent via SMS to the number passed in.                                     |
 | jumpto     | No       | Set this to "off" if you want to remove the search button in the toolbar                                |
+| title      | No       | Set this to "off" if you want to hide the survey title                                                  |
 
 Based on your mode, further parameters may apply.
 
