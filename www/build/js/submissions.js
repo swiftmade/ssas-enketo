@@ -592,6 +592,8 @@ var QueryParams = __webpack_require__(1);
 
 // CONCATENATED MODULE: ./src/js/common/Server.js
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Server_Server; });
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -668,13 +670,20 @@ function () {
         return _json.apply(this, arguments);
       };
     }()
+    /**
+     * @param Session session 
+     */
+
   }, {
     key: "postForm",
     value: function () {
       var _postForm = _asyncToGenerator(
       /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee2(url, form) {
-        var headers,
+      regeneratorRuntime.mark(function _callee2(session) {
+        var onProgress,
+            form,
+            submitUrl,
+            config,
             _ref2,
             data,
             _args2 = arguments;
@@ -683,18 +692,35 @@ function () {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                headers = _args2.length > 2 && _args2[2] !== undefined ? _args2[2] : {};
-                _context2.next = 3;
-                return axios_default.a.post(url, form, {
-                  headers: headers
-                });
+                onProgress = _args2.length > 1 && _args2[1] !== undefined ? _args2[1] : null;
+                form = new FormData();
+                form.append('Date', new Date().toUTCString());
+                form.append('xml_submission_file', new Blob([session.data.xml]));
 
-              case 3:
+                if (_typeof(session.data.payload) === 'object') {
+                  form.append('Payload', JSON.stringify(session.data.payload));
+                }
+
+                submitUrl = QueryParams["a" /* default */].getPath('submit');
+                config = {
+                  headers: this._headersForSession(session)
+                };
+
+                if (onProgress) {
+                  config.onUploadProgress = function (progressEvent) {
+                    return onProgress(progressEvent.total > 0 ? progressEvent.loaded / progressEvent.total : 0);
+                  };
+                }
+
+                _context2.next = 10;
+                return axios_default.a.post(submitUrl, form, config);
+
+              case 10:
                 _ref2 = _context2.sent;
                 data = _ref2.data;
                 return _context2.abrupt("return", data);
 
-              case 6:
+              case 13:
               case "end":
                 return _context2.stop();
             }
@@ -702,10 +728,21 @@ function () {
         }, _callee2, this);
       }));
 
-      return function postForm(_x2, _x3) {
+      return function postForm(_x2) {
         return _postForm.apply(this, arguments);
       };
     }()
+  }, {
+    key: "_headersForSession",
+    value: function _headersForSession(session) {
+      return {
+        'Content-Type': 'multipart/form-data',
+        // Open-rosa Headers
+        'X-OpenRosa-Version': '1.0',
+        'X-OpenRosa-Instance-Id': session.data.instance_id,
+        'X-OpenRosa-Deprecated-Id': session.data.deprecated_id
+      };
+    }
   }], [{
     key: "create",
     value: function create() {
@@ -875,10 +912,9 @@ app.controller('SubmissionsCtrl', ['$scope', '$timeout', function ($scope, $time
         $timeout(function () {
           packet.progress = progress * 100;
         });
-      }; // TODO: Handle progress
+      };
 
-
-      Server["a" /* default */].create().submit(new Session["a" /* default */](packet)).then(function (result) {
+      Server["a" /* default */].create().postForm(new Session["a" /* default */](packet), onUploadProgress).then(function () {
         return SessionRepository["a" /* default */].get(packet._id);
       }).then(function (session) {
         session.submitted = true;
@@ -889,6 +925,7 @@ app.controller('SubmissionsCtrl', ['$scope', '$timeout', function ($scope, $time
         }));
         $scope.remove(packet);
       }).catch(function (err) {
+        console.error(err);
         packet.uploading = false;
         packet.uploaded = false;
         $scope.$apply();

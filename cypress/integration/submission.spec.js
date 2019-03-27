@@ -51,7 +51,7 @@ describe('Submissions', () => {
             status: 200,
         }).as('postSubmission')
 
-        cy.visit('/survey.html?survey=test.json&mode=offline&session=test&submit=openrosa/submissions')
+        cy.visit('/survey.dev.html?survey=test.json&mode=offline&session=test&submit=openrosa/submissions')
             .get('input[name="/data/TEST1"]').type('Hello World!')
             .get('.submit-form').click()
 

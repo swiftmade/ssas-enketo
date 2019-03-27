@@ -1,5 +1,5 @@
 import toastr from 'toastr'
-import Submit from '../Submit'
+import Server from '../../common/Server'
 import Session from '../../common/Session'
 import sessionRepo from '../../common/repositories/SessionRepository'
 
@@ -114,7 +114,11 @@ app.controller('SubmissionsCtrl', ['$scope', '$timeout', function ($scope, $time
                 });
             };
 
-            Submit(new Session(packet))
+            Server.create()
+                .postForm(
+                    new Session(packet),
+                    onUploadProgress
+                )
                 .then(() => sessionRepo.get(packet._id))
                 .then(session => {
                     session.submitted = true;
@@ -127,6 +131,7 @@ app.controller('SubmissionsCtrl', ['$scope', '$timeout', function ($scope, $time
                     $scope.remove(packet);
                 })
                 .catch(function (err) {
+                    console.error(err);
                     packet.uploading = false;
                     packet.uploaded = false;
                     $scope.$apply();
