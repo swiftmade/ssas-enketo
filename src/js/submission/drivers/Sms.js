@@ -37,7 +37,7 @@ export default class Sms {
 
         emitter.emit(
             'EnketoForm.submit.status',
-            '<a href="' + smsLink + '" class="btn btn-primary" target="_blank" onclick="clickSendSms()">Click here to send SMS</a>'
+            '<a href="' + smsLink + '" class="btn btn-primary" id="instantSubmit__sms-send" target="_blank" onclick="clickSendSms()">Click here to send SMS</a>'
         )
 
         return new Promise(resolve => {

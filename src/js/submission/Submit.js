@@ -24,8 +24,8 @@ class Submission {
         emitter.emit(
             'EnketoForm.submit.status',
             '<div style="text-align:center">Please choose submission method <br>' +
-            '<a href="#" role="button" style="margin:16px" onclick="chooseMethod(\'sms\')" class="btn btn-primary">SMS</a>' +
-            '<a href="#" role="button" style="margin:16px" onclick="chooseMethod(\'http\')" class="btn btn-primary">Internet</a>' +
+            '<a href="#" id="instantSubmit__sms" role="button" style="margin:16px" onclick="chooseMethod(\'sms\')" class="btn btn-primary">SMS</a>' +
+            '<a href="#" id="instantSubmit__http" role="button" style="margin:16px" onclick="chooseMethod(\'http\')" class="btn btn-primary">Internet</a>' +
             '</div>'
         )
         return new Promise((resolve) => {

@@ -1048,7 +1048,7 @@ function () {
                   Sms_emitter.emit('SMS.click');
                 };
 
-                Sms_emitter.emit('EnketoForm.submit.status', '<a href="' + smsLink + '" class="btn btn-primary" target="_blank" onclick="clickSendSms()">Click here to send SMS</a>');
+                Sms_emitter.emit('EnketoForm.submit.status', '<a href="' + smsLink + '" class="btn btn-primary" id="instantSubmit__sms-send" target="_blank" onclick="clickSendSms()">Click here to send SMS</a>');
                 return _context.abrupt("return", new Promise(function (resolve) {
                   Sms_emitter.once('SMS.click', function () {
                     setTimeout(resolve, 200);
@@ -1253,7 +1253,7 @@ function () {
                   Submit_emitter.emit('Submit.method.choose', method);
                 };
 
-                Submit_emitter.emit('EnketoForm.submit.status', '<div style="text-align:center">Please choose submission method <br>' + '<a href="#" role="button" style="margin:16px" onclick="chooseMethod(\'sms\')" class="btn btn-primary">SMS</a>' + '<a href="#" role="button" style="margin:16px" onclick="chooseMethod(\'http\')" class="btn btn-primary">Internet</a>' + '</div>');
+                Submit_emitter.emit('EnketoForm.submit.status', '<div style="text-align:center">Please choose submission method <br>' + '<a href="#" id="instantSubmit__sms" role="button" style="margin:16px" onclick="chooseMethod(\'sms\')" class="btn btn-primary">SMS</a>' + '<a href="#" id="instantSubmit__http" role="button" style="margin:16px" onclick="chooseMethod(\'http\')" class="btn btn-primary">Internet</a>' + '</div>');
                 return _context.abrupt("return", new Promise(function (resolve) {
                   Submit_emitter.once('Submit.method.choose', function (method) {
                     Submit_emitter.emit('EnketoForm.submit.status', 'Please wait...');
