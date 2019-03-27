@@ -1,5 +1,5 @@
 import toastr from 'toastr'
-import Server from '../../common/Server'
+import Submit from '../Submit'
 import Session from '../../common/Session'
 import sessionRepo from '../../common/repositories/SessionRepository'
 
@@ -114,16 +114,13 @@ app.controller('SubmissionsCtrl', ['$scope', '$timeout', function ($scope, $time
                 });
             };
 
-            // TODO: Handle progress
-            Server.create().submit(new Session(packet))
-                .then(function (result) {
-                    return sessionRepo.get(packet._id);
-                })
-                .then(function (session) {
+            Submit(new Session(packet))
+                .then(() => sessionRepo.get(packet._id))
+                .then(session => {
                     session.submitted = true;
                     return sessionRepo.update(session);
                 })
-                .then(function () {
+                .then(() => {
                     toastr.success(i18n._("submissions.success", {
                         packet: packet.name
                     }));
