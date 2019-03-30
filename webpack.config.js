@@ -1,5 +1,6 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin")
 const HtmlWebpackExcludeAssetsPlugin = require('html-webpack-exclude-assets-plugin')
@@ -90,6 +91,11 @@ const webpackConfig = {
     optimization: {
         minimize: inProduction,
         minimizer: [
+            new UglifyJsPlugin({
+                uglifyOptions: {
+                    mangle: false,
+                },
+            }),
             new OptimizeCSSAssetsPlugin({})
         ]
     }
