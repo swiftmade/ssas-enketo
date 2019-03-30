@@ -13,8 +13,11 @@
     "type": "git",
     "url": "git+ssh://git@bitbucket.org/aozisik/school-mobile.git"
   },
-  "author": "",
-  "license": "ISC",
+  "files": [
+    "www/"
+  ],
+  "author": "Imagins",
+  "license": "GPL-3.0-or-later",
   "homepage": "https://github.com/swiftmade/ssas-enketo",
   "dependencies": {
     "angular": "1.7.4",
