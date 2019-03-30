@@ -1,0 +1,23 @@
+# Git
+.git
+
+# Source files and tests
+/src
+/cypress
+/test
+
+# Dev assets
+*.dev.css
+*.dev.js
+*.dev.html
+
+# Test fixtures
+www/test.json
+www/test.bal.json
+
+# Config Files
+.babelrc
+.gitignore
+cypress.json
+webpack.config.js
+yarn.lock
