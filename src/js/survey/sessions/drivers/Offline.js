@@ -42,9 +42,8 @@ import sessionRepository from '../../../common/repositories/SessionRepository'
 
     async _loadSessions() {
         this.sessions = await sessionRepository.all()
-        emitter.emit('SessionModal.updateSessions', this.sessions.filter(
-            session => session.draft
-        ))
+        const listedSessions = this.sessions.filter(s => s.draft).reverse()
+        emitter.emit('SessionModal.updateSessions', listedSessions)
     }
 
     async _chooseSession() {
@@ -60,7 +59,7 @@ import sessionRepository from '../../../common/repositories/SessionRepository'
         return new Promise(resolve => {
 
             emitter.once('Session.create', name => {
-                resolve(this._startFromName(name))
+                resolve(this._createDistinctFromName(name))
             })
 
             emitter.on('Session.delete', async (session) => {
@@ -98,5 +97,15 @@ import sessionRepository from '../../../common/repositories/SessionRepository'
             name,
             payload
         })
+    }
+
+    async _createDistinctFromName(name) {
+        // If a session exists by this name, append hour:minute
+        // so that the session name becomes unique again
+        if (this.sessions.find(s => s.name == name)) {
+            const date = new Date()
+            name = `${name} ${date.getHours()}:${date.getMinutes()}`
+        }
+        return this._createFromName(name)
     }
 }

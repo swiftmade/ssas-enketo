@@ -43,6 +43,32 @@ describe('Survey session', () => {
       .get('.session-name').should('not.exist')
   })
 
+  it('will not overwrite existing sessions while creating in offline mode', () => {
+    
+    const getTime = () => {
+      const date = new Date()
+      return `${date.getHours()}:${date.getMinutes()}`
+    }
+    
+    indexedDB.deleteDatabase('_pouch_sessions')
+    cy.visit('/survey.html?survey=test.json&mode=offline')
+      .get('#surveyModal').should('be.visible')
+      // Type in the session name and create it
+      .get('.modal-body input').type('Test session')
+      .get('.modal-body button').contains('Start').click()
+      // Make sure the save button is visible
+      .get('#surveyModal').should('not.exist')
+      .get('.save-progress').should('visible')
+      .reload()
+      // Type exactly the same session name
+      .get('.modal-body input').type('Test session')
+      .get('.modal-body button').contains('Start').click()
+      .get('#surveyModal').should('not.exist')
+      .reload()
+      .get('.session-name').contains('Test session').should('be.visible')
+      .get('.session-name').contains(`Test session ${getTime()}`).should('be.visible');
+  })
+
   it('can be saved', () => {
 
     indexedDB.deleteDatabase('_pouch_sessions')
