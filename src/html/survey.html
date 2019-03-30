@@ -65,7 +65,7 @@
                                 {{ page.label }}
                             </v-pane-header>
                             <v-pane-content>
-                                <a href="javascript:void(0);" ng-click="jump(page)"><span data-i18n="survey.jump"></span>
+                                <a role="button" ng-click="jump(page)"><span data-i18n="survey.jump"></span>
                                     {{ page.label }}</a>
                                 <div ng-if="page.items">
                                     <ng-include src="'accordion.html'" />
