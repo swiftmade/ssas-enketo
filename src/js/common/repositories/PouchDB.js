@@ -4,7 +4,7 @@ window.PouchDB = PouchDB;
 
 function getStorageDriver(name) {
     var storage = new PouchDB(name, {
-        adapter: 'idb',
+        // adapter: 'idb',
         // We don't really want to keep revisions at all.
         revs_limit: 1,
         // Get rid of redundant documents after each write
