@@ -1,8 +1,11 @@
+const emitter = require('tiny-emitter/instance')
+
+import optimize from '../Optimizer'
 import Session from '../../../common/Session'
 import Submit from '../../../submission/Submit'
-const emitter = require('tiny-emitter/instance')
 import queryParams from '../../../common/QueryParams'
 import sessionRepository from '../../../common/repositories/SessionRepository'
+
 
 /**
  * Offline session is stored on the device using IndexedDB (pouchdb)
@@ -20,6 +23,9 @@ import sessionRepository from '../../../common/repositories/SessionRepository'
     }
 
     async save(session) {
+        session = await optimize(session, (progress) => {
+            emitter.emit('EnketoForm.savingProgress', progress)
+        })
         return new Session(
             await sessionRepository.update(session.data)
         )

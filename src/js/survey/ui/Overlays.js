@@ -10,6 +10,7 @@ $(document).ready(() => setBackgroundImage())
 emitter.once('EnketoForm.initialized', () => showSurvey())
 
 emitter.on('EnketoForm.saving', () => saving())
+emitter.on('EnketoForm.savingProgress', (total, completed) => savingProgress(total, completed))
 emitter.on('EnketoForm.saveFailed', () => saveFailed())
 emitter.on('EnketoForm.saveSucceded', () => saveSucceded())
 
@@ -66,7 +67,13 @@ const saving = () => {
     $saveProgress.attr("disabled", "disabled");
 }
 
+const savingProgress = ({total, done}) => {
+    $('#submit-progress').overlay('show');
+    submitStatus(`Optimizing attachments... ${done} out of ${total}`);
+}
+
 var _finishSaving = function (outcome, message) {
+    $('#submit-progress').overlay('hide');
     var $saveProgress = $(".save-progress");
     $saveProgress.html('<i class="fa fa-save"></i>');
     $saveProgress.removeAttr("disabled", "disabled");
@@ -74,6 +81,8 @@ var _finishSaving = function (outcome, message) {
     if (message) {
         toastr[outcome](message);
     }
+
+    //$('#submit-progress').overlay('hide')
 }
 
 const saveFailed = () => {

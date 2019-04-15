@@ -42,7 +42,7 @@ export default class Session {
         
     }
 
-    writeEnketoForm(form) {
+    putEnketoForm(form) {
         this.setData({
             xml: form.xml,
             instance_id: form.instance_id,

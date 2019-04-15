@@ -18,21 +18,16 @@ class SessionManager
     }
 
     async finalize(form) {
-        if (this.driver.canSave()) {
-            await this.save(form)
-        } else {
-            this.session.writeEnketoForm(form)
-        }
-        // TODO: Optimize...
+        await this.save(form)
         await this.driver.finalize(this.session)
     }
 
-    // Form 
+    // Form
     async save(form) {
         if (!this.driver.canSave()) {
             return Promise.resolve(true)
         }
-        this.session.writeEnketoForm(form)
+        this.session.putEnketoForm(form)
         this.session = await this.driver.save(this.session)
     }
 }

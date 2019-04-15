@@ -1023,6 +1023,7 @@ bluebird@^3.5.3:
 blueimp-canvas-to-blob@^3.14.0:
   version "3.14.0"
   resolved "https://registry.yarnpkg.com/blueimp-canvas-to-blob/-/blueimp-canvas-to-blob-3.14.0.tgz#ea075ffbfb1436607b0c75e951fb1ceb3ca0288e"
+  integrity sha512-i6I2CiX1VR8YwUNYBo+dM8tg89ns4TTHxSpWjaDeHKcYS3yFalpLCwDaY21/EsJMufLy2tnG4j0JN5L8OVNkKQ==
 
 bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.1.1, bn.js@^4.4.0:
   version "4.11.8"
@@ -1501,6 +1502,14 @@ component-emitter@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/component-emitter/-/component-emitter-1.2.1.tgz#137918d6d78283f7df7a6b7c5a63e140e69425e6"
 
+compressorjs@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/compressorjs/-/compressorjs-1.0.5.tgz#b02735a802177447a7a14d07d63cfff61c7580dd"
+  integrity sha512-QUcAxEOG/qc/BoSbmv9Y1lZrKz7uEPbMirNgT4c/S0xibRB24hz+2pkNBUs9FPvY5nKKxsELkXIono/DBwe8XQ==
+  dependencies:
+    blueimp-canvas-to-blob "^3.14.0"
+    is-blob "^2.0.1"
+
 concat-map@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/concat-map/-/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"
@@ -1806,6 +1815,11 @@ currently-unhandled@^0.4.1:
 cyclist@~0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/cyclist/-/cyclist-0.2.2.tgz#1b33792e11e914a2fd6d6ed6447464444e5fa640"
+
+cypress-form-data-with-file-upload@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/cypress-form-data-with-file-upload/-/cypress-form-data-with-file-upload-1.0.0.tgz#a718ce21fa166e6eca88eed3ff53614efd47d9f8"
+  integrity sha512-z1x6XVyz9Gs1fsmENShsU+tEfaT/6LzjoT4B+F981EU2EhbbQc6F5lcut2ToPeXQawCWy9xN/VgurriJqfrdmg==
 
 dashdash@^1.12.0:
   version "1.14.1"
@@ -2811,13 +2825,6 @@ ignore-walk@^3.0.1:
   dependencies:
     minimatch "^3.0.4"
 
-image-compressor.js@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/image-compressor.js/-/image-compressor.js-1.1.1.tgz#89dcbe92937c9bbc8b844b15752f6f9023926e28"
-  dependencies:
-    blueimp-canvas-to-blob "^3.14.0"
-    is-blob "^1.0.0"
-
 immediate@3.0.6, immediate@~3.0.5:
   version "3.0.6"
   resolved "https://registry.yarnpkg.com/immediate/-/immediate-3.0.6.tgz#9db1dbd0faf8de6fbe0f5dd5e56bb606280de69b"
@@ -2954,9 +2961,10 @@ is-binary-path@^1.0.0:
   dependencies:
     binary-extensions "^1.0.0"
 
-is-blob@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/is-blob/-/is-blob-1.0.0.tgz#a3d7d96fe1c3ff065ec7ce27c2c21e6ba92c1832"
+is-blob@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/is-blob/-/is-blob-2.0.1.tgz#7fde57ef8782a154bc0f3bdcaa0ffdccb6c33767"
+  integrity sha512-SmqVJYMnAeqrKLcwq6TXu1rpAg3yipVlMZIqR5u510rxoOzJGW9GQY6g+WtWkcc44pjbWAuxzZDCkbgf5e6r0Q==
 
 is-buffer@^1.1.5:
   version "1.1.6"
