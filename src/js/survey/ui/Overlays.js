@@ -68,6 +68,9 @@ const saving = () => {
 }
 
 const savingProgress = ({total, done}) => {
+    if (total === 1 && done === 1) {
+        return
+    }
     $('#submit-progress').overlay('show');
     submitStatus(`Optimizing attachments... ${done} out of ${total}`);
 }
