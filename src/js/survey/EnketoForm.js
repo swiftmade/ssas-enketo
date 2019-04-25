@@ -147,6 +147,11 @@ class EnketoForm {
             emitter.emit('EnketoForm.submitFailed', e)
             throw e
         }
+
+        if (SessionManager.driver.canSave() && !queryParams.get('instant_submit')) {
+            return 'Survey finished. It\'s ready to upload!'
+        }
+        return 'Submission completed. Thank you!'
     }
 }
 

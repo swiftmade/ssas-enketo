@@ -16,18 +16,21 @@ class Kernel {
     async submit() {
         return EnketoForm
             .finishAndSubmit()
-            .then(_ => this.exit())
+            .then(message => this.exit({
+                message: message,
+                message_type: 'success'
+            }))
     }
 
     async _save() {
         await EnketoForm.save()
     }    
 
-    async exit() {
+    async exit(message = null) {
         if (queryParams.has('return')) {
             return window.location = queryParams.getPath('return')
         }
-        window.location = 'index.html'
+        window.location = 'index.html?' + $.param(message)
     }
 
     async saveAndExit() {
