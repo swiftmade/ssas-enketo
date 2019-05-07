@@ -5,7 +5,7 @@ describe('Toolbar', () => {
     })
 
     const openAndStartSession = (params = 'survey=test.json&mode=offline') => {
-        return cy.visit('/survey.html?' + params)
+        return cy.visit('/survey.dev.html?' + params)
             .wait(200)
             // Session modal
             .get('#surveyModal').should('be.visible')
@@ -39,5 +39,11 @@ describe('Toolbar', () => {
     it('can hide jump to', () => {
         openAndStartSession('survey=test.json&mode=offline&jumpto=off')
             .get('#jump-to').should('not.be.visible')
+    })
+
+    it('has quit button', () => {
+        openAndStartSession('survey=test.json&mode=offline&jumpto=off')
+            .get('#close-button').click()
+            .location('pathname').should('eq', '/index.html')
     })
 })

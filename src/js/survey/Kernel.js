@@ -30,7 +30,7 @@ class Kernel {
         if (queryParams.has('return')) {
             return window.location = queryParams.getPath('return')
         }
-        window.location = 'index.html?' + $.param(message)
+        window.location = 'index.html?' + (message ? $.param(message) : '')
     }
 
     async saveAndExit() {

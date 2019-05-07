@@ -1,6 +1,6 @@
 {
   "name": "ssas-enketo",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "description": "ssas enketo module",
   "main": "gulpfile.js",
   "scripts": {
