@@ -1,6 +1,7 @@
 import axios from 'axios'
 import Cookies from './Cookies'
 import queryParams from './QueryParams'
+import sessionRepo from '../common/repositories/SessionRepository'
 
 let serverInstance = null
 
@@ -56,6 +57,19 @@ export default class Server {
                 'Payload',
                 JSON.stringify(session.data.payload)
             )
+        }
+
+        if (typeof session.data._attachments === 'object') {
+            // Retrieve attachments from the session repository
+            const files = await Promise.all(Object.keys(session.data._attachments).map(async (file) => {
+                const blob = await sessionRepo.getAttachment(
+                    session.data._id,
+                    file
+                )
+                return {file, blob}
+            }))
+            // Then attach them to the form
+            files.forEach(({file, blob}) => form.append(file, blob, file))
         }
 
         const submitUrl = queryParams.getPath('submit')
