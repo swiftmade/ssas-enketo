@@ -22,12 +22,13 @@ class SessionManager
         await this.driver.finalize(this.session)
     }
 
-    // Form
     async save(form) {
+        // Update session
+        this.session.putEnketoForm(form)
         if (!this.driver.canSave()) {
             return Promise.resolve(true)
         }
-        this.session.putEnketoForm(form)
+        // Persist to disk
         this.session = await this.driver.save(this.session)
     }
 }

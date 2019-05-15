@@ -1,9 +1,25 @@
+const assert = require('chai').assert;
+
 describe('Submissions', () => {
     
     before(function () {
         indexedDB.deleteDatabase('_pouch_sessions')
     })
-    
+
+    const assertCorrectlySubmitted = (size = 286) => {
+        cy.wait('@postSubmission').then((xhr) => {
+            assert.equal(
+                xhr.request.body.get('xml_submission_file').size,
+                size
+            )
+            assert.containsAllKeys(xhr.request.headers, [
+                'X-OpenRosa-Version',
+                'X-OpenRosa-Instance-Id',
+                'X-OpenRosa-Deprecated-Id',
+            ])
+        })
+    }
+
     it('submits directly from survey page to server in online mode', () => {
         cy.server()
         cy.route({
@@ -15,13 +31,8 @@ describe('Submissions', () => {
         cy.visit('/survey.html?survey=test.json&mode=online&submit=openrosa/submissions&return=index.html')
             .get('input[name="/data/TEST1"]').type('Hello World!')
             .get('.submit-form').click()
-        
-        cy.wait('@postSubmission')
-            .its('request.headers')
-            .should('have.any.keys', 'X-OpenRosa-Version')
-            .should('have.any.keys', 'X-OpenRosa-Instance-Id')
-            .should('have.any.keys', 'X-OpenRosa-Deprecated-Id')
 
+        assertCorrectlySubmitted()
         cy.location('pathname').should('eq', '/index.html')
     })
 
@@ -75,12 +86,7 @@ describe('Submissions', () => {
             .get('.submit-form').click()
             .get('#instantSubmit__http').click()
 
-        cy.wait('@postSubmission')
-            .its('request.headers')
-            .should('have.any.keys', 'X-OpenRosa-Version')
-            .should('have.any.keys', 'X-OpenRosa-Instance-Id')
-            .should('have.any.keys', 'X-OpenRosa-Deprecated-Id')
-
+        assertCorrectlySubmitted(298)
         cy.location('pathname').should('eq', '/index.html')
     })
 
@@ -104,12 +110,7 @@ describe('Submissions', () => {
             .get('#packet-rows').children().should('have.length', 1)
             .get('.upload-packet').click()
 
-        cy.wait('@postSubmission')
-            .its('request.headers')
-            .should('have.any.keys', 'X-OpenRosa-Version')
-            .should('have.any.keys', 'X-OpenRosa-Instance-Id')
-            .should('have.any.keys', 'X-OpenRosa-Deprecated-Id')
-
+        assertCorrectlySubmitted()
         cy.get('#packet-rows').children().should('have.length', 0)
     })
 
