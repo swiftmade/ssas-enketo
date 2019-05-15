@@ -43,6 +43,29 @@ export default class Server {
         return data
     }
 
+    async getFileBlob(sessionId, fileName, attachment) {
+        if (attachment.data && !attachment.stub) {
+            return {
+                file: fileName,
+                blob: attachment.data,
+            }
+        }
+        const blob = await sessionRepo.getAttachment(
+            sessionId,
+            fileName
+        )
+        return {file: fileName, blob}
+    }
+
+    getFileBlobs(sessionId, attachments) {
+        return Object.keys(attachments)
+            .map(file => this.getFileBlob(
+                sessionId,
+                file,
+                attachments[file]
+            ))
+    }
+
     /**
      * @param Session session 
      */
@@ -61,13 +84,10 @@ export default class Server {
 
         if (typeof session.data._attachments === 'object') {
             // Retrieve attachments from the session repository
-            const files = await Promise.all(Object.keys(session.data._attachments).map(async (file) => {
-                const blob = await sessionRepo.getAttachment(
-                    session.data._id,
-                    file
-                )
-                return {file, blob}
-            }))
+            const files = await Promise.all(this.getFileBlobs(
+                session.data._id,
+                session.data._attachments
+            ))
             // Then attach them to the form
             files.forEach(({file, blob}) => form.append(file, blob, file))
         }
