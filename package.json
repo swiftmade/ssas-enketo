@@ -29,7 +29,7 @@
     "compressorjs": "^1.0.5",
     "css-loader": "^1.0.0",
     "cypress-form-data-with-file-upload": "^1.0.0",
-    "enketo-core": "4.51.6",
+    "enketo-core": "^5.13.0",
     "file-loader": "^2.0.0",
     "font-awesome": "4.7",
     "html-webpack-exclude-assets-plugin": "^0.0.7",
