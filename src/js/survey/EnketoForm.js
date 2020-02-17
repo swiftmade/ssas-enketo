@@ -20,21 +20,30 @@ class EnketoForm {
     this.saving = false;
     this.validating = false;
 
+    if (queryParams.has("lang")) {
+      i18n.set(queryParams.get("lang"));
+    }
+
     await SurveyManager.loadAndAttach();
     await SessionManager.start();
 
     this._newFormInstance();
     this._initFormInstance();
-    this._localizeForm();
 
     emitter.emit("EnketoForm.initialized");
   }
 
   _newFormInstance() {
-    this.form = new Form("form.or:eq(0)", {
-      modelStr: SurveyManager.survey.model,
-      ...SessionManager.session.toFormInstance()
-    });
+    this.form = new Form(
+      "form.or:eq(0)",
+      {
+        modelStr: SurveyManager.survey.model,
+        ...SessionManager.session.toFormInstance()
+      },
+      {
+        language: i18n.get("lang")
+      }
+    );
   }
 
   _initFormInstance() {
@@ -44,14 +53,6 @@ class EnketoForm {
       throw new Error("The form could not be initialized");
     }
     setTimeout(this._restoreLastPage.bind(this), 50);
-  }
-
-  _localizeForm() {
-    if (queryParams.has("lang")) {
-      i18n.set(queryParams.get("lang"));
-    }
-    var lang = i18n.get();
-    this.form.langs.setAll(lang);
   }
 
   async save() {
