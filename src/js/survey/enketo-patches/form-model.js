@@ -47,5 +47,3 @@ FormModel.prototype.createSession = function(id, sessObj) {
   this.xml.adoptNode(session);
   instance.appendChild(session);
 };
-
-module.exports = FormModel;

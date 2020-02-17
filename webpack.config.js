@@ -1,4 +1,5 @@
 const path = require("path");
+const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -26,6 +27,10 @@ const webpackConfig = {
     libraryTarget: "umd"
   },
   plugins: [
+    new webpack.ProvidePlugin({
+      $: "jquery",
+      jQuery: "jquery"
+    }),
     new HtmlWebpackPlugin({
       hash: true,
       excludeAssets: /submissions/,
@@ -45,7 +50,31 @@ const webpackConfig = {
     })
   ],
   resolve: {
-    mainFields: ["browser", "main", "module"]
+    mainFields: ["browser", "main", "module"],
+    alias: {
+      // Force all modules to use the same jquery version.
+      jquery: path.join(__dirname, "node_modules/jquery/src/jquery"),
+      "./images/layers.png$": path.resolve(
+        __dirname,
+        "node_modules/leaflet/dist/images/layers.png"
+      ),
+      "./images/layers-2x.png$": path.resolve(
+        __dirname,
+        "node_modules/leaflet/dist/images/layers-2x.png"
+      ),
+      "./images/marker-icon.png$": path.resolve(
+        __dirname,
+        "node_modules/leaflet/dist/images/marker-icon.png"
+      ),
+      "./images/marker-icon-2x.png$": path.resolve(
+        __dirname,
+        "node_modules/leaflet/dist/images/marker-icon-2x.png"
+      ),
+      "./images/marker-shadow.png$": path.resolve(
+        __dirname,
+        "node_modules/leaflet/dist/images/marker-shadow.png"
+      )
+    }
   },
   module: {
     rules: [
@@ -80,7 +109,7 @@ const webpackConfig = {
         ]
       },
       {
-        test: /\.(png|jpg|gif)$/,
+        test: /\.(png|jpe?g|gif)$/,
         use: [
           {
             loader: "file-loader",
