@@ -1,7 +1,7 @@
 import "./enketo-patches/form-model";
 import fileManager from "./enketo-patches/file-manager";
 
-const Form = require("enketo-core/src/js/Form");
+import { Form } from "enketo-core";
 const emitter = require("tiny-emitter/instance");
 
 import SurveyManager from "./SurveyManager";
