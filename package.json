@@ -7,7 +7,9 @@
     "serve": "http-server www/",
     "build": "NODE_ENV=production webpack --mode=production",
     "dev": "NODE_ENV=development webpack --mode=development --watch",
-    "test": "mocha --require @babel/register --require babel-polyfill"
+    "test": "mocha --require @babel/register --require babel-polyfill",
+    "clean": "rm -rf www/fonts www/build",
+    "prepublishOnly": "npm run clean && npm run build"
   },
   "repository": {
     "type": "git",
