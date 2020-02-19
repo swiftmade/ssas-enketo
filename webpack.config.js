@@ -123,7 +123,14 @@ const webpackConfig = {
   },
   optimization: {
     minimize: inProduction,
-    minimizer: [new TerserPlugin(), new OptimizeCSSAssetsPlugin({})]
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          mangle: false
+        }
+      }),
+      new OptimizeCSSAssetsPlugin({})
+    ]
   }
 };
 
