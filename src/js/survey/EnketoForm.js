@@ -80,6 +80,7 @@ class EnketoForm {
   }
 
   async _form() {
+    alert(this._getCurrentPage());
     return {
       xml: this.form.getDataStr(),
       files: await this._formFiles(),
@@ -90,10 +91,18 @@ class EnketoForm {
   }
 
   _getCurrentPage() {
-    return [...this.form.pages.activePages].indexOf(this.form.pages.current[0]);
+    // Handle the case that pagination is disabled
+    if (!this.form.pages.active) {
+      return null;
+    }
+    return this.form.pages.activePages.indexOf(this.form.pages.current);
   }
 
   _restoreLastPage() {
+    if (!this.form.pages.active) {
+      return;
+    }
+
     if (
       !SessionManager.session.data.current_page ||
       SessionManager.session.data.current_page <= 0
@@ -104,12 +113,11 @@ class EnketoForm {
     const pagesArr = [...this.form.pages.activePages];
 
     if (pagesArr[page]) {
-      this.form.pages.flipTo(pagesArr[page]);
+      this.form.pages._flipTo(pagesArr[page]);
     }
   }
 
   _formFiles() {
-    console.log(fileManager);
     /**
      * Get currently attached files from Enketo
      */
