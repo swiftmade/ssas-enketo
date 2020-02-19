@@ -2,7 +2,6 @@
   "name": "ssas-enketo",
   "version": "2.4.0",
   "description": "ssas enketo module",
-  "main": "gulpfile.js",
   "scripts": {
     "serve": "http-server www/",
     "build": "NODE_ENV=production webpack --mode=production",
