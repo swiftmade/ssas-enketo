@@ -4,7 +4,7 @@
  * The actual source for this module can be found here:
  * https://github.com/enketo/enketo-core/blob/master/src/js/file-manager.js
  */
-const fileManager = require("enketo-core/src/js/file-manager");
+import fileManager from "enketo-core/src/js/file-manager";
 import SessionManager from "../sessions/SessionManager";
 
 // Preserve the original getFileUrl method

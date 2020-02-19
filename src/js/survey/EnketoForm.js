@@ -90,9 +90,7 @@ class EnketoForm {
   }
 
   _getCurrentPage() {
-    return [...this.form.pages.$activePages].indexOf(
-      this.form.pages.$current[0]
-    );
+    return [...this.form.pages.activePages].indexOf(this.form.pages.current[0]);
   }
 
   _restoreLastPage() {
@@ -103,7 +101,7 @@ class EnketoForm {
       return;
     }
     const page = SessionManager.session.data.current_page;
-    const pagesArr = [...this.form.pages.$activePages];
+    const pagesArr = [...this.form.pages.activePages];
 
     if (pagesArr[page]) {
       this.form.pages.flipTo(pagesArr[page]);
@@ -111,6 +109,7 @@ class EnketoForm {
   }
 
   _formFiles() {
+    console.log(fileManager);
     /**
      * Get currently attached files from Enketo
      */
