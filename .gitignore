@@ -1,3 +1,13 @@
-/node_modules
-www/**/*.dev*
 .DS_Store
+
+# Dependencies
+/node_modules
+
+# webpack assets folders
+www/build
+www/fonts
+# Anything with .dev. in it
+www/**/*.dev*
+# HTML files built by webpack
+www/submissions.html
+www/survey.html
