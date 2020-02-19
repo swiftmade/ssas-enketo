@@ -1,7 +1,7 @@
 import "./enketo-patches/form-model";
 import fileManager from "./enketo-patches/file-manager";
 
-const Form = require("enketo-core/src/js/Form");
+import { Form } from "enketo-core";
 const emitter = require("tiny-emitter/instance");
 
 import SurveyManager from "./SurveyManager";
@@ -20,21 +20,30 @@ class EnketoForm {
     this.saving = false;
     this.validating = false;
 
+    if (queryParams.has("lang")) {
+      i18n.set(queryParams.get("lang"));
+    }
+
     await SurveyManager.loadAndAttach();
     await SessionManager.start();
 
     this._newFormInstance();
     this._initFormInstance();
-    this._localizeForm();
 
     emitter.emit("EnketoForm.initialized");
   }
 
   _newFormInstance() {
-    this.form = new Form("form.or:eq(0)", {
-      modelStr: SurveyManager.survey.model,
-      ...SessionManager.session.toFormInstance()
-    });
+    this.form = new Form(
+      "form.or:eq(0)",
+      {
+        modelStr: SurveyManager.survey.model,
+        ...SessionManager.session.toFormInstance()
+      },
+      {
+        language: i18n.get("lang")
+      }
+    );
   }
 
   _initFormInstance() {
@@ -44,14 +53,6 @@ class EnketoForm {
       throw new Error("The form could not be initialized");
     }
     setTimeout(this._restoreLastPage.bind(this), 50);
-  }
-
-  _localizeForm() {
-    if (queryParams.has("lang")) {
-      i18n.set(queryParams.get("lang"));
-    }
-    var lang = i18n.get();
-    this.form.langs.setAll(lang);
   }
 
   async save() {
@@ -79,6 +80,7 @@ class EnketoForm {
   }
 
   async _form() {
+    alert(this._getCurrentPage());
     return {
       xml: this.form.getDataStr(),
       files: await this._formFiles(),
@@ -89,12 +91,18 @@ class EnketoForm {
   }
 
   _getCurrentPage() {
-    return [...this.form.pages.$activePages].indexOf(
-      this.form.pages.$current[0]
-    );
+    // Handle the case that pagination is disabled
+    if (!this.form.pages.active) {
+      return null;
+    }
+    return this.form.pages.activePages.indexOf(this.form.pages.current);
   }
 
   _restoreLastPage() {
+    if (!this.form.pages.active) {
+      return;
+    }
+
     if (
       !SessionManager.session.data.current_page ||
       SessionManager.session.data.current_page <= 0
@@ -102,10 +110,10 @@ class EnketoForm {
       return;
     }
     const page = SessionManager.session.data.current_page;
-    const pagesArr = [...this.form.pages.$activePages];
+    const pagesArr = [...this.form.pages.activePages];
 
     if (pagesArr[page]) {
-      this.form.pages.flipTo(pagesArr[page]);
+      this.form.pages._flipTo(pagesArr[page]);
     }
   }
 

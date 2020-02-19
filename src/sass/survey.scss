@@ -1,6 +1,5 @@
 @import "fonts";
-@import "enketo/formhub";
-//@import 'enketo/formhub-print';
+@import "enketo-core/src/sass/formhub/formhub.scss";
 @import "vendor/v-accordion";
 @import "vendor/toastr";
 @import "vendor/intro";
@@ -391,4 +390,8 @@ legend .required {
 
 #toast-container > div {
   opacity: 1;
+}
+
+#form-languages {
+  display: none;
 }

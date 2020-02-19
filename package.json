@@ -1,13 +1,15 @@
 {
   "name": "ssas-enketo",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "ssas enketo module",
   "main": "gulpfile.js",
   "scripts": {
     "serve": "http-server www/",
     "build": "NODE_ENV=production webpack --mode=production",
     "dev": "NODE_ENV=development webpack --mode=development --watch",
-    "test": "mocha --require @babel/register --require babel-polyfill"
+    "test": "mocha --require @babel/register --require babel-polyfill",
+    "clean": "rm -rf www/fonts www/build",
+    "prepublishOnly": "npm run clean && npm run build"
   },
   "repository": {
     "type": "git",
@@ -29,7 +31,7 @@
     "compressorjs": "^1.0.5",
     "css-loader": "^1.0.0",
     "cypress-form-data-with-file-upload": "^1.0.0",
-    "enketo-core": "4.51.6",
+    "enketo-core": "^5.13.0",
     "file-loader": "^2.0.0",
     "font-awesome": "4.7",
     "html-webpack-exclude-assets-plugin": "^0.0.7",
@@ -46,9 +48,9 @@
     "sass-loader": "^7.1.0",
     "sinon": "^7.1.1",
     "style-loader": "^0.23.0",
+    "terser-webpack-plugin": "^2.3.5",
     "tiny-emitter": "^2.0.2",
     "toastr": "^2.1.2",
-    "uglifyjs-webpack-plugin": "^2.1.2",
     "url-search-params": "^0.5.0",
     "v-accordion": "^1.6.0",
     "webpack": "^4.18.1",
