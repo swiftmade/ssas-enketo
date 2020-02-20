@@ -80,7 +80,6 @@ class EnketoForm {
   }
 
   async _form() {
-    alert(this._getCurrentPage());
     return {
       xml: this.form.getDataStr(),
       files: await this._formFiles(),
