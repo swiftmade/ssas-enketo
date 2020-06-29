@@ -36,7 +36,8 @@ import sessionRepository from '../../../common/repositories/SessionRepository'
             return await Submit(session)
         }
         return await this.save(session.setData({
-            draft: false
+            draft: false,
+            submitted: false,
         }))
     }
 

@@ -13,6 +13,7 @@ export default class Online {
             return Promise.resolve(new Session({
                 online: true,
                 draft: false,
+                submitted: false,
             }))
         }
         return this._loadSessionFromUrl(queryParams.getPath('edit'))
