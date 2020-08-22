@@ -52,6 +52,21 @@ describe('Submissions', () => {
         cy.location('pathname').should('not.eq', '/index.html')
     })
 
+    it('cannot submit via SMS from survey page if instant_submit is active, but sms is not configured', () => {
+        cy.server()
+        cy.route({
+            method: 'POST',
+            url: '/openrosa/submissions',
+            response: [],
+            status: 200,
+        }).as('postSubmission')
+
+        cy.visit('/survey.html?survey=test.json&mode=offline&session=x&instant_submit=1&submit=openrosa/submissions&return=index.html')
+            .get('input[name="/data/TEST1"]').type('Hello World!')
+            .get('.submit-form').click()
+            .get('#instantSubmit__sms').should('not.visible')
+    })    
+
     it('can submit via SMS from survey page if instant_submit is active', () => {
 
         cy.server()
@@ -62,7 +77,7 @@ describe('Submissions', () => {
             status: 200,
         }).as('postSubmission')
 
-        cy.visit('/survey.html?survey=test.json&mode=offline&session=x&instant_submit=1&submit=openrosa/submissions&return=index.html')
+        cy.visit('/survey.html?survey=test.json&mode=offline&session=x&sms=+1235912&instant_submit=1&submit=openrosa/submissions&return=index.html')
             .get('input[name="/data/TEST1"]').type('Hello World!')
             .get('.submit-form').click()
             .get('#instantSubmit__sms').click()
@@ -81,12 +96,12 @@ describe('Submissions', () => {
             status: 200,
         }).as('postSubmission')
 
-        cy.visit('/survey.html?survey=test.json&mode=offline&session=x&instant_submit=1&submit=openrosa/submissions&return=index.html')
+        cy.visit('/survey.html?survey=test.json&mode=offline&session=x&sms=+12341235&instant_submit=1&submit=openrosa/submissions&return=index.html')
             .get('input[name="/data/TEST1"]').type('Hello World!')
             .get('.submit-form').click()
             .get('#instantSubmit__http').click()
 
-        assertCorrectlySubmitted(298)
+        assertCorrectlySubmitted(286)
         cy.location('pathname').should('eq', '/index.html')
     })
 
