@@ -43,8 +43,10 @@ class Submission {
         
         let driver
         emitter.emit('EnketoForm.submitting')
-        
-        if (queryParams.get('instant_submit')) {
+
+        // If instant submit is turned on, and sms settings are configured
+        // We need to ask the user to choose which method to use.
+        if (queryParams.get('instant_submit') && queryParams.get('sms')) {
             driver = await this.chooseDriver()
         } else {
             driver = this.getDriver()
