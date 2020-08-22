@@ -21,7 +21,7 @@
     "@babel/core": "^7.0.1",
     "@babel/preset-env": "^7.0.0",
     "@babel/register": "^7.0.0",
-    "angular": "1.7.4",
+    "angular": "1.8.0",
     "axios": "^0.18.0",
     "axios-mock-adapter": "^1.15.0",
     "babel-loader": "^8.0.2",
